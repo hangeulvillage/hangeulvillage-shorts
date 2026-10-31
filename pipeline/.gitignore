@@ -1,0 +1,7 @@
+_render.html
+__pycache__/
+asr/sherpa-onnx-*/
+brand/node_modules/
+brand/package*.json
+shorts/_*.wav
+shorts/_video.*

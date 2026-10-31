@@ -482,7 +482,7 @@ if (typeof module !== 'undefined') module.exports = { toHangul, decompose, compo
       push('hookE', 3.0, { item: items[0] });
       push('build', 0.6 + 0.85 * sylCount(items[0].ko) + 3.0, { item: items[0], meaning: true });
     } else {
-      push('hookC', 2.0, {});
+      push('hookC', 2.0, { reqs: items.filter(i => i.handle) });
       items.forEach(it => push('build', 0.5 + 0.75 * sylCount(it.ko) + 1.8, { item: it, label: true, handle: it.handle }));
     }
     push('end', 2.8, {});
@@ -552,7 +552,7 @@ if (typeof module !== 'undefined') module.exports = { toHangul, decompose, compo
     const s = plan.scenes.find(x => t >= x.t0 && t < x.t0 + x.dur) || plan.scenes[plan.scenes.length - 1];
     const lt = t - s.t0;
     if (s.type === 'hook') drawHook(lt, s.item, th);
-    else if (s.type === 'hookC') drawHookC(lt, th);
+    else if (s.type === 'hookC') drawHookC(lt, th, s);
     else if (s.type === 'quiz') drawQuiz(lt, s.item, th);
     else if (s.type === 'build') drawBuild(lt, s, th);
     else if (s.type === 'end') drawEnd(lt, th);
@@ -606,7 +606,27 @@ if (typeof module !== 'undefined') module.exports = { toHangul, decompose, compo
     lineIn(it.en.toUpperCase(), 930, sz, 800, FONT_D, th.accent, lt, 0.3);
     lineIn(S('hookA3', 'in Korean?'), 1060, 76, 800, FONT_D, th.ink, lt, 0.6);
   }
-  function drawHookC(lt, th) {
+  function drawHookC(lt, th, s) {
+    const reqs = (s && s.reqs) || [];
+    if (reqs.length) {  // show the real requests as comment cards (handle + requested name only)
+      lineIn(S('hookCr', 'Your comments'), 560, 64, 800, FONT_D, th.muted, lt, 0);
+      const cw = W - 200, ch = 190, gap = 40, y0 = 640;
+      reqs.forEach((r, i) => {
+        const a = easeOut(fade(lt, 0.25 + i * 0.3, 0.35)); if (a <= 0) return;
+        const x = 100 + (1 - a) * 80, y = y0 + i * (ch + gap);
+        ctx.save(); ctx.globalAlpha = a;
+        ctx.shadowColor = 'rgba(0,0,0,0.10)'; ctx.shadowBlur = 30; ctx.shadowOffsetY = 8;
+        ctx.fillStyle = '#ffffff'; rr(ctx, x, y, cw, ch, 36); ctx.fill(); ctx.restore();
+        ctx.save(); ctx.globalAlpha = a; ctx.fillStyle = [th.cho, th.jung, th.jong][i % 3];
+        ctx.beginPath(); ctx.arc(x + 95, y + ch / 2, 52, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+        text(r.handle.replace('@', '').charAt(0).toUpperCase(), x + 95, y + ch / 2 + 22, 60, 800, FONT_D, '#ffffff', a);
+        const hs = fitFont(r.handle, cw - 230, 40, 600, FONT_B, 24);
+        text(r.handle, x + 175, y + 78, hs, 600, FONT_B, th.muted, a, 'left');
+        const ns = fitFont(r.en, cw - 230, 70, 800, FONT_D, 30);
+        text(r.en, x + 175, y + 150, ns, 800, FONT_D, th.ink, a, 'left');
+      });
+      return;
+    }
     lineIn(S('hookC1', 'You asked.'), 780, 84, 800, FONT_D, th.ink, lt, 0);
     lineIn(S('hookC2', 'Your names'), 920, 110, 800, FONT_D, th.accent, lt, 0.35);
     lineIn(S('hookC3', 'in Korean'), 1040, 84, 800, FONT_D, th.ink, lt, 0.7);

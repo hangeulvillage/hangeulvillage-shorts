@@ -9,8 +9,10 @@ a = ap.parse_args()
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); import i18n
 UI = i18n.ui(a.lang)
 # 'Priya=프리야' fixes the Korean spelling of a name (curated local names)
-FIX = {n.split('=')[0].strip(): n.split('=')[1].strip() for n in a.names if '=' in n and a.fmt not in ('D', 'E')}
-if a.fmt not in ('D', 'E'): a.names = [n.split('=')[0].strip() for n in a.names]
+# 'Nikki=니키 @handle' keeps the handle (format C shows it as a comment card)
+import re as _re
+FIX = {n.split('=')[0].strip(): _re.sub(r'\s+@\S+$', '', n.split('=')[1]).strip() for n in a.names if '=' in n and a.fmt not in ('D', 'E')}
+if a.fmt not in ('D', 'E'): a.names = [n.split('=')[0].strip() + ((' ' + _re.search(r'@\S+$', n).group(0)) if '=' in n and _re.search(r'@\S+$', n) else '') for n in a.names]
 
 # ---- page with local fonts ----
 studio = open(os.path.join(SCR, 'shorts-studio.html')).read()
