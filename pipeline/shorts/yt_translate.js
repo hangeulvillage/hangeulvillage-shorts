@@ -15,7 +15,8 @@
         document.querySelector('#add-translations-button').click(); await sleep(1000);
         const opt = [...document.querySelectorAll('tp-yt-paper-item, [role=option]')].find(o => o.innerText.trim() === name);
         if (!opt) { log.push([name, 'no option']); document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); continue; }
-        opt.click(); await sleep(1800); row = rowOf(name);
+        opt.click();
+        for (let i = 0; i < 20 && !(row = rowOf(name)); i++) await sleep(400);
       }
       if (!row) { log.push([name, 'no row']); continue; }
       const hc = metaCell(row).querySelector('ytgn-video-translation-hover-cell') || metaCell(row);
@@ -23,15 +24,18 @@
       await sleep(500);
       const add = metaCell(row).querySelector('#metadata-add');
       if (!add) { log.push([name, 'no add button']); continue; }
-      add.click(); await sleep(1800);
-      const tas = [...document.querySelectorAll('textarea')].filter(e => vis(e) && !e.closest('[disabled]'));
+      add.click();
+      let tas = [];
+      for (let i = 0; i < 25 && tas.length < 2; i++) { await sleep(400); tas = [...document.querySelectorAll('textarea')].filter(e => vis(e) && !e.closest('[disabled]')); }
       if (tas.length < 2) { log.push([name, 'no editor']); continue; }
       const set = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value').set;
       const put = (el, v) => { el.focus(); set.call(el, v); el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })); };
       put(tas[0], title); put(tas[1], desc); await sleep(600);
       const pub = [...document.querySelectorAll('ytcp-button, button')].find(b => vis(b) && b.innerText.trim() === '게시');
       if (!pub) { log.push([name, 'no publish']); continue; }
-      pub.click(); await sleep(2500);
+      pub.click();
+      for (let i = 0; i < 25 && [...document.querySelectorAll('textarea')].some(e => vis(e) && !e.closest('[disabled]')); i++) await sleep(400);
+      await sleep(800);
       log.push([name, /게시됨/.test(metaCell(rowOf(name))?.innerText || '') ? 'published' : 'check']);
     } catch (e) { log.push([name, 'error ' + e.message]); }
   }
