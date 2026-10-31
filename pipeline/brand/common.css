@@ -1,0 +1,15 @@
+@import url("node_modules/@fontsource/gowun-batang/700.css");
+@import url("node_modules/@fontsource/noto-sans-kr/500.css");
+@import url("node_modules/@fontsource/noto-sans-kr/700.css");
+@import url("node_modules/@fontsource/bricolage-grotesque/800.css");
+@import url("node_modules/@fontsource/bricolage-grotesque/600.css");
+@import url("node_modules/@fontsource/noto-sans-tc/700.css");
+@import url("node_modules/@fontsource/noto-sans-devanagari/700.css");
+@import url("node_modules/@fontsource/noto-sans-bengali/700.css");
+@import url("node_modules/@fontsource/noto-sans-arabic/700.css");
+@import url("node_modules/@fontsource/noto-nastaliq-urdu/700.css");
+@import url("node_modules/@fontsource/noto-sans/700.css");
+:root{--paper:#f3f5fa;--ink:#18233a;--muted:#5a6580;--cho:#2f5da8;--jung:#c8463b;--jong:#b8860f;--s1:#e3ebf8;--s2:#f9e4e1;--s3:#f6ecd2}
+*{margin:0;box-sizing:border-box}
+body{background:var(--paper)}
+.tile{border-radius:18%;display:grid;place-items:center;font-family:"Noto Sans KR";font-weight:700}

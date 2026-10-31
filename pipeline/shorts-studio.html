@@ -1,0 +1,1039 @@
+<title>Hangeul Village Shorts Studio</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Gowun+Batang:wght@700&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+/* Layout: a work tool. Tabs on top (만들기 / 관리). 만들기 = settings column + 9:16 preview + upload package. 관리 = gate progress strip, shorts log table, name-request queue. */
+:root {
+  --paper: #f3f5fa; --panel: #ffffff; --ink: #18233a; --muted: #5a6580; --line: #d8deea; --hover: #eef1f7;
+  --cho: #2f5da8; --jung: #c8463b; --jong: #b8860f;
+  --good: #2e7d4f; --warn: #b8860f; --focus: #2f5da8;
+  --display: "Bricolage Grotesque", "Noto Sans KR", system-ui, sans-serif;
+  --hangul: "Gowun Batang", "Noto Serif KR", serif;
+  --body: "Noto Sans KR", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #0e1422; --panel: #161e30; --ink: #e8ecf5; --muted: #9ba6bd; --line: #2a3450; --hover: #1d2740;
+  --cho: #7aa2ea; --jung: #f07a6e; --jong: #e8bb4e; --good: #5cc28a; --warn: #e8bb4e; --focus: #7aa2ea; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --paper: #0e1422; --panel: #161e30; --ink: #e8ecf5; --muted: #9ba6bd; --line: #2a3450; --hover: #1d2740;
+  --cho: #7aa2ea; --jung: #f07a6e; --jong: #e8bb4e; --good: #5cc28a; --warn: #e8bb4e; --focus: #7aa2ea; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.5; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-block: 20px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 20px; }
+header.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.mark { font-family: var(--display); font-weight: 800; font-size: 18px; display: flex; align-items: center; gap: 8px; }
+.mark .dots { display: inline-flex; gap: 3px; }
+.mark .dots i { width: 10px; height: 10px; border-radius: 2px; display: block; }
+.mark .dots i:nth-child(1) { background: var(--cho); } .mark .dots i:nth-child(2) { background: var(--jung); } .mark .dots i:nth-child(3) { background: var(--jong); }
+.mark small { font-family: var(--body); font-weight: 500; font-size: 13px; color: var(--muted); }
+nav.tabs { display: flex; gap: 4px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 4px; }
+nav.tabs a { text-decoration: none; color: var(--muted); font-weight: 600; padding: 7px 16px; border-radius: 7px; }
+nav.tabs a[aria-current="page"] { background: var(--ink); color: var(--paper); }
+h2 { font-family: var(--display); font-weight: 600; font-size: 18px; margin: 0; }
+.sub { color: var(--muted); font-size: 13px; margin: 0; }
+button, .btn { font: 600 14px/1 var(--body); cursor: pointer; border-radius: 8px; border: 1.5px solid var(--ink); background: var(--ink); color: var(--paper); padding: 10px 14px; }
+button.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+button.ghost:hover { border-color: var(--ink); }
+button:disabled { opacity: .45; cursor: default; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+input, select, textarea { font: 14px/1.4 var(--body); color: var(--ink); background: var(--panel); border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 10px; min-width: 0; }
+textarea { width: 100%; resize: vertical; }
+label.lbl { font-size: 12px; font-weight: 600; color: var(--muted); letter-spacing: .04em; }
+
+/* create */
+.create { display: grid; grid-template-columns: minmax(0, 320px) minmax(0, 300px) minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 980px) { .create { grid-template-columns: minmax(0, 1fr) minmax(0, 300px); } .pkg { grid-column: 1 / -1; } }
+@media (max-width: 640px) { .create { grid-template-columns: minmax(0, 1fr); } }
+.col { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.box { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.formats { display: flex; flex-direction: column; gap: 6px; }
+.formats label { display: flex; gap: 10px; align-items: flex-start; padding: 10px; border: 1.5px solid var(--line); border-radius: 10px; cursor: pointer; }
+.formats label:has(input:checked) { border-color: var(--ink); background: var(--hover); }
+.formats b { display: block; font-size: 14px; }
+.formats span { font-size: 12px; color: var(--muted); }
+.names-hint { font-size: 12px; color: var(--muted); }
+.preview { display: flex; flex-direction: column; gap: 10px; align-items: stretch; }
+canvas#cv { width: 100%; max-width: 300px; aspect-ratio: 9 / 16; border-radius: 12px; border: 1px solid var(--line); background: #f3f5fa; display: block; }
+.prow { display: flex; gap: 8px; flex-wrap: wrap; }
+.meter { height: 4px; border-radius: 4px; background: var(--line); overflow: hidden; }
+.meter i { display: block; height: 100%; width: 0; background: var(--jung); }
+.status { font-size: 13px; color: var(--muted); min-height: 1.4em; }
+.pkg .field { display: flex; flex-direction: column; gap: 6px; }
+.pkg .field .head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.pkg .field button { padding: 6px 10px; font-size: 12px; }
+.pkg textarea { min-height: 60px; }
+.pkg .voice { background: var(--hover); border-radius: 10px; padding: 12px; font-size: 14px; }
+.pkg .voice ol { margin: 6px 0 0; padding-left: 20px; }
+.ko { font-family: var(--hangul); font-weight: 700; }
+.warn { font-size: 13px; color: var(--jung); }
+
+/* track */
+.strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 760px) { .strip { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.stat { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 6px; }
+.stat .k { font-size: 12px; color: var(--muted); font-weight: 600; }
+.stat .v { font-family: var(--display); font-weight: 800; font-size: 26px; font-variant-numeric: tabular-nums; }
+.stat .pill { align-self: flex-start; }
+.stat .v small { font-size: 14px; color: var(--muted); font-weight: 600; }
+.bar { height: 6px; border-radius: 6px; background: var(--line); overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--cho); }
+.bar.ok i { background: var(--good); }
+.pill { display: inline-block; font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.pill.ok { color: var(--good); } .pill.wait { color: var(--warn); }
+.tablewrap { overflow-x: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; }
+table { border-collapse: collapse; width: 100%; min-width: 860px; font-size: 14px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+th { font-size: 12px; color: var(--muted); font-weight: 600; }
+td.num input { width: 90px; text-align: right; font-variant-numeric: tabular-nums; }
+td input.url { width: 180px; }
+.plat { display: flex; gap: 6px; }
+.plat label { font-size: 12px; display: flex; gap: 3px; align-items: center; }
+.empty { padding: 18px; color: var(--muted); font-size: 14px; }
+.twocol { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 360px); gap: 20px; align-items: start; }
+@media (max-width: 900px) { .twocol { grid-template-columns: minmax(0, 1fr); } }
+.req-form { display: flex; gap: 6px; flex-wrap: wrap; }
+.req-form input { flex: 1 1 120px; }
+ul.reqs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+ul.reqs li { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+ul.reqs li .who { flex: 1 1 140px; min-width: 0; }
+ul.reqs li .who small { color: var(--muted); display: block; font-size: 12px; }
+ul.reqs li.done .who { text-decoration: line-through; color: var(--muted); }
+ul.reqs button { padding: 6px 9px; font-size: 12px; }
+.offline { font-size: 13px; color: var(--muted); border-left: 3px solid var(--jong); padding-left: 10px; }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="mark"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>Shorts Studio <small>한글 빌리지 홍보용</small></div>
+    <nav class="tabs" aria-label="화면">
+      <a href="#create" id="tab-create">만들기</a>
+      <a href="#track" id="tab-track">관리</a>
+    </nav>
+  </header>
+
+  <!-- ===== CREATE ===== -->
+  <section id="view-create">
+    <div class="create">
+      <div class="col">
+        <div class="box">
+          <h2>1. 형식</h2>
+          <div class="formats" id="formats">
+            <label><input type="radio" name="fmt" value="A" checked><div><b>A. 이름 만들기</b><span>"How do you write ___ in Korean?" 이름 하나를 블록으로 조립</span></div></label>
+            <label><input type="radio" name="fmt" value="B"><div><b>B. 읽어보세요 퀴즈</b><span>한글 이름을 먼저 보여주고 3초 뒤 정답과 원리 공개</span></div></label>
+            <label><input type="radio" name="fmt" value="C"><div><b>C. 댓글 요청 모음</b><span>댓글로 받은 이름 최대 3개를 차례로 조립</span></div></label>
+            <label><input type="radio" name="fmt" value="D"><div><b>D. K-드라마 단어</b><span>사랑해·화이팅처럼 자주 듣는 말을 조립하고 뜻 공개</span></div></label>
+            <label><input type="radio" name="fmt" value="E"><div><b>E. 서울 표지판 읽기</b><span>출구·김밥 같은 간판 글자를 조립하고 뜻 공개</span></div></label>
+          </div>
+        </div>
+        <div class="box">
+          <h2>2. 이름</h2>
+          <label class="lbl" for="names">한 줄에 하나. 요청자가 있으면 "이름 @아이디"</label>
+          <textarea id="names" rows="4" spellcheck="false">Sofia</textarea>
+          <div class="names-hint" id="names-hint"></div>
+          <div class="warn" id="names-warn" hidden></div>
+          <div id="ko-fix" class="col" style="gap:8px"></div>
+        </div>
+      </div>
+
+      <div class="col preview">
+        <canvas id="cv" width="1080" height="1920" aria-label="쇼츠 미리보기"></canvas>
+        <div class="meter"><i id="meter"></i></div>
+        <div class="prow">
+          <button type="button" class="ghost" id="play">미리보기 재생</button>
+          <button type="button" id="rec">영상 만들기</button>
+        </div>
+        <div class="status" id="status" role="status"></div>
+      </div>
+
+      <div class="col pkg">
+        <div class="box">
+          <h2>3. 업로드 패키지</h2>
+          <p class="sub">영상과 함께 올릴 문구입니다. 매번 문장이 조금씩 달라집니다.</p>
+          <div class="voice" id="voice"></div>
+          <div class="field"><div class="head"><label class="lbl" for="p-title">제목</label><button type="button" class="ghost" data-copy="p-title">복사</button></div><textarea id="p-title" rows="2"></textarea></div>
+          <div class="field"><div class="head"><label class="lbl" for="p-desc">설명 + 해시태그</label><button type="button" class="ghost" data-copy="p-desc">복사</button></div><textarea id="p-desc" rows="6"></textarea></div>
+          <div class="field"><div class="head"><label class="lbl" for="p-pin">고정 댓글</label><button type="button" class="ghost" data-copy="p-pin">복사</button></div><textarea id="p-pin" rows="2"></textarea></div>
+          <div class="prow"><button type="button" class="ghost" id="shuffle">문구 다시 쓰기</button><button type="button" class="ghost" id="log-add">관리 목록에 추가</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== TRACK ===== -->
+  <section id="view-track" hidden>
+    <div class="col" style="gap:20px">
+      <div class="offline" id="offline" hidden>관리 기록은 claude.ai에 로그인한 상태로 이 페이지를 열어야 저장됩니다.</div>
+      <div>
+        <h2>첫 관문 · 11월 13일 판정</h2>
+        <p class="sub">쇼츠 하나라도 조회 1만을 넘거나, "내 이름도 해주세요" 요청이 꾸준히 들어오면 앱 개발로 넘어갑니다.</p>
+      </div>
+      <div class="strip" id="strip"></div>
+      <div class="twocol">
+        <div class="col">
+          <h2>쇼츠 기록</h2>
+          <div class="tablewrap" id="shorts-wrap"></div>
+          <p class="sub">조회수와 댓글 수는 각 앱의 통계에서 보고 입력하세요. 입력하면 바로 저장됩니다.</p>
+        </div>
+        <div class="col">
+          <h2>이름 요청 대기열</h2>
+          <form class="req-form" id="req-form" autocomplete="off">
+            <input id="req-name" placeholder="이름 (예: Lucas)" aria-label="요청된 이름" maxlength="40">
+            <input id="req-handle" placeholder="@아이디 (선택)" aria-label="요청자 아이디" maxlength="40">
+            <button type="submit">추가</button>
+          </form>
+          <ul class="reqs" id="reqs"></ul>
+          <div class="prow"><button type="button" class="ghost" id="req-make">선택한 이름으로 C형 만들기</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+// ===== Hangul engine (shared by page and tests) =====
+const L_LIST = 'ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ'.split('');
+const V_LIST = 'ㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ'.split('');
+const T_LIST = ['', ...'ㄱㄲㄳㄴㄵㄶㄷㄹㄺㄻㄼㄽㄾㄿㅀㅁㅂㅄㅅㅆㅇㅈㅊㅋㅌㅍㅎ'.split('')];
+const L_ROM = ['g','kk','n','d','tt','r','m','b','pp','s','ss','','j','jj','ch','k','t','p','h'];
+const V_ROM = ['a','ae','ya','yae','eo','e','yeo','ye','o','wa','wae','oe','yo','u','wo','we','wi','yu','eu','ui','i'];
+const T_ROM = {'':'','ㄱ':'k','ㄲ':'k','ㄴ':'n','ㄷ':'t','ㄹ':'l','ㅁ':'m','ㅂ':'p','ㅅ':'t','ㅆ':'t','ㅇ':'ng','ㅈ':'t','ㅊ':'t','ㅋ':'k','ㅌ':'t','ㅍ':'p','ㅎ':'t'};
+
+function compose(L, V, T) {
+  const li = L_LIST.indexOf(L), vi = V_LIST.indexOf(V), ti = T_LIST.indexOf(T || '');
+  if (li < 0 || vi < 0 || ti < 0) return null;
+  return String.fromCharCode(0xAC00 + (li * 21 + vi) * 28 + ti);
+}
+function decompose(ch) {
+  const c = ch.charCodeAt(0) - 0xAC00;
+  if (c < 0 || c > 11171) return null;
+  const L = L_LIST[Math.floor(c / 588)], V = V_LIST[Math.floor((c % 588) / 28)], T = T_LIST[c % 28];
+  return { L, V, T, rom: L_ROM[Math.floor(c / 588)] + V_ROM[Math.floor((c % 588) / 28)] + T_ROM[T] };
+}
+
+const DICT = {
+  james:'제임스', john:'존', michael:'마이클', david:'데이비드', chris:'크리스', christopher:'크리스토퍼', daniel:'대니얼', matthew:'매슈', andrew:'앤드루', joseph:'조지프', ryan:'라이언', kevin:'케빈', brian:'브라이언', jason:'제이슨', justin:'저스틴', eric:'에릭', alex:'알렉스', alexander:'알렉산더', william:'윌리엄', thomas:'토머스', robert:'로버트', richard:'리처드', mark:'마크', paul:'폴', steven:'스티븐', stephen:'스티븐', adam:'애덤', sam:'샘', samuel:'새뮤얼', benjamin:'벤저민', ben:'벤', jack:'잭', lucas:'루카스', liam:'리엄', noah:'노아', ethan:'이선', oliver:'올리버', henry:'헨리', leo:'레오', max:'맥스', tom:'톰', jacob:'제이컵', anthony:'앤서니', nathan:'네이선', tyler:'타일러', aaron:'에런', peter:'피터', george:'조지', edward:'에드워드', jake:'제이크', josh:'조시', joshua:'조슈아', luke:'루크', isaac:'아이작', owen:'오언', dylan:'딜런', mason:'메이슨', logan:'로건', aiden:'에이든', elijah:'일라이저', jordan:'조던', charlie:'찰리', charles:'찰스', harry:'해리', jonathan:'조너선', nick:'닉', nicholas:'니컬러스', patrick:'패트릭', sean:'숀', simon:'사이먼', tim:'팀', timothy:'티모시', zach:'잭', zachary:'재커리',
+  mia:'미아', emma:'에마', olivia:'올리비아', sophia:'소피아', sophie:'소피', ava:'에이바', isabella:'이사벨라', emily:'에밀리', grace:'그레이스', chloe:'클로이', lily:'릴리', anna:'안나', hannah:'해나', sarah:'세라', sara:'사라', laura:'로라', maria:'마리아', jessica:'제시카', jennifer:'제니퍼', jenny:'제니', lisa:'리사', rose:'로즈', amy:'에이미', kate:'케이트', katie:'케이티', elizabeth:'엘리자베스', rachel:'레이철', rebecca:'레베카', nicole:'니콜', ashley:'애슐리', amanda:'어맨다', michelle:'미셸', natalie:'내털리', victoria:'빅토리아', julia:'줄리아', lucy:'루시', ella:'엘라', zoe:'조이', mary:'메리', linda:'린다', karen:'캐런', nancy:'낸시', kelly:'켈리', megan:'메건', lauren:'로런', alice:'앨리스', eva:'에바', nina:'니나', abigail:'애비게일', charlotte:'샬럿', amelia:'아멜리아', harper:'하퍼', evelyn:'에벌린', madison:'매디슨', avery:'에이버리', scarlett:'스칼릿', aria:'아리아', layla:'레일라', nora:'노라', stella:'스텔라', hazel:'헤이즐', violet:'바이올렛', claire:'클레어', emilia:'에밀리아', jasmine:'재스민', olive:'올리브', ruby:'루비', daisy:'데이지', bella:'벨라', luna:'루나', ellie:'엘리', molly:'몰리', taylor:'테일러', samantha:'서맨사', stephanie:'스테파니', melissa:'멜리사', angela:'앤절라', helen:'헬렌', diana:'다이애나', jane:'제인', julie:'줄리', kim:'킴', tiffany:'티파니', vanessa:'버네사', vivian:'비비안', wendy:'웬디', yvonne:'이본', iris:'아이리스', irene:'아이린',
+  carlos:'카를로스', jose:'호세', juan:'후안', luis:'루이스', miguel:'미겔', diego:'디에고', javier:'하비에르', sofia:'소피아', valentina:'발렌티나', camila:'카밀라', lucia:'루시아', gabriel:'가브리엘', mateo:'마테오', santiago:'산티아고', sebastian:'세바스티안', alejandro:'알레한드로', fernando:'페르난도', pablo:'파블로', jorge:'호르헤', antonio:'안토니오', manuel:'마누엘', isabel:'이사벨', daniela:'다니엘라', gabriela:'가브리엘라', valeria:'발레리아', mariana:'마리아나', paula:'파울라', andrea:'안드레아', carmen:'카르멘', elena:'엘레나', ana:'아나', jimena:'히메나', ximena:'히메나', ricardo:'리카르도', rafael:'라파엘', pedro:'페드로', joao:'주앙', beatriz:'베아트리스', larissa:'라리사', thiago:'치아구', felipe:'펠리페', bruno:'브루누',
+  ahmad:'아마드', muhammad:'무함마드', mohammed:'무함마드', ali:'알리', fatima:'파티마', aisha:'아이샤', omar:'오마르', putri:'푸트리', dewi:'데위', siti:'시티', rizky:'리즈키', budi:'부디', agus:'아구스', ayu:'아유', indah:'인다', nur:'누르', sri:'스리', wulan:'울란', nguyen:'응우옌', linh:'린', minh:'민', anh:'아인', thao:'타오', huong:'흐엉', trang:'짱', mai:'마이', lan:'란', tuan:'뚜언', duc:'득', maya:'마야', priya:'프리야', arjun:'아르준', rahul:'라훌', yuki:'유키', hana:'하나', sakura:'사쿠라', kenji:'겐지', haruto:'하루토', yuna:'유나', mei:'메이', wei:'웨이',
+  marco:'마르코', luca:'루카', giulia:'줄리아', francesca:'프란체스카', alessandro:'알레산드로', pierre:'피에르', louis:'루이', camille:'카미유', jean:'장', marie:'마리', lea:'레아', manon:'마농', hugo:'위고', hans:'한스', lukas:'루카스', felix:'펠릭스', lena:'레나', ivan:'이반', olga:'올가', dmitri:'드미트리', anastasia:'아나스타시아', natasha:'나타샤', jan:'얀', erik:'에리크', lars:'라르스', ingrid:'잉그리드', freya:'프레야', phoebe:'피비', nathalie:'나탈리', jiwoo:'지우', minjun:'민준', seoyeon:'서연',
+  smith:'스미스', johnson:'존슨', brown:'브라운', garcia:'가르시아', lopez:'로페스', martinez:'마르티네스', rodriguez:'로드리게스', lee:'리', wilson:'윌슨', miller:'밀러', davis:'데이비스', jones:'존스', williams:'윌리엄스', anderson:'앤더슨', white:'화이트', harris:'해리스', martin:'마틴', clark:'클라크', lewis:'루이스', walker:'워커', hall:'홀', young:'영', king:'킹', wright:'라이트', scott:'스콧', green:'그린', baker:'베이커', adams:'애덤스', nelson:'넬슨', hill:'힐', campbell:'캠벨', mitchell:'미첼', roberts:'로버츠', carter:'카터', phillips:'필립스', evans:'에번스', turner:'터너', parker:'파커', collins:'콜린스', edwards:'에드워즈', stewart:'스튜어트', morris:'모리스', murphy:'머피', cook:'쿡', rogers:'로저스', morgan:'모건', cooper:'쿠퍼', peterson:'피터슨', reed:'리드', bailey:'베일리', bell:'벨', gomez:'고메스', hernandez:'에르난데스', gonzalez:'곤살레스', perez:'페레스', sanchez:'산체스', ramirez:'라미레스', torres:'토레스', silva:'시우바', santos:'산투스', tran:'쩐', le:'레', pham:'팜'
+};
+
+const VOW = 'aeiou';
+const isVowelCh = c => VOW.includes(c);
+
+// tokens: {t:'C', k}, {t:'V', v, long}, {t:'G', g:'w'|'y'}
+function tokenize(w) {
+  const out = [];
+  const n = w.length;
+  const yIsVowel = i => {
+    const nx = w[i + 1];
+    return !(nx && isVowelCh(nx)) || i > 0 && !isVowelCh(w[i - 1]) && i === n - 1;
+  };
+  // magic-e detection: V C e$  (a,i,o,u)
+  let magic = -1;
+  if (n >= 4 && w[n - 1] === 'e' && !isVowelCh(w[n - 2]) && 'aiouy'.includes(w[n - 3]) && !isVowelCh(w[n - 4] || 'x')) magic = n - 3;
+  let i = 0;
+  while (i < n) {
+    const c = w[i], c2 = w.slice(i, i + 2), c3 = w.slice(i, i + 3);
+    const next = w[i + 2];
+    const atEnd = k => i + k >= n;
+    // silent final e (magic or after consonant, long words)
+    if (c === 'e' && i === n - 1 && n > 3 && !isVowelCh(w[i - 1])) { i++; continue; }
+    if (i === magic) {
+      const map = { a: ['ㅔ', 'ㅣ'], i: ['ㅏ', 'ㅣ'], y: ['ㅏ', 'ㅣ'], o: ['ㅗ'], u: ['ㅠ'] }[c];
+      map.forEach((v, k) => out.push({ t: 'V', v, long: true, second: k > 0 }));
+      i++; continue;
+    }
+    // vowels
+    if (isVowelCh(c) || (c === 'y' && i > 0 && yIsVowel(i))) {
+      // r-colored
+      if ('aeiou'.includes(c) && w[i + 1] === 'r' && (atEnd(2) || !isVowelCh(w[i + 2]) && w[i + 2] !== 'r')) {
+        const v = { a: 'ㅏ', e: 'ㅓ', i: 'ㅓ', o: 'ㅗ', u: 'ㅓ' }[c];
+        out.push({ t: 'V', v, long: true }); i += 2; continue;
+      }
+      const nextV = w[i + 2] && isVowelCh(w[i + 2]);
+      if (c3 === 'eau') { out.push({ t: 'V', v: 'ㅗ', long: true }); i += 3; continue; }
+      const di = {
+        ee: ['ㅣ'], ea: ['ㅣ'], oo: ['ㅜ'], ou: ['ㅜ'], au: ['ㅗ'], aw: ['ㅗ'], oa: ['ㅗ'], ow: ['ㅗ'],
+        ai: ['ㅔ', 'ㅣ'], ay: nextV ? null : ['ㅔ', 'ㅣ'], ei: ['ㅔ', 'ㅣ'], ey: nextV ? null : atEnd(2) ? ['ㅣ'] : ['ㅔ', 'ㅣ'],
+        oi: ['ㅗ', 'ㅣ'], oy: nextV ? null : ['ㅗ', 'ㅣ'], ew: ['ㅠ'], ue: atEnd(2) ? ['ㅜ'] : null, ie: atEnd(2) ? ['ㅣ'] : null
+      }[c2];
+      if (di) { di.forEach((v, k) => out.push({ t: 'V', v, long: true, second: k > 0 })); i += 2; continue; }
+      const v = { a: 'ㅏ', e: 'ㅔ', i: 'ㅣ', o: 'ㅗ', u: 'ㅜ', y: 'ㅣ' }[c];
+      out.push({ t: 'V', v, long: false }); i++; continue;
+    }
+    // glides
+    if (c === 'w' && w[i + 1] && isVowelCh(w[i + 1])) { out.push({ t: 'G', g: 'w' }); i++; continue; }
+    if (c === 'w') { i++; continue; }
+    if (c === 'y') { out.push({ t: 'G', g: 'y' }); i++; continue; }
+    // consonant clusters
+    if (c3 === 'que' && i + 3 >= n) { out.push({ t: 'C', k: 'k' }); i += 3; continue; }
+    if (c3 === 'tch') { out.push({ t: 'C', k: 'ch' }); i += 3; continue; }
+    if (c3 === 'sch') { out.push({ t: 'C', k: 'sh' }); i += 3; continue; }
+    if (c2 === 'ch') { out.push({ t: 'C', k: 'ch' }); i += 2; continue; }
+    if (c2 === 'sh') { out.push({ t: 'C', k: 'sh' }); i += 2; continue; }
+    if (c2 === 'th') { out.push({ t: 'C', k: 's' }); i += 2; continue; }
+    if (c2 === 'ph') { out.push({ t: 'C', k: 'f' }); i += 2; continue; }
+    if (c2 === 'ck') { out.push({ t: 'C', k: 'k' }); i += 2; continue; }
+    if (c2 === 'gh') { if (i === 0) out.push({ t: 'C', k: 'g' }); i += 2; continue; }
+    if (c2 === 'kn' && i === 0) { out.push({ t: 'C', k: 'n' }); i += 2; continue; }
+    if (c2 === 'wh') { out.push({ t: 'G', g: 'w' }); i += 2; continue; }
+    if (c2 === 'qu') { out.push({ t: 'C', k: 'k' }); out.push({ t: 'G', g: 'w' }); i += 2; continue; }
+    if (c2 === 'ng' && !(w[i + 2] && isVowelCh(w[i + 2]))) { out.push({ t: 'C', k: 'ng' }); i += 2; continue; }
+    if (c === w[i + 1] && c !== 'l') { i++; continue; } // doubled consonant -> single
+    if (c === 'h') { if (w[i + 1] && isVowelCh(w[i + 1])) out.push({ t: 'C', k: 'h' }); i++; continue; }
+    if (c === 'c') { out.push({ t: 'C', k: 'eiy'.includes(w[i + 1] || '') ? 's' : 'k' }); i++; continue; }
+    if (c === 'g') { out.push({ t: 'C', k: 'eiy'.includes(w[i + 1] || '') && i > 0 ? 'j' : 'g' }); i++; continue; }
+    if (c === 'x' && i === 0) { out.push({ t: 'C', k: 's' }); i++; continue; }
+    if (c === 'x') { out.push({ t: 'C', k: 'k' }); out.push({ t: 'C', k: 's' }); i++; continue; }
+    if (c === 'q') { out.push({ t: 'C', k: 'k' }); i++; continue; }
+    if ('bdfjklmnprstvz'.includes(c)) { out.push({ t: 'C', k: c }); i++; continue; }
+    i++;
+  }
+  return out;
+}
+
+const ONSET = { k: 'ㅋ', g: 'ㄱ', t: 'ㅌ', d: 'ㄷ', p: 'ㅍ', b: 'ㅂ', s: 'ㅅ', sh: 'ㅅ', ch: 'ㅊ', j: 'ㅈ', z: 'ㅈ', f: 'ㅍ', v: 'ㅂ', h: 'ㅎ', m: 'ㅁ', n: 'ㄴ', l: 'ㄹ', r: 'ㄹ', ng: 'ㅇ' };
+const GLIDE = {
+  w: { 'ㅏ': 'ㅘ', 'ㅔ': 'ㅞ', 'ㅣ': 'ㅟ', 'ㅗ': 'ㅝ', 'ㅓ': 'ㅝ', 'ㅜ': 'ㅜ', 'ㅠ': 'ㅠ' },
+  y: { 'ㅏ': 'ㅑ', 'ㅔ': 'ㅖ', 'ㅗ': 'ㅛ', 'ㅜ': 'ㅠ', 'ㅓ': 'ㅕ', 'ㅣ': 'ㅣ', 'ㅠ': 'ㅠ' }
+};
+
+function syllabify(tokens) {
+  const syl = [];
+  let onset = null, glide = null;
+  const last = () => syl[syl.length - 1];
+  const standalone = k => {
+    const L = ONSET[k] || 'ㅇ';
+    const V = (k === 'ch' || k === 'sh' || k === 'j') ? 'ㅣ' : 'ㅡ';
+    syl.push({ L, V, T: '' });
+  };
+  for (let i = 0; i < tokens.length; i++) {
+    const tk = tokens[i], nx = tokens[i + 1], pv = tokens[i - 1];
+    if (tk.t === 'G') {
+      if (onset === null && nx && nx.t === 'V') { glide = tk.g; } else { glide = tk.g; }
+      continue;
+    }
+    if (tk.t === 'C') {
+      const followedByVowel = nx && (nx.t === 'V' || nx.t === 'G');
+      if (onset !== null) {
+        standalone(onset); onset = null;
+        if (tk.k === 'l' && followedByVowel) last().T = 'ㄹ';
+      }
+      if (followedByVowel) {
+        if (tk.k === 'l' && pv && pv.t === 'V' && last() && !last().T) last().T = 'ㄹ';
+        if (tk.k === 'l' && pv && pv.t === 'C' && last() && !last().T && last().V === 'ㅡ') last().T = 'ㄹ';
+        onset = tk.k; continue;
+      }
+      // coda candidates
+      const s = last();
+      const afterVowel = pv && pv.t === 'V' && s && !s.T;
+      if (afterVowel) {
+        if (['m', 'n', 'l', 'ng'].includes(tk.k)) { s.T = { m: 'ㅁ', n: 'ㄴ', l: 'ㄹ', ng: 'ㅇ' }[tk.k]; continue; }
+        if (tk.k === 'r') continue;
+        if (!pv.long && tk.k === 'k') { s.T = 'ㄱ'; continue; }
+        if (!pv.long && tk.k === 'p') { s.T = 'ㅂ'; continue; }
+        if (!pv.long && tk.k === 't' && i === tokens.length - 1) { s.T = 'ㅅ'; continue; }
+      }
+      if (tk.k === 'r' && pv && pv.t === 'C') { standalone('r'); continue; }
+      standalone(tk.k);
+      continue;
+    }
+    // vowel
+    let V = tk.v;
+    let L = onset !== null ? ONSET[onset] : 'ㅇ';
+    let g = glide;
+    if (onset === 'sh' && V !== 'ㅣ' && !g) g = 'y';
+    if (g && GLIDE[g][V]) V = GLIDE[g][V];
+    if (V === 'ㅖ' && L !== 'ㅇ') V = 'ㅔ';
+    syl.push({ L, V, T: '' });
+    onset = null; glide = null;
+  }
+  if (onset !== null) standalone(onset);
+  return syl.map(s => compose(s.L, s.V, s.T)).filter(Boolean).join('');
+}
+
+function toHangulWord(raw) {
+  const w = raw.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z]/g, '');
+  if (!w) return { ko: '', fromDict: true };
+  if (DICT[w]) return { ko: DICT[w], fromDict: true };
+  return { ko: syllabify(tokenize(w)), fromDict: false };
+}
+function toHangul(name) {
+  const parts = name.trim().replace(/-/g, '').split(/\s+/).filter(Boolean).slice(0, 4);
+  const res = parts.map(toHangulWord);
+  return { ko: res.map(r => r.ko).filter(Boolean).join(' '), exact: res.every(r => r.fromDict) };
+}
+if (typeof module !== 'undefined') module.exports = { toHangul, decompose, compose };
+
+
+(function () {
+  const $ = id => document.getElementById(id);
+  const W = 1080, H = 1920;
+  const cv = $('cv'), ctx = cv.getContext('2d');
+  const THEMES = {
+    A: { bg: '#f3f5fa', ink: '#18233a', muted: '#5a6580', tile: '#ffffff', line: '#d3dae8', cho: '#2f5da8', jung: '#c8463b', jong: '#b8860f', s1: '#e3ebf8', s2: '#f9e4e1', s3: '#f6ecd2', accent: '#c8463b' },
+    B: { bg: '#121a2c', ink: '#eef1f8', muted: '#a3aec4', tile: '#1b2540', line: '#2f3b5c', cho: '#7aa2ea', jung: '#f07a6e', jong: '#e8bb4e', s1: '#203258', s2: '#47252b', s3: '#433822', accent: '#e8bb4e' },
+    C: { bg: '#eaf3ef', ink: '#13302a', muted: '#4c6a62', tile: '#ffffff', line: '#cfe0d8', cho: '#2f5da8', jung: '#c8463b', jong: '#a87a0c', s1: '#e3ebf8', s2: '#f9e4e1', s3: '#f6ecd2', accent: '#2f5da8' },
+    D: { bg: '#1c1238', ink: '#ffffff', muted: '#c9bde8', tile: '#2a1d52', line: '#4a3a7a', cho: '#8fb4ff', jung: '#ff6f9f', jong: '#ffd166', s1: '#26386a', s2: '#55234a', s3: '#4f4326', accent: '#ff6f9f' },
+    E: { bg: '#0f3b2e', ink: '#ffffff', muted: '#b9d8cc', tile: '#155040', line: '#2b6b58', cho: '#9cc8ff', jung: '#ff8a7a', jong: '#ffd23f', s1: '#1f4d6b', s2: '#5a3330', s3: '#56501f', accent: '#ffd23f' }
+  };
+  const UI = window.HV_UI || {}; const S = (k, d) => (k in UI ? UI[k] : d);
+  const FB = '"Noto Sans TC", "Noto Sans SC", "Noto Sans Devanagari", "Noto Sans Bengali", "Noto Sans Arabic", "Noto Nastaliq Urdu", "Noto Sans"';
+  const FONT_D = '"Bricolage Grotesque", ' + FB + ', "Noto Sans KR", sans-serif';
+  const FONT_K = '"Gowun Batang", "Noto Serif KR", serif';
+  const FONT_B = '"Noto Sans KR", ' + FB + ', sans-serif';
+
+  // ---------- helpers ----------
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const easeOut = p => 1 - Math.pow(1 - clamp(p, 0, 1), 3);
+  const easeBack = p => { p = clamp(p, 0, 1); const c = 1.6; return 1 + (c + 1) * Math.pow(p - 1, 3) + c * Math.pow(p - 1, 2); };
+  const fade = (t, a, d) => clamp((t - a) / d, 0, 1);
+  function rr(x, a, b, w, h, r) { x.beginPath(); x.moveTo(a + r, b); x.arcTo(a + w, b, a + w, b + h, r); x.arcTo(a + w, b + h, a, b + h, r); x.arcTo(a, b + h, a, b, r); x.arcTo(a, b, a + w, b, r); x.closePath(); }
+  function fitFont(text, maxW, size, weight, fam, min) {
+    do { ctx.font = weight + ' ' + size + 'px ' + fam; if (ctx.measureText(text).width <= maxW) break; size -= 4; } while (size > (min || 24));
+    return size;
+  }
+  function text(t, x, y, size, weight, fam, color, alpha, align) {
+    ctx.save(); ctx.globalAlpha = alpha == null ? 1 : alpha; ctx.fillStyle = color; ctx.font = weight + ' ' + size + 'px ' + fam;
+    ctx.textAlign = align || 'center'; ctx.textBaseline = 'alphabetic'; ctx.direction = (UI.rtl && /[\u0600-\u06FF]/.test(t)) ? 'rtl' : 'ltr'; ctx.fillText(t, x, y); ctx.restore();
+  }
+  function romanize(ko) { return ko.split(' ').map(w => [...w].map(ch => (decompose(ch) || { rom: '' }).rom).join('')).map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' '); }
+  const soundsLike = ko => ko.split(' ').map(w => [...w].map(ch => (decompose(ch) || { rom: '' }).rom).join('-')).join(' ');
+  const cap = s => s.replace(/\b\w/g, c => c.toUpperCase());
+
+  // ---------- state ----------
+  let items = [];      // [{en, ko, handle, exact}]
+  let overrides = {};  // en(lower) -> ko
+  let fmt = 'A';
+  let plan = null;
+  let seed = 1;
+
+  function parseNames() {
+    const lines = $('names').value.split('\n').map(s => s.trim()).filter(Boolean);
+    if (fmt === 'D' || fmt === 'E') {
+      const out = [];
+      lines.slice(0, 1).forEach(line => {
+        const m = line.match(/^([\uAC00-\uD7A3 ]+)\s*=\s*([^|]+)(?:\|(.*))?$/);
+        if (m) out.push({ ko: m[1].trim().replace(/\s+/g, ' '), en: m[2].trim(), note: (m[3] || '').trim(), handle: '', exact: true, word: true });
+      });
+      $('names-hint').textContent = '"한글 = 뜻 | 한 줄 설명" 형식으로 한 줄. 예: 사랑해 = I love you | Heard in every K-drama';
+      $('names-warn').hidden = !(lines.length && !out.length);
+      $('names-warn').textContent = '예: 출구 = Exit | Look for this sign in the subway';
+      items = out; renderFixes(); return;
+    }
+    const max = fmt === 'C' ? 3 : 1;
+    const out = [];
+    lines.slice(0, max).forEach(line => {
+      const m = line.match(/^(.*?)(\s+@[\w.\-]+)?$/);
+      const en = cap((m[1] || '').trim().replace(/\s+/g, ' '));
+      const handle = m[2] ? m[2].trim() : '';
+      if (!en) return;
+      const key = en.toLowerCase();
+      const r = toHangul(en);
+      const ko = overrides[key] || r.ko;
+      if (ko) out.push({ en, ko, handle, exact: !!overrides[key] || r.exact });
+    });
+    $('names-hint').textContent = fmt === 'C' ? '형식 C는 앞의 이름 3개까지 사용합니다.' : '첫 줄 이름만 사용합니다.';
+    $('names-warn').hidden = !(lines.length && !out.length);
+    $('names-warn').textContent = '영문 이름을 입력하세요 (A~Z).';
+    items = out;
+    renderFixes();
+  }
+
+  function renderFixes() {
+    const box = $('ko-fix'); box.textContent = '';
+    items.forEach(it => {
+      const row = document.createElement('div'); row.className = 'prow'; row.style.alignItems = 'center';
+      const lab = document.createElement('label'); lab.className = 'lbl'; lab.textContent = it.en + (it.exact ? '' : ' · 추정 표기, 확인 필요');
+      lab.style.flexBasis = '100%'; lab.style.color = it.exact ? '' : 'var(--jung)';
+      const inp = document.createElement('input'); inp.value = it.ko; inp.className = 'ko'; inp.style.flex = '1 1 120px'; inp.style.fontSize = '18px';
+      inp.setAttribute('aria-label', it.en + ' 한글 표기'); inp.id = 'fix-' + it.en.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      inp.addEventListener('change', () => {
+        const v = inp.value.trim().replace(/\s+/g, ' ');
+        if (/^[가-힣 ]+$/.test(v)) { overrides[it.en.toLowerCase()] = v; refresh(); }
+        else { inp.value = it.ko; setStatus('완성된 한글 글자만 쓸 수 있어요 (예: 소피아).'); }
+      });
+      row.append(lab, inp); box.appendChild(row);
+    });
+  }
+
+  // ---------- plan ----------
+  function sylCount(ko) { return ko.replace(/ /g, '').length; }
+  function buildPlan() {
+    const sc = []; let t = 0;
+    const push = (type, dur, data) => { sc.push(Object.assign({ type, t0: t, dur }, data || {})); t += dur; };
+    if (!items.length) return { scenes: [], total: 0 };
+    if (fmt === 'A') {
+      push('hook', 2.2, { item: items[0] });
+      push('build', 0.6 + 0.85 * sylCount(items[0].ko) + 2.4, { item: items[0], label: true });
+    } else if (fmt === 'B') {
+      push('quiz', 4.2, { item: items[0] });
+      push('build', 0.6 + 0.85 * sylCount(items[0].ko) + 2.6, { item: items[0], reveal: true });
+    } else if (fmt === 'D') {
+      push('hookD', 2.4, { item: items[0] });
+      push('build', 0.6 + 0.85 * sylCount(items[0].ko) + 3.0, { item: items[0], meaning: true });
+    } else if (fmt === 'E') {
+      push('hookE', 3.0, { item: items[0] });
+      push('build', 0.6 + 0.85 * sylCount(items[0].ko) + 3.0, { item: items[0], meaning: true });
+    } else {
+      push('hookC', 2.0, {});
+      items.forEach(it => push('build', 0.5 + 0.75 * sylCount(it.ko) + 1.8, { item: it, label: true, handle: it.handle }));
+    }
+    push('end', 2.8, {});
+    return { scenes: sc, total: t };
+  }
+
+  // ---------- drawing ----------
+  const DRIFT = Array.from({ length: 22 }, (_, i) => ({ x: (i * 397) % W, y: (i * 811) % H, s: 70 + (i * 37) % 70, v: 18 + (i * 13) % 30, r: ((i * 53) % 40 - 20) / 100, j: 'ㄱㄴㄷㄹㅁㅂㅅㅇㅈㅊㅋㅌㅍㅎㅏㅓㅗㅜㅡㅣ'[(i * 7) % 20], c: i % 3 }));
+  function drawDrift(t, th) {
+    DRIFT.forEach(d => {
+      const y = ((d.y - t * d.v) % (H + 200) + H + 200) % (H + 200) - 100;
+      ctx.save(); ctx.globalAlpha = 0.10; ctx.translate(d.x, y); ctx.rotate(d.r + Math.sin(t * 0.6 + d.x) * 0.08);
+      ctx.fillStyle = [th.cho, th.jung, th.jong][d.c]; rr(ctx, -d.s / 2, -d.s / 2, d.s, d.s, d.s * 0.2); ctx.fill();
+      ctx.globalAlpha = 0.18; ctx.fillStyle = th.bg; ctx.font = '700 ' + Math.round(d.s * 0.55) + 'px ' + FONT_B; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(d.j, 0, 2);
+      ctx.restore();
+    });
+  }
+  // Tori: an original tiger-cub mascot drawn from simple shapes
+  function drawTori(x, y, sz, t, bounce, cheer) {
+    const b = Math.sin(t * 3) * 6 - bounce * 40;
+    ctx.save(); ctx.translate(x, y + b); const k = sz / 200; ctx.scale(k, k);
+    const O = '#f59a3c', D = '#2b1d14', C = '#fff4e6';
+    // ears
+    [[-62, -70], [62, -70]].forEach(([ex, ey]) => { ctx.fillStyle = O; ctx.beginPath(); ctx.arc(ex, ey, 30, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = C; ctx.beginPath(); ctx.arc(ex, ey, 15, 0, Math.PI * 2); ctx.fill(); });
+    // head
+    ctx.fillStyle = O; ctx.beginPath(); ctx.ellipse(0, 0, 100, 88, 0, 0, Math.PI * 2); ctx.fill();
+    // stripes
+    ctx.fillStyle = D; [[-14, -84, 10, 28], [0, -88, 10, 34], [14, -84, 10, 28]].forEach(([sx, sy, w, h]) => { rr(ctx, sx - w / 2, sy, w, h, 5); ctx.fill(); });
+    [[-100, -10], [100, -10]].forEach(([sx, sy], i) => { ctx.save(); ctx.translate(sx, sy); ctx.rotate(i ? 0.3 : -0.3); rr(ctx, -16, -5, 32, 10, 5); ctx.fill(); ctx.translate(0, 22); rr(ctx, -14, -5, 28, 10, 5); ctx.fill(); ctx.restore(); });
+    // muzzle
+    ctx.fillStyle = C; ctx.beginPath(); ctx.ellipse(0, 34, 52, 38, 0, 0, Math.PI * 2); ctx.fill();
+    // eyes (blink)
+    const blink = (t % 3.2) > 3.05 ? 0.15 : 1;
+    ctx.fillStyle = D; [[-36, -10], [36, -10]].forEach(([ex, ey]) => { ctx.beginPath(); if (cheer) { ctx.lineWidth = 8; ctx.strokeStyle = D; ctx.arc(ex, ey + 6, 14, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke(); } else { ctx.ellipse(ex, ey, 11, 15 * blink, 0, 0, Math.PI * 2); ctx.fill(); } });
+    // nose + mouth
+    ctx.fillStyle = '#e8627c'; ctx.beginPath(); ctx.ellipse(0, 18, 13, 9, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = D; ctx.lineWidth = 6; ctx.lineCap = 'round'; ctx.beginPath();
+    if (cheer) { ctx.arc(0, 36, 20, 0.1 * Math.PI, 0.9 * Math.PI); } else { ctx.moveTo(-16, 42); ctx.quadraticCurveTo(0, 54, 16, 42); }
+    ctx.stroke(); ctx.restore();
+  }
+  function bubble(x, y, str, th, a) {
+    if (a <= 0) return;
+    ctx.save(); ctx.globalAlpha = a; ctx.font = '700 46px ' + FONT_B; const w = ctx.measureText(str).width + 60, h = 84;
+    ctx.fillStyle = '#ffffff'; rr(ctx, x, y - h, w, h, 30); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(x + 40, y - 2); ctx.lineTo(x + 10, y + 34); ctx.lineTo(x + 90, y - 2); ctx.fill();
+    ctx.fillStyle = '#18233a'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(str, x + w / 2, y - h / 2 + 2); ctx.restore();
+  }
+  function burst(cx, cy, p, th, n, spread, seedv) {
+    if (p < 0 || p > 1) return;
+    const cols = [th.cho, th.jung, th.jong, th.accent];
+    for (let i = 0; i < n; i++) {
+      const ang = (i / n) * Math.PI * 2 + seedv; const sp = spread * (0.6 + ((i * 37) % 10) / 25);
+      const x = cx + Math.cos(ang) * sp * easeOut(p), y = cy + Math.sin(ang) * sp * easeOut(p) + p * p * 260;
+      ctx.save(); ctx.globalAlpha = 1 - p; ctx.translate(x, y); ctx.rotate(p * 6 + i); ctx.fillStyle = cols[i % 4]; ctx.fillRect(-9, -6, 18, 12); ctx.restore();
+    }
+  }
+  let FX = { lastLand: -9, cheer: false, bubble: '', bubbleA: 0 };
+  function drawFrame(t) {
+    const th = THEMES[fmt];
+    ctx.fillStyle = th.bg; ctx.fillRect(0, 0, W, H);
+    drawDrift(t, th);
+    FX = { lastLand: -9, cheer: false, bubble: '', bubbleA: 0, t };
+    // brand mark (kept clear of top UI and side buttons)
+    [[th.cho, 0], [th.jung, 1], [th.jong, 2]].forEach(([c, i]) => { ctx.fillStyle = c; rr(ctx, 120 + i * 34, 236, 26, 26, 5); ctx.fill(); });
+    text('Hangeul Village', 230, 259, 30, 800, FONT_D, th.muted, 1, 'left');
+    if (!plan || !plan.scenes.length) { text('Type a name', W / 2, 960, 60, 700, FONT_D, th.muted); return; }
+    const s = plan.scenes.find(x => t >= x.t0 && t < x.t0 + x.dur) || plan.scenes[plan.scenes.length - 1];
+    const lt = t - s.t0;
+    if (s.type === 'hook') drawHook(lt, s.item, th);
+    else if (s.type === 'hookC') drawHookC(lt, th);
+    else if (s.type === 'quiz') drawQuiz(lt, s.item, th);
+    else if (s.type === 'build') drawBuild(lt, s, th);
+    else if (s.type === 'end') drawEnd(lt, th);
+    else if (s.type === 'hookD') drawHookD(lt, s.item, th);
+    else if (s.type === 'hookE') drawHookE(lt, s.item, th);
+    // mascot reacts to landing blocks and cheers at the end
+    const since = t - FX.lastLand; const bounce = since >= 0 && since < 0.35 ? Math.sin(since / 0.35 * Math.PI) : 0;
+    drawTori(175, 1478, 160, t, bounce, FX.cheer || s.type === 'end');
+    bubble(235, 1380, FX.bubble, th, FX.bubbleA);
+    // progress line
+    ctx.fillStyle = th.line; ctx.fillRect(120, 1560, W - 240, 6);
+    ctx.fillStyle = th.accent; ctx.fillRect(120, 1560, (W - 240) * clamp(t / plan.total, 0, 1), 6);
+  }
+
+  function lineIn(str, y, size, weight, fam, color, lt, delay) {
+    if (!str) return; size = fitFont(str, W - 140, size, weight, fam, 28);
+    const p = easeBack(fade(lt, delay, 0.4)); const a = clamp(fade(lt, delay, 0.2), 0, 1);
+    ctx.save(); ctx.translate(W / 2, y); ctx.scale(0.7 + 0.3 * p, 0.7 + 0.3 * p); ctx.translate(-W / 2, -y); text(str, W / 2, y, size, weight, fam, color, a); ctx.restore();
+  }
+  function chip(str, y, th, lt, delay) {
+    const a = clamp(fade(lt, delay, 0.25), 0, 1); if (!a) return;
+    ctx.save(); ctx.globalAlpha = a; ctx.font = '800 40px ' + FONT_D; const w = ctx.measureText(str).width + 64;
+    ctx.fillStyle = th.accent; rr(ctx, W / 2 - w / 2, y - 52, w, 72, 36); ctx.fill();
+    ctx.fillStyle = th.bg; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(str, W / 2, y - 14); ctx.restore();
+  }
+  function drawHookD(lt, it, th) {
+    chip(S('Dchip', 'K-DRAMA WORD'), 640, th, lt, 0);
+    lineIn(S('D1', 'You hear this'), 800, 92, 800, FONT_D, th.ink, lt, 0.2);
+    lineIn(S('D2', 'ALL the time'), 920, 110, 800, FONT_D, th.accent, lt, 0.5);
+    lineIn(S('D3', 'Can you read it?'), 1040, 64, 700, FONT_D, th.muted, lt, 0.9);
+    FX.bubble = '이 말, 들어 봤죠?'; FX.bubbleA = fade(lt, 0.6, 0.3);
+  }
+  function drawHookE(lt, it, th) {
+    chip(S('Echip', 'SEOUL SIGN'), 560, th, lt, 0);
+    lineIn(S('E1', 'Can you read'), 690, 84, 800, FONT_D, th.ink, lt, 0.2);
+    lineIn(S('E2', 'this sign?'), 790, 84, 800, FONT_D, th.ink, lt, 0.45);
+    const p = easeBack(fade(lt, 0.8, 0.5));
+    if (p > 0) {
+      const sz = fitFont(it.ko, 700, 190, 700, FONT_B, 80); ctx.font = '700 ' + sz + 'px ' + FONT_B;
+      const w = Math.max(420, ctx.measureText(it.ko).width + 140), h = sz + 110;
+      ctx.save(); ctx.translate(W / 2, 1010); ctx.scale(0.6 + 0.4 * p, 0.6 + 0.4 * p);
+      ctx.fillStyle = '#ffffff'; rr(ctx, -w / 2 - 10, -h / 2 - 10, w + 20, h + 20, 30); ctx.fill();
+      ctx.fillStyle = '#1a7f5a'; rr(ctx, -w / 2, -h / 2, w, h, 24); ctx.fill();
+      ctx.fillStyle = '#ffffff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(it.ko, 0, 6); ctx.restore();
+    }
+    FX.bubble = '읽을 수 있어요?'; FX.bubbleA = fade(lt, 1.0, 0.3);
+  }
+  function drawHook(lt, it, th) {
+    lineIn(S('hookA1', 'How do you write'), 760, 76, 800, FONT_D, th.ink, lt, 0);
+    const sz = fitFont(it.en.toUpperCase(), W - 200, 150, 800, FONT_D, 60);
+    lineIn(it.en.toUpperCase(), 930, sz, 800, FONT_D, th.accent, lt, 0.3);
+    lineIn(S('hookA3', 'in Korean?'), 1060, 76, 800, FONT_D, th.ink, lt, 0.6);
+  }
+  function drawHookC(lt, th) {
+    lineIn(S('hookC1', 'You asked.'), 780, 84, 800, FONT_D, th.ink, lt, 0);
+    lineIn(S('hookC2', 'Your names'), 920, 110, 800, FONT_D, th.accent, lt, 0.35);
+    lineIn(S('hookC3', 'in Korean'), 1040, 84, 800, FONT_D, th.ink, lt, 0.7);
+  }
+  function drawQuiz(lt, it, th) {
+    lineIn(S('quiz1', 'Can you read'), 520, 76, 800, FONT_D, th.ink, lt, 0);
+    lineIn(S('quiz2', 'this name?'), 610, 76, 800, FONT_D, th.ink, lt, 0.25);
+    lineIn('읽을 수 있어요?', 690, 44, 700, FONT_K, th.muted, lt, 0.4);
+    const sz = fitFont(it.ko, W - 200, 230, 700, FONT_K, 90);
+    const p = easeBack(fade(lt, 0.5, 0.5));
+    ctx.save(); ctx.translate(W / 2, 960); ctx.scale(0.6 + 0.4 * p, 0.6 + 0.4 * p); ctx.translate(-W / 2, -960);
+    text(it.ko, W / 2, 1020, sz, 700, FONT_K, th.ink, clamp(p, 0, 1)); ctx.restore();
+    if (lt > 1.2) {
+      const n = 3 - Math.floor((lt - 1.2) / 1.0);
+      if (n >= 1) {
+        const f = ((lt - 1.2) % 1.0);
+        text(String(n), W / 2, 1320, 160 - f * 30, 800, FONT_D, th.accent, 1 - f * 0.6);
+      }
+    }
+  }
+  function layoutTiles(ko) {
+    const words = ko.split(' ');
+    const total = sylCount(ko);
+    const rows = total <= 5 || words.length === 1 ? [words.join(' ')] : words;
+    const out = []; let k = 0;
+    const rowH = []; let maxCount = 0;
+    rows.forEach(r => { maxCount = Math.max(maxCount, r.length); });
+    const size = Math.min(270, Math.floor((W - 160 - (maxCount - 1) * 18) / Math.max(1, maxCount)));
+    const gap = 18;
+    const totalH = rows.length * size + (rows.length - 1) * 70;
+    let y0 = 900 - totalH / 2;
+    rows.forEach((r, ri) => {
+      const chars = [...r];
+      const rowW = chars.reduce((a, c) => a + (c === ' ' ? size * 0.35 : size), 0) + (chars.length - 1) * gap;
+      let x = W / 2 - rowW / 2;
+      chars.forEach(ch => {
+        if (ch === ' ') { x += size * 0.35 + gap; return; }
+        out.push({ ch, d: decompose(ch), x, y: y0 + ri * (size + 70), s: size, k: k++ });
+        x += size + gap;
+      });
+    });
+    return out;
+  }
+  function drawBuild(lt, sc, th) {
+    const it = sc.item;
+    const per = fmt === 'C' ? 0.75 : 0.85;
+    const tiles = layoutTiles(it.ko);
+    const n = tiles.length;
+    const doneAt = 0.5 + per * n + 0.2;
+    const top = tiles.length ? tiles[0].y : 800;
+    if (sc.meaning) {
+      // word formats: no English shown until the reveal
+    } else if (sc.label) {
+      text(it.en.toUpperCase(), W / 2, top - 150, fitFont(it.en.toUpperCase(), W - 240, 72, 800, FONT_D, 40), 800, FONT_D, th.ink, easeOut(fade(lt, 0, 0.3)));
+      if (sc.handle) text('for ' + sc.handle, W / 2, top - 80, 38, 500, FONT_B, th.muted, easeOut(fade(lt, 0.1, 0.3)));
+    } else if (sc.reveal) {
+      text("Here's how it's built", W / 2, top - 110, 52, 700, FONT_D, th.muted, easeOut(fade(lt, 0, 0.3)));
+    }
+    tiles.forEach(tl => {
+      const ts = 0.5 + per * tl.k;
+      const p = lt - ts;
+      const cx = tl.x + tl.s / 2, cy = tl.y + tl.s / 2;
+      // slot
+      ctx.save();
+      const landed = easeBack(fade(p, 0.55, 0.3));
+      ctx.fillStyle = th.tile; ctx.strokeStyle = th.line; ctx.lineWidth = 3;
+      if (p < 0.55) { ctx.setLineDash([14, 10]); rr(ctx, tl.x, tl.y, tl.s, tl.s, tl.s * 0.12); ctx.stroke(); ctx.setLineDash([]); }
+      else { rr(ctx, tl.x, tl.y, tl.s, tl.s, tl.s * 0.12); ctx.fill(); ctx.stroke(); }
+      ctx.restore();
+      // flying jamo
+      if (p >= 0 && p < 0.75 && tl.d) {
+        const parts = [[tl.d.L, th.s1, th.cho, -1, 0], [tl.d.V, th.s2, th.jung, 1, 0], [tl.d.T, th.s3, th.jong, 0, 1]].filter(q => q[0]);
+        const cs = tl.s * 0.42;
+        parts.forEach(([j, bg, fg, dx, dy], idx) => {
+          const fly = easeOut(p / 0.45);
+          const merge = easeOut((p - 0.45) / 0.25);
+          const restX = cx + (parts.length === 3 ? (idx - 1) * cs * 1.05 : (idx - 0.5) * cs * 1.1);
+          const restY = cy;
+          const fromX = cx + dx * 700, fromY = cy + (dy ? 600 : (idx % 2 ? -260 : 260)) * (dy ? 1 : 0.4);
+          let x = fromX + (restX - fromX) * fly, y = fromY + (restY - fromY) * fly;
+          x += (cx - x) * merge; y += (cy - y) * merge;
+          const sc2 = 1 - merge * 0.6;
+          ctx.save(); ctx.globalAlpha = 1 - merge;
+          ctx.fillStyle = bg; rr(ctx, x - cs * sc2 / 2, y - cs * sc2 / 2, cs * sc2, cs * sc2, 14); ctx.fill();
+          ctx.fillStyle = fg; ctx.font = '700 ' + Math.round(cs * 0.62 * sc2) + 'px ' + FONT_B; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          ctx.fillText(j, x, y + 2); ctx.restore();
+        });
+      }
+      // glyph
+      if (p >= 0.55 && p < 1.4) { FX.lastLand = Math.max(FX.lastLand, FX.t - (p - 0.55)); burst(cx, cy, (p - 0.55) / 0.6, th, 10, tl.s * 0.9, tl.k); }
+      if (p >= 0.55) {
+        const q = clamp((p - 0.55) / 0.25, 0, 1); const sq = Math.sin(q * Math.PI) * 0.14;
+        ctx.save(); ctx.translate(cx, cy); const z = 0.6 + 0.4 * landed; ctx.scale(z * (1 + sq), z * (1 - sq));
+        ctx.fillStyle = th.ink; ctx.font = '700 ' + Math.round(tl.s * 0.66) + 'px ' + FONT_K; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(tl.ch, 0, tl.s * 0.04); ctx.restore();
+      }
+      // recipe under tile
+      if (lt > doneAt && tl.d) {
+        const a = easeOut(fade(lt, doneAt, 0.4));
+        const parts = [[tl.d.L, th.cho], [tl.d.V, th.jung], [tl.d.T, th.jong]].filter(q => q[0]);
+        const fs = Math.max(30, Math.round(tl.s * 0.24));
+        const wEach = fs * 1.15;
+        let x0 = cx - (parts.length * wEach) / 2 + wEach / 2;
+        parts.forEach(([j, c]) => { text(j, x0, tl.y + tl.s + fs + 14, fs, 700, FONT_B, c, a); x0 += wEach; });
+        text(tl.d.rom, cx, tl.y + tl.s + fs * 2 + 26, Math.round(fs * 0.8), 500, FONT_B, th.muted, a);
+      }
+    });
+    // after build: romanization / reveal
+    const last = tiles[tiles.length - 1];
+    const bottom = last ? last.y + last.s + 170 : 1100;
+    if (lt > doneAt) { FX.cheer = true; burst(W / 2, (tiles[0] ? tiles[0].y : 800) + 100, (lt - doneAt) / 1.4, th, 46, 520, 0.3); }
+    if (lt > doneAt + 0.3) {
+      const a = easeOut(fade(lt, doneAt + 0.3, 0.4));
+      if (sc.meaning) {
+        const m = '= ' + it.en;
+        text(m, W / 2, Math.min(bottom + 135, 1310), fitFont(m, W - 160, 100, 800, FONT_D, 50), 800, FONT_D, th.accent, a);
+        if (it.note) text(it.note, W / 2, Math.min(bottom + 200, 1375), fitFont(it.note, W - 200, 46, 500, FONT_B, 28), 500, FONT_B, th.muted, easeOut(fade(lt, doneAt + 0.7, 0.4)));
+        FX.bubble = soundsLike(it.ko); FX.bubbleA = 0;
+      } else if (sc.reveal) {
+        text('= ' + it.en, W / 2, Math.min(bottom + 120, 1470), fitFont('= ' + it.en, W - 200, 110, 800, FONT_D, 50), 800, FONT_D, th.accent, a);
+      } else {
+        FX.bubble = soundsLike(it.ko) + '!'; FX.bubbleA = a;
+      }
+    }
+  }
+  function drawEnd(lt, th) {
+    const words = fmt === 'D' || fmt === 'E';
+    const ko = words ? '다음 단어를 추천해 주세요!' : '이름을 알려 주세요!';
+    lineIn(ko, 780, fitFont(ko, W - 160, 104, 700, FONT_K, 56), 700, FONT_K, th.ink, lt, 0);
+    lineIn(words ? S('endWords', '= Which word next?') : S('endName', '= Tell me your name!'), 890, 64, 800, FONT_D, th.accent, lt, 0.3);
+    lineIn(S('endSub', 'Comment it below'), 980, 46, 500, FONT_B, th.muted, lt, 0.55);
+    const p = easeOut(fade(lt, 0.8, 0.4)); const bob = Math.sin(lt * 5) * 14;
+    ctx.save(); ctx.globalAlpha = p; ctx.strokeStyle = th.accent; ctx.lineWidth = 12; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.beginPath(); ctx.moveTo(W / 2, 1090 + bob); ctx.lineTo(W / 2, 1250 + bob); ctx.moveTo(W / 2 - 50, 1200 + bob); ctx.lineTo(W / 2, 1250 + bob); ctx.lineTo(W / 2 + 50, 1200 + bob); ctx.stroke(); ctx.restore();
+  }
+
+  // ---------- playback / recording ----------
+  let raf = 0, busy = false;
+  function stopLoop() { cancelAnimationFrame(raf); raf = 0; }
+  function playOnce(onDone) {
+    stopLoop();
+    const start = performance.now();
+    const step = now => {
+      const t = (now - start) / 1000;
+      drawFrame(Math.min(t, plan.total));
+      $('meter').style.width = (clamp(t / plan.total, 0, 1) * 100) + '%';
+      if (t < plan.total) raf = requestAnimationFrame(step); else { raf = 0; onDone && onDone(); }
+    };
+    raf = requestAnimationFrame(step);
+  }
+  function stillFrame() {
+    if (!plan || !plan.scenes.length) { drawFrame(0); return; }
+    const b = plan.scenes.find(s => s.type === 'build');
+    drawFrame(b ? b.t0 + b.dur - 0.1 : 0);
+    $('meter').style.width = '0%';
+  }
+  function pickMime() {
+    const list = ['video/mp4;codecs=avc1.42E01E', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'];
+    if (typeof MediaRecorder === 'undefined') return null;
+    return list.find(m => { try { return MediaRecorder.isTypeSupported(m); } catch (e) { return false; } }) || null;
+  }
+  function setStatus(s) { $('status').textContent = s; }
+
+  $('play').addEventListener('click', () => { if (busy || !plan || !plan.total) return; playOnce(() => setTimeout(stillFrame, 600)); });
+
+  let downloads = null, db = null;
+  $('rec').addEventListener('click', async () => {
+    if (busy || !plan || !plan.total) return;
+    const mime = pickMime();
+    if (!mime || !cv.captureStream) { setStatus('이 브라우저는 영상 녹화를 지원하지 않습니다. 컴퓨터의 Chrome에서 열어 주세요.'); return; }
+    busy = true; $('rec').disabled = true; $('play').disabled = true;
+    setStatus('녹화 중… 이 탭을 계속 열어 두세요 (' + Math.ceil(plan.total) + '초)');
+    try {
+      await fontsReady;
+      drawFrame(0);
+      const stream = cv.captureStream(30);
+      const rec = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 8000000 });
+      const chunks = [];
+      rec.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
+      const stopped = new Promise(r => { rec.onstop = r; });
+      rec.start(250);
+      await new Promise(r => playOnce(r));
+      await new Promise(r => setTimeout(r, 200));
+      rec.stop(); await stopped;
+      stream.getTracks().forEach(tr => tr.stop());
+      const blob = new Blob(chunks, { type: mime.split(';')[0] });
+      const ext = mime.startsWith('video/mp4') ? 'mp4' : 'webm';
+      const name = 'short-' + fmt + '-' + items.map(i => i.en.toLowerCase().replace(/[^a-z0-9]+/g, '-')).join('-') + '.' + ext;
+      if (!downloads) { setStatus('영상 저장 기능을 쓸 수 없는 화면입니다. claude.ai에서 이 페이지를 열어 주세요.'); }
+      else {
+        try {
+          await downloads.save({ filename: name, data: blob });
+          setStatus('저장했습니다: ' + name + (ext === 'webm' ? ' (유튜브·틱톡 모두 webm 업로드 가능)' : ''));
+          await addLog(true);
+        } catch (err) {
+          const c = err && err.code;
+          setStatus(c === 'declined' ? '저장을 취소했습니다.' : c === 'rate_limited' ? '저장 확인 창이 이미 열려 있습니다.' : '저장하지 못했습니다 (' + (c || 'unknown') + ').');
+        }
+      }
+    } catch (e) {
+      setStatus('녹화 중 문제가 생겼습니다: ' + (e && e.message ? e.message : e));
+    } finally {
+      busy = false; $('rec').disabled = false; $('play').disabled = false; setTimeout(stillFrame, 300);
+    }
+  });
+
+  // ---------- package text ----------
+  function rnd(n) { seed = (seed * 9301 + 49297) % 233280; return Math.floor(seed / 233280 * n); }
+  const pick = arr => arr[rnd(arr.length)];
+  function recipeLine(ko) { return [...ko.replace(/ /g, '')].map(ch => { const d = decompose(ch); return d ? [d.L, d.V, d.T].filter(Boolean).join('+') + '=' + ch : ''; }).join('  '); }
+  function buildPackage() {
+    if (!items.length) { ['p-title', 'p-desc', 'p-pin'].forEach(id => $(id).value = ''); $('voice').textContent = ''; return; }
+    const it = items[0], rom = 'sounds like ' + soundsLike(it.ko);
+    const tags = '#korean #learnkorean #hangul #koreanname #shorts';
+    let title, desc, pin;
+    if (fmt === 'A') {
+      title = pick([`${it.en} in Korean is ${it.ko} #shorts`, `How to write ${it.en} in Korean (Hangul)`, `Your name in Korean: ${it.en} = ${it.ko}`]);
+      desc = `${it.en} in Korean is ${it.ko} (${rom}).\n${recipeLine(it.ko)}\n\nEvery Korean syllable is a little block: first sound + vowel (+ final sound).\n${pick(['Comment your name and I will build it next.', 'Want yours? Drop your name in the comments.'])}\n\n${tags}`;
+    } else if (fmt === 'B') {
+      title = pick([`Can you read this Korean name? ${it.ko}`, `Read this in 3 seconds: ${it.ko}`, `Guess the name: ${it.ko} #shorts`]);
+      desc = `${it.ko} = ${it.en} (${rom}).\n${recipeLine(it.ko)}\n\nDid you get it before the answer? Tell me in the comments.\n\n${tags} #koreanquiz`;
+    } else {
+      const list = items.map(i => `${i.en} = ${i.ko}`).join('\n');
+      title = pick([`Your names in Korean: ${items.map(i => i.en).join(', ')}`, `You asked, I built it: ${items.map(i => i.ko).join(' ')}`, `Writing your names in Korean #shorts`]);
+      desc = `${list}\n\nThanks ${items.map(i => i.handle).filter(Boolean).join(' ') || 'everyone'} for the requests.\nComment your name for the next one.\n\n${tags}`;
+    }
+    pin = pick(['Comment your name below and I will write it in Korean in a future short.', 'Next video is your name. Comment it below.', 'Name requests open: comment yours.']);
+    $('p-title').value = title; $('p-desc').value = desc; $('p-pin').value = pin;
+    // voice guide (Korean for the creator)
+    const v = $('voice'); v.textContent = '';
+    const h = document.createElement('b'); h.textContent = '녹음 대사 (10~15초, 본인 목소리)'; v.appendChild(h);
+    const ol = document.createElement('ol');
+    const lines = fmt === 'B'
+      ? [`(퀴즈 화면) "Can you read this? You have three seconds."`, `(정답 후) 한국어로 또박또박 2번: "${it.ko}… ${it.ko}."`, `"이름을 알려 주세요!" (= Tell me your name!)`]
+      : fmt === 'C'
+        ? items.map(i => `"${i.en}${i.handle ? ' for ' + i.handle : ''}" → 한국어로 2번: "${i.ko}… ${i.ko}."`).concat([`"이름을 알려 주세요!"`])
+        : [`"Here's ${it.en} in Korean."`, `블록이 합쳐질 때 한국어로 천천히: "${[...it.ko.replace(/ /g, '')].join(', ')}"`, `이어서 자연스럽게 2번: "${it.ko}… ${it.ko}." + "이름을 알려 주세요!"`];
+    lines.forEach(s => { const li = document.createElement('li'); li.textContent = s; ol.appendChild(li); });
+    v.appendChild(ol);
+    const tip = document.createElement('div'); tip.style.marginTop = '6px'; tip.style.color = 'var(--muted)'; tip.style.fontSize = '13px';
+    tip.textContent = '유튜브 앱 쇼츠 편집의 "보이스오버"나 CapCut으로 영상 위에 녹음하세요. 원어민 발음이 이 채널의 가장 큰 가치입니다.';
+    v.appendChild(tip);
+  }
+  document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', () => {
+    const ta = $(b.dataset.copy);
+    const ok = () => setStatus('복사했습니다.');
+    const fb = () => { ta.focus(); ta.select(); setStatus('선택했습니다. Ctrl+C로 복사하세요.'); };
+    try { navigator.clipboard.writeText(ta.value).then(ok, fb); } catch (e) { fb(); }
+  }));
+  $('shuffle').addEventListener('click', () => { seed = (seed + 7) % 233280; buildPackage(); });
+
+  function refresh() {
+    parseNames();
+    plan = buildPlan();
+    buildPackage();
+    if (!raf) stillFrame();
+  }
+  $('names').addEventListener('input', () => { clearTimeout(refresh._t); refresh._t = setTimeout(refresh, 250); });
+  document.querySelectorAll('input[name=fmt]').forEach(r => r.addEventListener('change', () => { fmt = r.value; seed = 1; refresh(); }));
+
+  // ---------- tracker (db) ----------
+  let shorts = [], reqs = [];
+  const GOAL_VIEWS = 10000, GOAL_POSTS = 10, GATE = '2026-11-13';
+  async function addLog(fromSave) {
+    if (!db) { if (!fromSave) setStatus('관리 기록은 claude.ai에 로그인한 상태에서만 저장됩니다.'); return; }
+    if (!items.length) return;
+    try {
+      await db.collection('shorts').add({
+        createdAt: new Date().toISOString(), format: fmt,
+        names: items.map(i => ({ en: i.en, ko: i.ko, handle: i.handle || '' })),
+        title: $('p-title').value, status: 'made', platforms: { yt: false, tt: false, ig: false }, views: 0, comments: 0, url: ''
+      });
+      // mark used requests as done
+      for (const it of items) {
+        const r = reqs.find(q => !q.done && q.name.toLowerCase() === it.en.toLowerCase());
+        if (r) await db.doc('requests/' + r.id).update({ done: true });
+      }
+      if (!fromSave) setStatus('관리 목록에 추가했습니다.');
+    } catch (e) { setStatus('기록하지 못했습니다 (' + (e && e.code || 'error') + ').'); }
+  }
+  $('log-add').addEventListener('click', () => addLog(false));
+
+  function renderStrip() {
+    const best = shorts.reduce((m, s) => Math.max(m, Number(s.views) || 0), 0);
+    const totalViews = shorts.reduce((m, s) => m + (Number(s.views) || 0), 0);
+    const posted = shorts.filter(s => s.status === 'posted').length;
+    const reqCount = reqs.length;
+    const days = Math.floor((Date.parse(GATE + 'T23:59:59+09:00') - Date.now()) / 864e5);
+    const pass = best >= GOAL_VIEWS;
+    const strip = $('strip'); strip.textContent = '';
+    const add = (k, v, sub, ratio, ok) => {
+      const d = document.createElement('div'); d.className = 'stat';
+      const kk = document.createElement('div'); kk.className = 'k'; kk.textContent = k;
+      const vv = document.createElement('div'); vv.className = 'v'; vv.textContent = v;
+      if (sub) { const sm = document.createElement('small'); sm.textContent = ' ' + sub; vv.appendChild(sm); }
+      d.append(kk, vv);
+      if (ratio != null) { const b = document.createElement('div'); b.className = 'bar' + (ok ? ' ok' : ''); const i = document.createElement('i'); i.style.width = clamp(ratio, 0, 1) * 100 + '%'; b.appendChild(i); d.appendChild(b); }
+      strip.appendChild(d);
+    };
+    add('최고 조회수', best.toLocaleString(), '/ 10,000', best / GOAL_VIEWS, pass);
+    add('업로드한 쇼츠', String(posted), '/ ' + GOAL_POSTS + '편', posted / GOAL_POSTS, posted >= GOAL_POSTS);
+    add('이름 요청', String(reqCount), '건 (누적)', null);
+    const d = document.createElement('div'); d.className = 'stat';
+    const k = document.createElement('div'); k.className = 'k'; k.textContent = '관문까지';
+    const v = document.createElement('div'); v.className = 'v'; v.textContent = days > 0 ? 'D-' + days : days === 0 ? 'D-day' : '판정 완료';
+    const pill = document.createElement('span'); pill.className = 'pill ' + (pass ? 'ok' : 'wait'); pill.textContent = pass ? '통과 기준 달성' : '진행 중';
+    const tv = document.createElement('div'); tv.className = 'sub'; tv.textContent = '총 조회수 ' + totalViews.toLocaleString();
+    d.append(k, v, pill, tv); strip.appendChild(d);
+  }
+
+  function renderShorts() {
+    const wrap = $('shorts-wrap'); wrap.textContent = '';
+    if (!shorts.length) { const e = document.createElement('div'); e.className = 'empty'; e.textContent = '아직 기록이 없습니다. 만들기 탭에서 영상을 저장하면 여기에 자동으로 추가됩니다.'; wrap.appendChild(e); return; }
+    const tb = document.createElement('table');
+    tb.innerHTML = '<thead><tr><th>만든 날</th><th>형식</th><th>이름</th><th>올린 곳</th><th>상태</th><th>조회수</th><th>댓글</th><th>링크</th><th></th></tr></thead>';
+    const body = document.createElement('tbody');
+    shorts.forEach(s => {
+      const tr = document.createElement('tr');
+      const td = c => { const x = document.createElement('td'); if (c) x.className = c; tr.appendChild(x); return x; };
+      td().textContent = (s.createdAt || '').slice(5, 10).replace('-', '/');
+      td().textContent = s.format || '';
+      const nm = td(); nm.className = 'ko'; nm.textContent = (s.names || []).map(n => n.ko).join(', ');
+      nm.title = (s.names || []).map(n => n.en).join(', ');
+      const pl = td(); const pd = document.createElement('div'); pd.className = 'plat';
+      [['yt', '유튜브'], ['tt', '틱톡'], ['ig', '인스타']].forEach(([key, lab]) => {
+        const l = document.createElement('label'); const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = !!(s.platforms && s.platforms[key]);
+        cb.id = 'pl-' + s.id + '-' + key;
+        cb.addEventListener('change', () => {
+          const p = Object.assign({ yt: false, tt: false, ig: false }, s.platforms || {}); p[key] = cb.checked;
+          const any = p.yt || p.tt || p.ig;
+          save(s.id, { platforms: p, status: any ? 'posted' : 'made' });
+        });
+        l.append(cb, document.createTextNode(lab)); pd.appendChild(l);
+      });
+      pl.appendChild(pd);
+      const st = td(); const pill = document.createElement('span'); pill.className = 'pill ' + (s.status === 'posted' ? 'ok' : 'wait'); pill.textContent = s.status === 'posted' ? '업로드됨' : '제작됨'; st.appendChild(pill);
+      ['views', 'comments'].forEach(f => {
+        const c = td('num'); const inp = document.createElement('input'); inp.type = 'number'; inp.min = '0'; inp.value = Number(s[f]) || 0; inp.id = f + '-' + s.id;
+        inp.setAttribute('aria-label', f === 'views' ? '조회수' : '댓글 수');
+        inp.addEventListener('change', () => save(s.id, { [f]: Math.max(0, Number(inp.value) || 0) }));
+        c.appendChild(inp);
+      });
+      const u = td(); const ui = document.createElement('input'); ui.className = 'url'; ui.placeholder = 'https://'; ui.value = s.url || ''; ui.id = 'url-' + s.id; ui.setAttribute('aria-label', '영상 링크');
+      ui.addEventListener('change', () => save(s.id, { url: ui.value.trim() })); u.appendChild(ui);
+      const del = td(); const db2 = document.createElement('button'); db2.type = 'button'; db2.className = 'ghost'; db2.textContent = '삭제';
+      let armed = false;
+      db2.addEventListener('click', () => { if (!armed) { armed = true; db2.textContent = '정말 삭제'; setTimeout(() => { armed = false; db2.textContent = '삭제'; }, 3000); return; } db.doc('shorts/' + s.id).delete().catch(() => {}); });
+      del.appendChild(db2);
+      body.appendChild(tr);
+    });
+    tb.appendChild(body); wrap.appendChild(tb);
+  }
+  async function save(id, patch) { try { await db.doc('shorts/' + id).update(patch); } catch (e) { setStatus('저장하지 못했습니다.'); } }
+
+  const picked = new Set();
+  function renderReqs() {
+    const ul = $('reqs'); ul.textContent = '';
+    if (!reqs.length) { const li = document.createElement('li'); li.className = 'empty'; li.textContent = '댓글로 받은 이름을 여기에 모아 두세요.'; ul.appendChild(li); return; }
+    reqs.forEach(r => {
+      const li = document.createElement('li'); if (r.done) li.className = 'done';
+      const cb = document.createElement('input'); cb.type = 'checkbox'; cb.id = 'rq-' + r.id; cb.checked = picked.has(r.id); cb.disabled = !!r.done; cb.setAttribute('aria-label', r.name + ' 선택');
+      cb.addEventListener('change', () => { cb.checked ? picked.add(r.id) : picked.delete(r.id); });
+      const who = document.createElement('div'); who.className = 'who';
+      const ko = toHangul(r.name).ko;
+      who.textContent = r.name + ' '; const k = document.createElement('span'); k.className = 'ko'; k.textContent = ko; who.appendChild(k);
+      if (r.handle) { const sm = document.createElement('small'); sm.textContent = r.handle; who.appendChild(sm); }
+      const a = document.createElement('button'); a.type = 'button'; a.className = 'ghost'; a.textContent = 'A형 만들기';
+      a.disabled = !!r.done;
+      a.addEventListener('click', () => { setFormat('A'); $('names').value = r.name + (r.handle ? ' ' + r.handle : ''); refresh(); location.hash = '#create'; });
+      const d = document.createElement('button'); d.type = 'button'; d.className = 'ghost'; d.textContent = r.done ? '되돌리기' : '완료';
+      d.addEventListener('click', () => db.doc('requests/' + r.id).update({ done: !r.done }).catch(() => {}));
+      const x = document.createElement('button'); x.type = 'button'; x.className = 'ghost'; x.textContent = '삭제'; x.setAttribute('aria-label', r.name + ' 삭제');
+      x.addEventListener('click', () => db.doc('requests/' + r.id).delete().catch(() => {}));
+      li.append(cb, who, a, d, x); ul.appendChild(li);
+    });
+  }
+  function setFormat(f) { fmt = f; document.querySelectorAll('input[name=fmt]').forEach(r => r.checked = r.value === f); }
+  $('req-make').addEventListener('click', () => {
+    const sel = reqs.filter(r => picked.has(r.id) && !r.done).slice(0, 3);
+    if (!sel.length) { setStatus('대기열에서 이름을 1~3개 선택하세요.'); location.hash = '#track'; return; }
+    setFormat('C'); $('names').value = sel.map(r => r.name + (r.handle ? ' ' + r.handle : '')).join('\n');
+    picked.clear(); refresh(); location.hash = '#create';
+  });
+  $('req-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const name = cap($('req-name').value.trim().replace(/\s+/g, ' ')); let handle = $('req-handle').value.trim();
+    if (!name) return;
+    if (handle && !handle.startsWith('@')) handle = '@' + handle;
+    if (!db) { setStatus('관리 기록은 claude.ai에 로그인한 상태에서만 저장됩니다.'); return; }
+    try { await db.collection('requests').add({ name, handle, createdAt: new Date().toISOString(), done: false }); $('req-name').value = ''; $('req-handle').value = ''; $('req-name').focus(); }
+    catch (err) { setStatus('추가하지 못했습니다 (' + (err && err.code || 'error') + ').'); }
+  });
+
+  function startDb(d) {
+    db = d;
+    db.collection('shorts').orderBy('createdAt', 'desc').onSnapshot(snap => {
+      shorts = snap.docs.map(x => Object.assign({ id: x.id }, x.data()));
+      renderShorts(); renderStrip();
+    }, () => { $('offline').hidden = false; });
+    db.collection('requests').orderBy('createdAt', 'desc').onSnapshot(snap => {
+      reqs = snap.docs.map(x => Object.assign({ id: x.id }, x.data()));
+      renderReqs(); renderStrip();
+    }, () => {});
+  }
+
+  // ---------- tabs ----------
+  function route() {
+    const h = location.hash === '#track' ? 'track' : 'create';
+    $('view-create').hidden = h !== 'create'; $('view-track').hidden = h !== 'track';
+    $('tab-create').toggleAttribute('aria-current', false); $('tab-track').toggleAttribute('aria-current', false);
+    $('tab-' + h).setAttribute('aria-current', 'page');
+  }
+  window.addEventListener('hashchange', route);
+  route();
+
+  // ---------- boot ----------
+  renderShorts(); renderReqs(); renderStrip();
+  const fontsReady = (document.fonts && document.fonts.load) ? Promise.all([
+    document.fonts.load('700 100px "Gowun Batang"', '소피아제임스'),
+    document.fonts.load('700 40px "Noto Sans KR"', 'ㅅㅗㅍㅣ'),
+    document.fonts.load('800 60px "Bricolage Grotesque"', 'Comment')
+  ]).catch(() => {}) : Promise.resolve();
+  refresh();
+  fontsReady.then(() => { if (!raf) stillFrame(); });
+  if (window.claude && typeof window.claude.use === 'function') {
+    window.claude.use('downloads').then(d => { downloads = d; }).catch(() => {});
+    window.claude.use('db').then(d => { if (d) startDb(d); else $('offline').hidden = false; }).catch(() => { $('offline').hidden = false; });
+  } else { $('offline').hidden = false; }
+})();
+</script>
