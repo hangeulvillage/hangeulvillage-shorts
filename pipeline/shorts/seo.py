@@ -53,7 +53,11 @@ def quiz_package(fmt, it, snd, seed=0):
     if fmt == 'Q':
         ig = f'Guess the English word: {ko} 🤔\n\nIt is an English word written in Hangul. Comment your guess before the answer at the end!\n\n{ig_tags}'
     else:
-        ig = f'Which one means "{mean}"? 1 or 2 🤔\n\nComment your number before the answer at the end!\n\n{ig_tags}'
+        wrong = it.get('wrong', '')
+        h = 0
+        for c in ko + wrong: h = (h * 31 + ord(c)) % 997  # same order as the video (shorts-studio.html)
+        o1, o2 = (wrong, ko) if h % 2 else (ko, wrong)
+        ig = f'Which one means "{mean}"? 🤔\n\n1) {o1}\n2) {o2}\n\nComment 1 or 2 before the answer at the end!\n\n{ig_tags}'
     return {'youtube': {'title': title[:95], 'description': desc, 'tags': tags, 'made_for_kids': False, 'pinned_comment': pin},
             'tiktok': {'caption': _fit(tt, tt_tags, 150), 'pinned_comment': pin},
             'instagram': {'caption': ig, 'alt_text': f'Quiz animation building the Korean word {ko} ({mean}) from Hangul blocks.', 'pinned_comment': pin}}
