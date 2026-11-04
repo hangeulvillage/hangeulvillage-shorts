@@ -28,7 +28,34 @@ def _fit(text, tags, limit):
         if len(out) + 1 + len(t) <= limit: out += ' ' + t
     return out
 
+def quiz_package(fmt, it, snd, seed=0):
+    r = random.Random(seed); ko, mean, note = it['ko'], it['en'], _sentence(it.get('note', ''))
+    if fmt == 'Q':
+        title = r.choice([f'Guess the English word: {ko} #shorts', f'Can you read this? It is English! {ko} #shorts', f'{ko} = ? Comment your guess #shorts'])
+        tags = ['konglish', 'korean loanwords', 'english words in korean', 'korean quiz', 'learn korean', 'hangul', 'read korean', f'{mean.lower()} in korean']
+        tt = f'Guess the English word: {ko}. Comment your guess before the answer!'
+        tt_tags = '#learnkorean #koreanquiz #konglish #hangul #korean'; ig_tags = '#learnkorean #koreanquiz #konglish #hangul #studykorean'
+        lead = f'{ko} ({snd}) is "{mean}" written in Hangul.'
+        ask = 'Did you guess it before the answer? Comment your guess on the next one!'
+        pin = r.choice(['How fast did you read it? Comment your time!', 'Got it right? Comment the next English word you want to see in Hangul.'])
+    else:
+        wrong, wrong_en = it.get('wrong', ''), it.get('wrong_en', '')
+        title = r.choice([f'Which one means "{mean}"? 1 or 2 #shorts', f'Korean quiz: "{mean}" is 1 or 2? #shorts', f'1 or 2? Find "{mean}" in Korean #shorts'])
+        tags = ['korean quiz', 'korean words', 'learn korean', 'kdrama korean', 'hangul', 'korean for beginners', f'{mean.lower()} in korean']
+        tt = f'Which one means "{mean}" in Korean? Comment 1 or 2!'
+        tt_tags = '#learnkorean #koreanquiz #kdrama #hangul #korean'; ig_tags = '#learnkorean #koreanquiz #kdrama #hangul #studykorean'
+        lead = f'"{mean}" in Korean is {ko} ({snd}).' + (f' The other one, {wrong}, means "{wrong_en}".' if wrong and wrong_en else '')
+        ask = 'Comment 1 or 2 before the answer next time!'
+        pin = r.choice(['Did you pick the right number? Comment 1 or 2!', 'What was your answer? Comment 1 or 2 and we will make the next quiz harder.'])
+    desc = (f"{lead}\n{_sylls(ko)}\n{note}\n\nEvery Korean syllable is a block: first sound + vowel (+ final sound).\n"
+            f"{ask}\n\n#learnkorean #hangul #koreanquiz #shorts")
+    ig = f'{ko} = {mean} ✍️\n\n{_sylls(ko)}\n{note}\n\n{ask}\n\n{ig_tags}'
+    return {'youtube': {'title': title[:95], 'description': desc, 'tags': tags, 'made_for_kids': False, 'pinned_comment': pin},
+            'tiktok': {'caption': _fit(tt, tt_tags, 150), 'pinned_comment': pin},
+            'instagram': {'caption': ig, 'alt_text': f'Quiz animation building the Korean word {ko} ({mean}) from Hangul blocks.', 'pinned_comment': pin}}
+
 def word_package(fmt, it, snd, seed=0):
+    if fmt in ('Q', 'V'): return quiz_package(fmt, it, snd, seed)
     r = random.Random(seed); ko, mean, note = it['ko'], it['en'], _sentence(it.get('note', ''))
     if fmt == 'D':
         title = r.choice([f'What does {ko} mean? (K-drama Korean) #shorts', f'{ko} = {mean} | Korean you hear in every K-drama #shorts', f'Read this K-drama word: {ko} #shorts'])
@@ -51,7 +78,7 @@ def word_package(fmt, it, snd, seed=0):
             'instagram': {'caption': ig, 'alt_text': f'Animation building the Korean word {ko} ({mean}) from Hangul blocks.', 'pinned_comment': pin}}
 
 def package(fmt, items, sounds, seed=0):
-    if fmt in ('D', 'E'):
+    if fmt in ('D', 'E', 'Q', 'V'):
         return word_package(fmt, items[0], sounds.get(items[0]['ko'], ''), seed)
     """items: [{'en','ko','handle'}]; sounds: {ko: 'so-pi-a'}"""
     r = random.Random(seed)
@@ -104,6 +131,7 @@ REPLY_TEMPLATES = {
 # ---------- other languages (i18n.py) ----------
 def _loc_parts(fmt, items, sounds, lang):
     import i18n
+    if fmt in ('Q', 'V'): return None  # quiz formats: English copy only for now
     m = i18n.meta(lang)
     it = items[0]; ko = it['ko']; snd = sounds.get(ko, '')
     names = ', '.join(i['en'] for i in items)

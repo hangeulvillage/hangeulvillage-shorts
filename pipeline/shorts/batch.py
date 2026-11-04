@@ -10,6 +10,7 @@ sys.path.insert(0, HERE)
 import seo, qa
 STUDIO = open(os.path.join(os.path.dirname(HERE), 'shorts-studio.html')).read()
 DICT = set(re.findall(r"(\w+):'[\uAC00-\uD7A3 ]+'", STUDIO[STUDIO.find('const DICT'):STUDIO.find('};', STUDIO.find('const DICT'))]))
+WORDF = ('D', 'E', 'Q', 'V')
 WORDS = json.load(open(os.path.join(HERE, 'words.json')))
 
 L_ROM = ['g','kk','n','d','tt','r','m','b','pp','s','ss','','j','jj','ch','k','t','p','h']
@@ -29,13 +30,13 @@ def main(plan_path, out_dir):
     plan = json.load(open(plan_path)); os.makedirs(out_dir, exist_ok=True)
     manifest = []
     for n, job in enumerate(plan, 1):
-        if job['fmt'] in ('D', 'E') and '=' not in job['names'][0]:  # look up vetted meaning + note
+        if job['fmt'] in WORDF and '=' not in job['names'][0]:  # look up vetted meaning + note
             w = {x[0]: x for x in WORDS[job['fmt']]}.get(job['names'][0].strip())
-            if w: job['names'] = [f'{w[0]} = {w[1]} | {w[2]}']
+            if w: job['names'] = [f'{w[0]} = {w[1]} | {w[2]}' + (f' | {w[3]} | {w[4]}' if job['fmt'] == 'V' else '')]
             if w and job.get('lang', 'en') != 'en':
                 import i18n; mn = i18n.mean(job['lang'], w[0])
                 job['names'] = [f'{w[0]} = {mn}'] if mn else job['names']
-        if job['fmt'] in ('D', 'E'):
+        if job['fmt'] in WORDF:
             slug = re.sub(r'[^a-z0-9]+', '-', sounds_like(job['names'][0].split('=')[0].strip())).strip('-')
         else:
             slug = re.sub(r'[^a-z0-9]+', '-', '-'.join(x.split('@')[0].split('=')[0] for x in job['names']).lower()).strip('-')
@@ -48,17 +49,20 @@ def main(plan_path, out_dir):
             manifest.append({'n': n, 'job': job, 'error': (res.stderr or res.stdout)[-800:]}); continue
         info = json.loads(line[-1])
         items = []
-        if job['fmt'] in ('D', 'E'):
+        if job['fmt'] in WORDF:
             m = re.match(r'^([\uAC00-\uD7A3 ]+)\s*=\s*([^|]+)(?:\|(.*))?$', job['names'][0].strip())
-            items.append({'ko': m.group(1).strip(), 'en': m.group(2).strip(), 'note': (m.group(3) or '').strip(), 'handle': ''})
-        for raw, ko in ([] if job['fmt'] in ('D', 'E') else zip(job['names'], info['korean'])):
+            rest = [x.strip() for x in (m.group(3) or '').split('|')]
+            it = {'ko': m.group(1).strip(), 'en': m.group(2).strip(), 'note': rest[0], 'handle': ''}
+            if job['fmt'] == 'V': it['wrong'], it['wrong_en'] = (rest + ['', '', ''])[1:3]
+            items.append(it)
+        for raw, ko in ([] if job['fmt'] in WORDF else zip(job['names'], info['korean'])):
             m = re.match(r'^(.*?)(\s+@[\w.\-]+)?$', re.sub(r'=[^@]*', ' ', raw).strip())
             items.append({'en': m.group(1).strip().title(), 'ko': ko, 'handle': (m.group(2) or '').strip()})
         snd = {i['ko']: sounds_like(i['ko']) for i in items}
         pk = seo.package(job['fmt'], items, snd, seed=n) if lang == 'en' else seo.localized(job['fmt'], items, snd, lang, seed=n)
         yt_tr = seo.translations(job['fmt'], items, snd) if lang == 'en' else {}
         ok = all(c[2] for c in info['voice_check'])
-        exact = [('=' in raw) or all(p.lower() in DICT for p in re.sub(r'[^A-Za-z ]', ' ', i['en']).split()) for i, raw in zip(items, job['names'])] if job['fmt'] not in ('D', 'E') else []
+        exact = [('=' in raw) or all(p.lower() in DICT for p in re.sub(r'[^A-Za-z ]', ' ', i['en']).split()) for i, raw in zip(items, job['names'])] if job['fmt'] not in WORDF else []
         report = qa.check(job, items, pk, info, base + '.mp4', exact, lang)
         with open(base + '.txt', 'w') as f:
             f.write(f"[YouTube Shorts]\nTitle: {pk['youtube']['title']}\n\nDescription:\n{pk['youtube']['description']}\n\nTags: {', '.join(pk['youtube']['tags'])}\nAudience: Not made for kids\nPinned comment: {pk['youtube']['pinned_comment']}\n\n")

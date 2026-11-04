@@ -36,9 +36,9 @@ def check(job, items, pk, info, video, exact_flags=None, lang='en'):
     if len(texts['tt']) > 150: issues.append('tiktok caption over 150 chars')
     for ko in kos:
         if ko not in texts['yt_desc'] or ko not in texts['ig']: issues.append(f'Korean "{ko}" missing from copy')
-    if info.get('korean') and fmt not in ('D', 'E') and [k.replace(' ', '') for k in info['korean']] != [k.replace(' ', '') for k in kos]:
+    if info.get('korean') and fmt not in ('D', 'E', 'Q', 'V') and [k.replace(' ', '') for k in info['korean']] != [k.replace(' ', '') for k in kos]:
         issues.append(f'copy Korean {kos} differs from video Korean {info["korean"]}')
-    if fmt in ('D', 'E') and lang == 'en':
+    if fmt in ('D', 'E', 'Q', 'V') and lang == 'en':
         vetted = {w[0]: w[1] for w in WORDS[fmt]}
         it = items[0]
         if it['ko'] not in vetted: review.append(f'word "{it["ko"]}" is not in the vetted list: confirm spelling and meaning "{it["en"]}"')

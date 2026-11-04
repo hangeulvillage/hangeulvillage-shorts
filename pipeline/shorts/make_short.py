@@ -11,8 +11,9 @@ UI = i18n.ui(a.lang)
 # 'Priya=프리야' fixes the Korean spelling of a name (curated local names)
 # 'Nikki=니키 @handle' keeps the handle (format C shows it as a comment card)
 import re as _re
-FIX = {n.split('=')[0].strip(): _re.sub(r'\s+@\S+$', '', n.split('=')[1]).strip() for n in a.names if '=' in n and a.fmt not in ('D', 'E')}
-if a.fmt not in ('D', 'E'): a.names = [n.split('=')[0].strip() + ((' ' + _re.search(r'@\S+$', n).group(0)) if '=' in n and _re.search(r'@\S+$', n) else '') for n in a.names]
+WORDF = ('D', 'E', 'Q', 'V')
+FIX = {n.split('=')[0].strip(): _re.sub(r'\s+@\S+$', '', n.split('=')[1]).strip() for n in a.names if '=' in n and a.fmt not in WORDF}
+if a.fmt not in WORDF: a.names = [n.split('=')[0].strip() + ((' ' + _re.search(r'@\S+$', n).group(0)) if '=' in n and _re.search(r'@\S+$', n) else '') for n in a.names]
 
 # ---- page with local fonts ----
 studio = open(os.path.join(SCR, 'shorts-studio.html')).read()
@@ -79,6 +80,17 @@ elif a.fmt == 'B':
     done = t + 0.5 + 0.85 * nsyl(ko) + 0.2; sfx.append((done, 'chime'))
     lines.append((done + 0.45, ko, 0.85))
     t += 0.6 + 0.85 * nsyl(ko) + 2.6
+elif a.fmt in ('Q', 'V'):
+    ko = kos[0]; sfx.append((0.05, 'whoosh'))
+    if a.fmt == 'Q':
+        lines += [(0.7, '이 단어, 읽을 수 있어요?', 0.9), (2.3, '댓글로 맞혀 보세요!', 0.9)]; t = 4.6
+    else:
+        lines += [(0.9, '어느 쪽일까요?', 0.9), (2.5, '댓글로 번호를 남겨 주세요!', 0.9)]; t = 5.4
+        sfx.append((4.6, 'chime'))
+    syl_lines(ko, t, 0.85); land_sfx(t, 0.85, nsyl(ko))
+    done = t + 0.5 + 0.85 * nsyl(ko) + 0.2; sfx.append((done, 'chime'))
+    lines += [(done + 0.45, ko, 0.85), (done + 1.6, ko, 0.85)]
+    t += 0.6 + 0.85 * nsyl(ko) + 3.0
 elif a.fmt in ('D', 'E'):
     ko = kos[0]; sfx.append((0.05, 'whoosh'))
     lines.append((0.7, '이 말, 들어 봤죠?' if a.fmt == 'D' else '이 표지판, 읽을 수 있어요?', 0.9))
@@ -95,7 +107,7 @@ else:
         done = t + 0.5 + 0.75 * nsyl(ko) + 0.2; sfx.append((done, 'chime'))
         lines.append((done + 0.4, ko, 0.85))
         t += 0.5 + 0.75 * nsyl(ko) + 1.8
-lines.append((t + 0.35, '다음 단어를 추천해 주세요!' if a.fmt in ('D', 'E') else '이름을 알려 주세요!', 0.9))
+lines.append((t + 0.35, '맞혔나요? 댓글로 알려 주세요!' if a.fmt in ('Q', 'V') else '다음 단어를 추천해 주세요!' if a.fmt in ('D', 'E') else '이름을 알려 주세요!', 0.9))
 
 # ---- TTS (Supertonic-3, voice F2, each clip verified by speech recognition) ----
 os.environ['HV_VOICE'] = a.voice
