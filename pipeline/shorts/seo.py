@@ -49,7 +49,11 @@ def quiz_package(fmt, it, snd, seed=0):
         pin = r.choice(['Did you pick the right number? Comment 1 or 2!', 'What was your answer? Comment 1 or 2 and we will make the next quiz harder.'])
     desc = (f"{lead}\n{_sylls(ko)}\n{note}\n\nEvery Korean syllable is a block: first sound + vowel (+ final sound).\n"
             f"{ask}\n\n#learnkorean #hangul #koreanquiz #shorts")
-    ig = f'{ko} = {mean} ✍️\n\n{_sylls(ko)}\n{note}\n\n{ask}\n\n{ig_tags}'
+    # captions must not give the answer away (they show before the video ends)
+    if fmt == 'Q':
+        ig = f'Guess the English word: {ko} 🤔\n\nIt is an English word written in Hangul. Comment your guess before the answer at the end!\n\n{ig_tags}'
+    else:
+        ig = f'Which one means "{mean}"? 1 or 2 🤔\n\nComment your number before the answer at the end!\n\n{ig_tags}'
     return {'youtube': {'title': title[:95], 'description': desc, 'tags': tags, 'made_for_kids': False, 'pinned_comment': pin},
             'tiktok': {'caption': _fit(tt, tt_tags, 150), 'pinned_comment': pin},
             'instagram': {'caption': ig, 'alt_text': f'Quiz animation building the Korean word {ko} ({mean}) from Hangul blocks.', 'pinned_comment': pin}}
