@@ -18,3 +18,10 @@ Every spoken syllable is regenerated until a Korean speech recognizer hears it (
 - Q and V ask viewers to answer in the comments before a 3-2-1 countdown, then build the answer.
 - Vetted lists: words.json Q (English loanwords, incl. Konglish like 노트북 = laptop) and V (correct, meaning, note, distractor, distractor meaning).
 - English copy only (no YouTube translations yet).
+
+
+## 2026-11-05 update: faster pacing, hook test, ja/de
+- **Pacing v3:** syllables land every 0.6 s (was 0.85), the word holds 2.0 s, end card 2.0 s, countdown 0.8 s per number. Shorts now run 8-12 s (were 11-14 s). QA accepts 6-35 s and flags anything over 12.5 s for review.
+- **Hook A/B/C test:** D/E/Q/V have 3 opening variants (on-screen line + Korean voice line). `job.hook` picks one; without it, a stable hash of the word does. The manifest records `hook` and `duration`. Localized videos always use variant 0.
+- **Titles:** YouTube titles prefer candidates of 60 chars or less (before ` #shorts`), so they aren't cut off in the Shorts feed.
+- **Japanese (ja) and German (de)** language packs: UI, copy, all vetted word meanings, local names, Noto Sans JP font.

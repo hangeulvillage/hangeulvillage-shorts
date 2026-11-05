@@ -388,7 +388,7 @@ if (typeof module !== 'undefined') module.exports = { toHangul, decompose, compo
     V: { bg: '#0d2b45', ink: '#ffffff', muted: '#a9c3dc', tile: '#143a5c', line: '#2a5479', cho: '#8fc1ff', jung: '#ff8fa3', jong: '#ffd166', s1: '#1d4470', s2: '#5a2d3d', s3: '#56481f', accent: '#5eead4' }
   };
   const UI = window.HV_UI || {}; const S = (k, d) => (k in UI ? UI[k] : d);
-  const FB = '"Noto Sans TC", "Noto Sans SC", "Noto Sans Devanagari", "Noto Sans Bengali", "Noto Sans Arabic", "Noto Nastaliq Urdu", "Noto Sans"';
+  const FB = (document.documentElement.lang === 'ja' || (window.HV_UI || {}).ja ? '"Noto Sans JP", ' : '') + '"Noto Sans TC", "Noto Sans SC", "Noto Sans Devanagari", "Noto Sans Bengali", "Noto Sans Arabic", "Noto Nastaliq Urdu", "Noto Sans"';
   const FONT_D = '"Bricolage Grotesque", ' + FB + ', "Noto Sans KR", sans-serif';
   const FONT_K = '"Gowun Batang", "Noto Serif KR", serif';
   const FONT_B = '"Noto Sans KR", ' + FB + ', sans-serif';
@@ -475,33 +475,37 @@ if (typeof module !== 'undefined') module.exports = { toHangul, decompose, compo
 
   // ---------- plan ----------
   function sylCount(ko) { return ko.replace(/ /g, '').length; }
+  // fast pacing (v3, 2026-11-05): target 8-10 s, something new on screen about every 2 s
+  const PER = 0.6, HOLD = 2.0, HOLD_C = 1.4, END = 2.0, CD_STEP = 0.8;
+  const HOOK = (window.HV_HOOK | 0) % 3;
+  const hv = (arr) => (Object.keys(window.HV_UI || {}).length ? arr[0] : arr[HOOK] || arr[0]);
   function buildPlan() {
     const sc = []; let t = 0;
     const push = (type, dur, data) => { sc.push(Object.assign({ type, t0: t, dur }, data || {})); t += dur; };
     if (!items.length) return { scenes: [], total: 0 };
     if (fmt === 'A') {
-      push('hook', 2.2, { item: items[0] });
-      push('build', 0.6 + 0.85 * sylCount(items[0].ko) + 2.4, { item: items[0], label: true });
+      push('hook', 1.8, { item: items[0] });
+      push('build', 0.6 + PER * sylCount(items[0].ko) + HOLD, { item: items[0], label: true });
     } else if (fmt === 'B') {
-      push('quiz', 4.2, { item: items[0] });
-      push('build', 0.6 + 0.85 * sylCount(items[0].ko) + 2.6, { item: items[0], reveal: true });
+      push('quiz', 3.4, { item: items[0] });
+      push('build', 0.6 + PER * sylCount(items[0].ko) + HOLD, { item: items[0], reveal: true });
     } else if (fmt === 'D') {
-      push('hookD', 2.4, { item: items[0] });
-      push('build', 0.6 + 0.85 * sylCount(items[0].ko) + 3.0, { item: items[0], meaning: true });
+      push('hookD', 1.8, { item: items[0] });
+      push('build', 0.6 + PER * sylCount(items[0].ko) + HOLD, { item: items[0], meaning: true });
     } else if (fmt === 'E') {
-      push('hookE', 3.0, { item: items[0] });
-      push('build', 0.6 + 0.85 * sylCount(items[0].ko) + 3.0, { item: items[0], meaning: true });
+      push('hookE', 2.4, { item: items[0] });
+      push('build', 0.6 + PER * sylCount(items[0].ko) + HOLD, { item: items[0], meaning: true });
     } else if (fmt === 'Q') {
-      push('hookQ', 4.6, { item: items[0] });
-      push('build', 0.6 + 0.85 * sylCount(items[0].ko) + 3.0, { item: items[0], meaning: true });
+      push('hookQ', 3.6, { item: items[0] });
+      push('build', 0.6 + PER * sylCount(items[0].ko) + HOLD, { item: items[0], meaning: true });
     } else if (fmt === 'V') {
-      push('hookV', 5.4, { item: items[0] });
-      push('build', 0.6 + 0.85 * sylCount(items[0].ko) + 3.0, { item: items[0], meaning: true });
+      push('hookV', 4.4, { item: items[0] });
+      push('build', 0.6 + PER * sylCount(items[0].ko) + HOLD, { item: items[0], meaning: true });
     } else {
       push('hookC', 2.0, { reqs: items.filter(i => i.handle) });
-      items.forEach(it => push('build', 0.5 + 0.75 * sylCount(it.ko) + 1.8, { item: it, label: true, handle: it.handle }));
+      items.forEach(it => push('build', 0.5 + PER * sylCount(it.ko) + HOLD_C, { item: it, label: true, handle: it.handle }));
     }
-    push('end', 2.8, {});
+    push('end', END, {});
     return { scenes: sc, total: t };
   }
 
@@ -598,16 +602,22 @@ if (typeof module !== 'undefined') module.exports = { toHangul, decompose, compo
   }
   function drawHookD(lt, it, th) {
     chip(S('Dchip', 'K-DRAMA WORD'), 640, th, lt, 0);
-    lineIn(S('D1', 'You hear this'), 800, 92, 800, FONT_D, th.ink, lt, 0.2);
-    lineIn(S('D2', 'ALL the time'), 920, 110, 800, FONT_D, th.accent, lt, 0.5);
-    lineIn(S('D3', 'Can you read it?'), 1040, 64, 700, FONT_D, th.muted, lt, 0.9);
-    FX.bubble = '이 말, 들어 봤죠?'; FX.bubbleA = fade(lt, 0.6, 0.3);
+    const v = hv([[S('D1', 'You hear this'), S('D2', 'ALL the time'), S('D3', 'Can you read it?'), '이 말, 들어 봤죠?'],
+                  ['Every K-drama', 'says this', 'Do you know it?', '드라마에 꼭 나와요!'],
+                  ['Only real fans', 'know this word', 'Do you?', '진짜 팬이면 알죠?']]);
+    lineIn(v[0], 800, fitFont(v[0], W - 160, 92, 800, FONT_D, 50), 800, FONT_D, th.ink, lt, 0.15);
+    lineIn(v[1], 920, fitFont(v[1], W - 160, 110, 800, FONT_D, 50), 800, FONT_D, th.accent, lt, 0.35);
+    lineIn(v[2], 1040, 64, 700, FONT_D, th.muted, lt, 0.6);
+    FX.bubble = v[3]; FX.bubbleA = fade(lt, 0.4, 0.3);
   }
   function drawHookE(lt, it, th) {
     chip(S('Echip', 'SEOUL SIGN'), 560, th, lt, 0);
-    lineIn(S('E1', 'Can you read'), 690, 84, 800, FONT_D, th.ink, lt, 0.2);
-    lineIn(S('E2', 'this sign?'), 790, 84, 800, FONT_D, th.ink, lt, 0.45);
-    const p = easeBack(fade(lt, 0.8, 0.5));
+    const v = hv([[S('E1', 'Can you read'), S('E2', 'this sign?'), '읽을 수 있어요?'],
+                  ["You'll see this", 'all over Seoul', '서울 어디에나 있어요!'],
+                  ['Lost in Seoul?', 'Read this sign!', '이거 모르면 길 잃어요!']]);
+    lineIn(v[0], 690, fitFont(v[0], W - 160, 84, 800, FONT_D, 50), 800, FONT_D, th.ink, lt, 0.15);
+    lineIn(v[1], 790, fitFont(v[1], W - 160, 84, 800, FONT_D, 50), 800, FONT_D, th.ink, lt, 0.35);
+    const p = easeBack(fade(lt, 0.6, 0.5));
     if (p > 0) {
       const sz = fitFont(it.ko, 700, 190, 700, FONT_B, 80); ctx.font = '700 ' + sz + 'px ' + FONT_B;
       const w = Math.max(420, ctx.measureText(it.ko).width + 140), h = sz + 110;
@@ -616,12 +626,12 @@ if (typeof module !== 'undefined') module.exports = { toHangul, decompose, compo
       ctx.fillStyle = '#1a7f5a'; rr(ctx, -w / 2, -h / 2, w, h, 24); ctx.fill();
       ctx.fillStyle = '#ffffff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(it.ko, 0, 6); ctx.restore();
     }
-    FX.bubble = '읽을 수 있어요?'; FX.bubbleA = fade(lt, 1.0, 0.3);
+    FX.bubble = v[2]; FX.bubbleA = fade(lt, 0.8, 0.3);
   }
   function countdown(lt, start, y, th) {
     if (lt <= start) return;
-    const n = 3 - Math.floor((lt - start) / 1.0);
-    if (n >= 1) { const f = (lt - start) % 1.0; text(String(n), W / 2, y, 160 - f * 30, 800, FONT_D, th.accent, 1 - f * 0.6); }
+    const n = 3 - Math.floor((lt - start) / CD_STEP);
+    if (n >= 1) { const f = ((lt - start) % CD_STEP) / CD_STEP; text(String(n), W / 2, y, 160 - f * 30, 800, FONT_D, th.accent, 1 - f * 0.6); }
   }
   function wordCard(ko, cx, cy, maxW, size, bg, fg, p) {
     if (p <= 0) return;
@@ -634,22 +644,26 @@ if (typeof module !== 'undefined') module.exports = { toHangul, decompose, compo
   }
   function drawHookQ(lt, it, th) {
     chip(S('Qchip', 'GUESS THE WORD'), 520, th, lt, 0);
-    lineIn(S('Q1', "It's an English word"), 650, 76, 800, FONT_D, th.ink, lt, 0.2);
-    lineIn(S('Q2', 'written in Korean!'), 745, 76, 800, FONT_D, th.accent, lt, 0.45);
-    wordCard(it.ko, W / 2, 990, W - 160, 200, '#ffffff', th.ink, easeBack(fade(lt, 0.8, 0.5)));
-    lineIn(S('Q3', 'Comment your guess before 0!'), 1175, 50, 700, FONT_D, th.muted, lt, 1.2);
-    countdown(lt, 1.5, 1340, th);
-    FX.bubble = '맞혀 보세요!'; FX.bubbleA = fade(lt, 1.0, 0.3);
+    const v = hv([[S('Q1', "It's an English word"), S('Q2', 'written in Korean!'), '맞혀 보세요!'],
+                  ['Koreans say this', 'every day. In English!', '매일 쓰는 영어 단어!'],
+                  ["Bet you can't", 'read this in 3 sec', '3초 안에 읽어 보세요!']]);
+    lineIn(v[0], 650, fitFont(v[0], W - 160, 76, 800, FONT_D, 44), 800, FONT_D, th.ink, lt, 0.1);
+    lineIn(v[1], 745, fitFont(v[1], W - 160, 76, 800, FONT_D, 44), 800, FONT_D, th.accent, lt, 0.3);
+    wordCard(it.ko, W / 2, 990, W - 160, 200, '#ffffff', th.ink, easeBack(fade(lt, 0.5, 0.5)));
+    lineIn(S('Q3', 'Comment your guess before 0!'), 1175, 50, 700, FONT_D, th.muted, lt, 0.8);
+    countdown(lt, 1.0, 1340, th);
+    FX.bubble = v[2]; FX.bubbleA = 0;  // countdown sits where the bubble would be
   }
   function drawHookV(lt, it, th) {
     chip(S('Vchip', '1 OR 2?'), 470, th, lt, 0);
-    lineIn(S('V1', 'Which one means'), 600, 70, 800, FONT_D, th.ink, lt, 0.2);
+    const v = hv([[S('V1', 'Which one means'), '몇 번일까요?'], ['Only one means', '1번? 2번?'], ['Most people miss this:', '헷갈리죠?']]);
+    lineIn(v[0], 600, fitFont(v[0], W - 160, 70, 800, FONT_D, 44), 800, FONT_D, th.ink, lt, 0.1);
     const q = '"' + it.en + '"?';
-    lineIn(q, 715, fitFont(q, W - 160, 96, 800, FONT_D, 44), 800, FONT_D, th.accent, lt, 0.45);
+    lineIn(q, 715, fitFont(q, W - 160, 96, 800, FONT_D, 44), 800, FONT_D, th.accent, lt, 0.3);
     const opts = it.pos ? [it.wrong, it.ko] : [it.ko, it.wrong];
-    const reveal = lt > 4.6;
+    const reveal = lt > 3.6;
     opts.forEach((ko, i) => {
-      const cy = 930 + i * 250, p = easeBack(fade(lt, 0.8 + i * 0.25, 0.45));
+      const cy = 930 + i * 250, p = easeBack(fade(lt, 0.5 + i * 0.2, 0.45));
       const right = ko === it.ko;
       const bg = reveal ? (right ? th.accent : th.tile) : '#ffffff';
       const fg = reveal ? (right ? th.bg : th.muted) : '#13263b';
@@ -660,8 +674,8 @@ if (typeof module !== 'undefined') module.exports = { toHangul, decompose, compo
         text(String(i + 1), W / 2 + 40 - r.w / 2 - 70, cy + 22, 64, 800, FONT_D, th.bg, a);
       }
     });
-    if (!reveal) countdown(lt, 1.6, 1460, th);
-    FX.bubble = reveal ? '정답!' : '몇 번일까요?'; FX.bubbleA = fade(lt, 1.0, 0.3);
+    if (!reveal) countdown(lt, 1.1, 1460, th);
+    FX.bubble = reveal ? '정답!' : v[1]; FX.bubbleA = fade(lt, 1.0, 0.3);
     if (reveal) FX.cheer = true;
   }
   function drawHook(lt, it, th) {
@@ -703,10 +717,10 @@ if (typeof module !== 'undefined') module.exports = { toHangul, decompose, compo
     const p = easeBack(fade(lt, 0.5, 0.5));
     ctx.save(); ctx.translate(W / 2, 960); ctx.scale(0.6 + 0.4 * p, 0.6 + 0.4 * p); ctx.translate(-W / 2, -960);
     text(it.ko, W / 2, 1020, sz, 700, FONT_K, th.ink, clamp(p, 0, 1)); ctx.restore();
-    if (lt > 1.2) {
-      const n = 3 - Math.floor((lt - 1.2) / 1.0);
+    if (lt > 0.9) {
+      const n = 3 - Math.floor((lt - 0.9) / CD_STEP);
       if (n >= 1) {
-        const f = ((lt - 1.2) % 1.0);
+        const f = ((lt - 0.9) % CD_STEP) / CD_STEP;
         text(String(n), W / 2, 1320, 160 - f * 30, 800, FONT_D, th.accent, 1 - f * 0.6);
       }
     }
@@ -736,7 +750,7 @@ if (typeof module !== 'undefined') module.exports = { toHangul, decompose, compo
   }
   function drawBuild(lt, sc, th) {
     const it = sc.item;
-    const per = fmt === 'C' ? 0.75 : 0.85;
+    const per = PER;
     const tiles = layoutTiles(it.ko);
     const n = tiles.length;
     const doneAt = 0.5 + per * n + 0.2;

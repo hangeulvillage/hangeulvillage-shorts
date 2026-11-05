@@ -18,6 +18,11 @@ def _sylls(ko):
             from_.append(L + '+' + V + ('+' + T if T else '') + '=' + ch)
     return ' · '.join(from_)
 
+def pick(r, cands, limit=60):
+    """random title among those that fit the Shorts feed (about 60 chars before ' #shorts'), else the shortest."""
+    ok = [c for c in cands if len(c.replace(' #shorts', '')) <= limit]
+    return r.choice(ok) if ok else min(cands, key=len)
+
 def _sentence(x):
     x = (x or '').strip()
     return x if not x or x[-1] in '.!?' else x + '.'
@@ -31,7 +36,7 @@ def _fit(text, tags, limit):
 def quiz_package(fmt, it, snd, seed=0):
     r = random.Random(seed); ko, mean, note = it['ko'], it['en'], _sentence(it.get('note', ''))
     if fmt == 'Q':
-        title = r.choice([f'Guess the English word: {ko} #shorts', f'Can you read this? It is English! {ko} #shorts', f'{ko} = ? Comment your guess #shorts'])
+        title = pick(r, [f'Guess the English word: {ko} #shorts', f'Can you read this? It is English! {ko} #shorts', f'{ko} = ? Comment your guess #shorts'])
         tags = ['konglish', 'korean loanwords', 'english words in korean', 'korean quiz', 'learn korean', 'hangul', 'read korean', f'{mean.lower()} in korean']
         tt = f'Guess the English word: {ko}. Comment your guess before the answer!'
         tt_tags = '#learnkorean #koreanquiz #konglish #hangul #korean'; ig_tags = '#learnkorean #koreanquiz #konglish #hangul #studykorean'
@@ -40,7 +45,7 @@ def quiz_package(fmt, it, snd, seed=0):
         pin = r.choice(['How fast did you read it? Comment your time!', 'Got it right? Comment the next English word you want to see in Hangul.'])
     else:
         wrong, wrong_en = it.get('wrong', ''), it.get('wrong_en', '')
-        title = r.choice([f'Which one means "{mean}"? 1 or 2 #shorts', f'Korean quiz: "{mean}" is 1 or 2? #shorts', f'1 or 2? Find "{mean}" in Korean #shorts'])
+        title = pick(r, [f'Which one means "{mean}"? 1 or 2 #shorts', f'Korean quiz: "{mean}" is 1 or 2? #shorts', f'1 or 2? Find "{mean}" in Korean #shorts'])
         tags = ['korean quiz', 'korean words', 'learn korean', 'kdrama korean', 'hangul', 'korean for beginners', f'{mean.lower()} in korean']
         tt = f'Which one means "{mean}" in Korean? Comment 1 or 2!'
         tt_tags = '#learnkorean #koreanquiz #kdrama #hangul #korean'; ig_tags = '#learnkorean #koreanquiz #kdrama #hangul #studykorean'
@@ -66,12 +71,12 @@ def word_package(fmt, it, snd, seed=0):
     if fmt in ('Q', 'V'): return quiz_package(fmt, it, snd, seed)
     r = random.Random(seed); ko, mean, note = it['ko'], it['en'], _sentence(it.get('note', ''))
     if fmt == 'D':
-        title = r.choice([f'What does {ko} mean? (K-drama Korean) #shorts', f'{ko} = {mean} | Korean you hear in every K-drama #shorts', f'Read this K-drama word: {ko} #shorts'])
+        title = pick(r, [f'What does {ko} mean? (K-drama Korean) #shorts', f'{ko} = {mean} | Korean you hear in every K-drama #shorts', f'Read this K-drama word: {ko} #shorts'])
         tags = ['kdrama korean', 'korean words', 'learn korean with kdrama', 'kpop korean words', 'korean phrases', 'learn korean', 'hangul', f'{snd.replace("-", "")} meaning', f'what does {ko} mean']
         tt_tags = '#kdrama #learnkorean #koreanwords #hangul #kpop'; ig_tags = '#kdrama #learnkorean #koreanwords #koreanlanguage #hangul'
         lead = f'{ko} ({snd}) means "{mean}".'
     else:
-        title = r.choice([f'Can you read this Korean sign? {ko} #shorts', f'{ko} = {mean} | Korean for your Seoul trip #shorts', f'Read this sign in Seoul: {ko} #shorts'])
+        title = pick(r, [f'Can you read this Korean sign? {ko} #shorts', f'{ko} = {mean} | Korean for your Seoul trip #shorts', f'Read this sign in Seoul: {ko} #shorts'])
         tags = ['korean signs', 'korea travel', 'seoul travel tips', 'korean for travel', 'learn korean', 'hangul', 'read korean', f'{snd.replace("-", "")} korean', f'{mean.lower()} in korean']
         tt_tags = '#koreatravel #seoul #learnkorean #hangul #koreanwords'; ig_tags = '#koreatravel #seoul #learnkorean #hangul #studykorean'
         lead = f'This sign says {ko} ({snd}): "{mean}".'
@@ -95,13 +100,13 @@ def package(fmt, items, sounds, seed=0):
     kos = ' · '.join(i['ko'] for i in items)
     handles = ' '.join(i['handle'] for i in items if i.get('handle'))
     if fmt == 'A':
-        yt_title = r.choice([f'{en} in Korean (Hangul) #shorts', f'How to write {en} in Korean #shorts', f'Your name in Korean: {en} = {ko} #shorts'])
+        yt_title = pick(r, [f'{en} in Korean (Hangul) #shorts', f'How to write {en} in Korean #shorts', f'Your name in Korean: {en} = {ko} #shorts'])
         hook = f'{en} in Korean is {ko}'
     elif fmt == 'B':
-        yt_title = r.choice([f'Can you read this Korean name? {ko} #shorts', f'Read this Korean name in 3 seconds #shorts', f'Guess the name: {ko} #shorts'])
+        yt_title = pick(r, [f'Can you read this Korean name? {ko} #shorts', f'Read this Korean name in 3 seconds #shorts', f'Guess the name: {ko} #shorts'])
         hook = f'Could you read {ko}? It says {en}'
     else:
-        yt_title = r.choice([f'Your names in Korean: {names} #shorts', f'Writing your names in Hangul #shorts', f'You asked, I built it: {kos} #shorts'])
+        yt_title = pick(r, [f'Your names in Korean: {names} #shorts', f'Writing your names in Hangul #shorts', f'You asked, I built it: {kos} #shorts'])
         hook = f'Your names in Korean: {names}'
     yt_title = yt_title[:95]
     breakdown = '\n'.join(f"{i['en']} = {i['ko']} ({sounds.get(i['ko'], '')})\n{_sylls(i['ko'])}" for i in items)

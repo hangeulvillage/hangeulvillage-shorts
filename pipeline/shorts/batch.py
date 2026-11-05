@@ -42,7 +42,10 @@ def main(plan_path, out_dir):
             slug = re.sub(r'[^a-z0-9]+', '-', '-'.join(x.split('@')[0].split('=')[0] for x in job['names']).lower()).strip('-')
         lang = job.get('lang', 'en')
         base = os.path.join(out_dir, f'{n:02d}_{job["fmt"]}_{slug}_{job.get("voice", "female")}' + ('' if lang == 'en' else '_' + lang))
-        res = subprocess.run([sys.executable, os.path.join(HERE, 'make_short.py'), job['fmt'], *job['names'], '--voice', job.get('voice', 'female'), '--lang', lang, '--out', base + '.mp4'],
+        # opening-line variant for the A/B/C hook test: set by the plan, else stable per word (re-renders match)
+        hook = int(job['hook']) if 'hook' in job else sum(ord(c) for c in job['names'][0].split('=')[0].strip()) % 3
+        job['hook'] = hook
+        res = subprocess.run([sys.executable, os.path.join(HERE, 'make_short.py'), job['fmt'], *job['names'], '--voice', job.get('voice', 'female'), '--lang', lang, '--hook', str(hook), '--out', base + '.mp4'],
                              capture_output=True, text=True)
         line = [l for l in res.stdout.splitlines() if l.startswith('{')]
         if res.returncode or not line:
@@ -71,9 +74,9 @@ def main(plan_path, out_dir):
             f.write(f"\n[Language] video/title language: {lang}\n")
             for lg, tr in yt_tr.items():
                 f.write(f"\n[YouTube translation {lg}]\nTitle: {tr['title']}\nDescription:\n{tr['description']}\n")
-        manifest.append({'n': n, 'job': job, 'video': base + '.mp4', 'copy': base + '.txt', 'items': items, 'voice_ok': ok, 'voice_check': info['voice_check'], 'package': pk, 'lang': lang, 'yt_translations': yt_tr, 'qa': report})
+        manifest.append({'n': n, 'job': job, 'video': base + '.mp4', 'copy': base + '.txt', 'items': items, 'voice_ok': ok, 'voice_check': info['voice_check'], 'package': pk, 'lang': lang, 'hook': info.get('hook', 0), 'duration': info.get('duration'), 'yt_translations': yt_tr, 'qa': report})
     json.dump(manifest, open(os.path.join(out_dir, 'manifest.json'), 'w'), ensure_ascii=False, indent=1)
-    print(json.dumps([{'n': m['n'], 'qa_pass': (m.get('qa') or {}).get('pass'), 'issues': (m.get('qa') or {}).get('issues'), 'review': (m.get('qa') or {}).get('review'), 'video': os.path.basename(m.get('video', '')), 'error': m.get('error', '')[:200]} for m in manifest], ensure_ascii=False))
+    print(json.dumps([{'n': m['n'], 'hook': m.get('hook'), 'sec': round(m.get('duration') or 0, 1), 'qa_pass': (m.get('qa') or {}).get('pass'), 'issues': (m.get('qa') or {}).get('issues'), 'review': (m.get('qa') or {}).get('review'), 'video': os.path.basename(m.get('video', '')), 'error': m.get('error', '')[:200]} for m in manifest], ensure_ascii=False))
 
 if __name__ == '__main__':
     main(sys.argv[1], sys.argv[2])

@@ -15,12 +15,12 @@ try:
 except Exception:  # OpenCC missing: Traditional falls back to Simplified text
     _s2t = lambda s: s
 
-ORDER = ['zh-Hant', 'hi', 'es', 'ar', 'fr', 'bn', 'pt', 'id', 'ur', 'ru']   # video rollout (Mandarin = Taiwan/HK/SEA on these platforms)
-META_LANGS = ['zh-Hans', 'zh-Hant', 'hi', 'es', 'ar', 'fr', 'bn', 'pt', 'id', 'ur', 'ru']  # YouTube translated titles/descriptions
+ORDER = ['zh-Hant', 'hi', 'es', 'ar', 'fr', 'bn', 'pt', 'id', 'ur', 'ru', 'ja', 'de']   # ja/de added 2026-11-05: high ad rates + big Korean-learning markets   # video rollout (Mandarin = Taiwan/HK/SEA on these platforms)
+META_LANGS = ['zh-Hans', 'zh-Hant', 'hi', 'es', 'ar', 'fr', 'bn', 'pt', 'id', 'ur', 'ru', 'ja', 'de']  # YouTube translated titles/descriptions
 RTL = {'ar', 'ur'}
 
 STUDIO = {'en': '영어', 'zh-Hans': '중국어(간체)', 'zh-Hant': '중국어(번체)', 'hi': '힌디어', 'es': '스페인어', 'ar': '아랍어',
-          'fr': '프랑스어', 'bn': '벵골어', 'pt': '포르투갈어', 'id': '인도네시아어', 'ur': '우르두어', 'ru': '러시아어'}
+          'fr': '프랑스어', 'bn': '벵골어', 'pt': '포르투갈어', 'id': '인도네시아어', 'ur': '우르두어', 'ru': '러시아어', 'ja': '일본어', 'de': '독일어'}
 
 _UI = {
  'zh': dict(hookA1='', hookA3='的韩文怎么写？', hookC1='你们点的名字', hookC2='韩文版', hookC3='来了！', quiz1='你看得懂', quiz2='这个名字吗？',
@@ -53,6 +53,12 @@ _UI = {
  'ru': dict(hookA1='Как написать', hookA3='по-корейски?', hookC1='Вы просили.', hookC2='Ваши имена', hookC3='по-корейски', quiz1='Сможешь прочитать', quiz2='это имя?',
             Dchip='СЛОВО ИЗ ДОРАМ', D1='Ты слышишь это', D2='ПОСТОЯННО', D3='Сможешь прочитать?', Echip='ВЫВЕСКА В СЕУЛЕ', E1='Сможешь прочитать', E2='эту вывеску?',
             endWords='= Какое слово дальше?', endName='= Напиши своё имя!', endSub='Пиши в комментариях'),
+ 'ja': dict(hookA1='', hookA3='を韓国語で書くと？', hookC1='リクエストの', hookC2='名前を', hookC3='韓国語で！', quiz1='この名前', quiz2='読める？',
+            Dchip='韓ドラの言葉', D1='韓ドラで', D2='毎回聞く', D3='読める？', Echip='ソウルの看板', E1='この看板', E2='読める？',
+            endWords='＝次の単語は？', endName='＝名前を教えて！', endSub='コメントで教えてね', ja=True),
+ 'de': dict(hookA1='Wie schreibt man', hookA3='auf Koreanisch?', hookC1='Ihr wolltet es.', hookC2='Eure Namen', hookC3='auf Koreanisch', quiz1='Kannst du', quiz2='diesen Namen lesen?',
+            Dchip='K-DRAMA-WORT', D1='Du hörst es', D2='STÄNDIG', D3='Kannst du es lesen?', Echip='SCHILD IN SEOUL', E1='Kannst du', E2='dieses Schild lesen?',
+            endWords='= Welches Wort als Nächstes?', endName='= Sag mir deinen Namen!', endSub='Schreib es in die Kommentare'),
 }
 
 _META = {
@@ -96,51 +102,59 @@ _META = {
             A_l='{en} по-корейски пишется {ko} ({snd}).', B_l='{ko} = {en} ({snd}).', C_l='Ваши имена по-корейски:', D_l='{ko} ({snd}) значит «{mean}».', E_l='На этой вывеске написано {ko} ({snd}): «{mean}».',
             block='Каждый корейский слог — это блок: начальный звук + гласный (+ конечный звук).', cta_name='Напиши своё имя в комментариях, и мы напишем его по-корейски.', cta_word='Какое слово выучим дальше? Пиши в комментариях.',
             tags='#корейскийязык #учимкорейский #hangul'),
+ 'ja': dict(A_t='{en}を韓国語で書くと？{ko}', B_t='この韓国語の名前、読める？{ko}', C_t='みんなの名前を韓国語で：{names}', D_t='韓ドラの「{ko}」ってどういう意味？', E_t='この韓国語の看板、読める？{ko}',
+            A_l='{en}は韓国語で{ko}（{snd}）と書きます。', B_l='{ko}＝{en}（{snd}）。', C_l='みんなの名前を韓国語で：', D_l='{ko}（{snd}）は「{mean}」という意味です。', E_l='この看板は{ko}（{snd}）：「{mean}」。',
+            block='ハングルは1文字が1ブロック：最初の音＋母音（＋最後の音）。', cta_name='コメントに名前を書いてね。次の動画で韓国語にします。', cta_word='次はどの単語を知りたい？コメントで教えてね。',
+            tags='#韓国語 #韓国語勉強 #ハングル'),
+ 'de': dict(A_t='{en} auf Koreanisch: {ko}', B_t='Kannst du diesen koreanischen Namen lesen? {ko}', C_t='Eure Namen auf Koreanisch: {names}', D_t='Was heißt {ko}? Koreanisch aus K-Dramas', E_t='Kannst du dieses koreanische Schild lesen? {ko}',
+            A_l='{en} schreibt man auf Koreanisch {ko} ({snd}).', B_l='{ko} = {en} ({snd}).', C_l='Eure Namen auf Koreanisch:', D_l='{ko} ({snd}) heißt „{mean}“.', E_l='Auf diesem Schild steht {ko} ({snd}): „{mean}“.',
+            block='Jede koreanische Silbe ist ein Block: Anfangslaut + Vokal (+ Endlaut).', cta_name='Schreib deinen Namen in die Kommentare, wir schreiben ihn auf Koreanisch.', cta_word='Welches Wort sollen wir als Nächstes machen? Schreib es in die Kommentare.',
+            tags='#koreanischlernen #koreanisch #hangul'),
 }
 
-# meanings of the vetted words: order zh, hi, es, ar, fr, bn, pt, id, ur, ru
-_ML = ['zh', 'hi', 'es', 'ar', 'fr', 'bn', 'pt', 'id', 'ur', 'ru']
+# meanings of the vetted words: order zh, hi, es, ar, fr, bn, pt, id, ur, ru, ja, de
+_ML = ['zh', 'hi', 'es', 'ar', 'fr', 'bn', 'pt', 'id', 'ur', 'ru', 'ja', 'de']
 _MEAN = {
- '사랑해': ['我爱你', 'मुझे तुमसे प्यार है', 'Te quiero', 'أحبك', 'Je t’aime', 'আমি তোমাকে ভালোবাসি', 'Eu te amo', 'Aku cinta kamu', 'مجھے تم سے محبت ہے', 'Я тебя люблю'],
- '화이팅': ['加油！', 'तुम कर सकते हो!', '¡Tú puedes!', 'تستطيع فعلها!', 'Tu peux le faire !', 'তুমি পারবে!', 'Você consegue!', 'Semangat!', 'تم کر سکتے ہو!', 'Ты сможешь!'],
- '대박': ['太棒了！', 'कमाल है!', '¡Increíble!', 'رائع!', 'Génial !', 'দারুণ!', 'Incrível!', 'Keren banget!', 'زبردست!', 'Круто!'],
- '언니': ['姐姐（女生用）', 'बड़ी बहन (लड़कियाँ कहती हैं)', 'Hermana mayor (lo dicen las chicas)', 'الأخت الكبرى (تقولها الفتيات)', 'Grande sœur (dit par une fille)', 'বড় বোন (মেয়েরা বলে)', 'Irmã mais velha (dito por meninas)', 'Kakak perempuan (dipakai perempuan)', 'بڑی بہن (لڑکیاں کہتی ہیں)', 'Старшая сестра (так говорят девушки)'],
- '오빠': ['哥哥（女生用）', 'बड़ा भाई (लड़कियाँ कहती हैं)', 'Hermano mayor (lo dicen las chicas)', 'الأخ الأكبر (تقولها الفتيات)', 'Grand frère (dit par une fille)', 'বড় ভাই (মেয়েরা বলে)', 'Irmão mais velho (dito por meninas)', 'Kakak laki-laki (dipakai perempuan)', 'بڑا بھائی (لڑکیاں کہتی ہیں)', 'Старший брат (так говорят девушки)'],
- '감사합니다': ['谢谢', 'धन्यवाद', 'Gracias', 'شكرًا', 'Merci', 'ধন্যবাদ', 'Obrigado', 'Terima kasih', 'شکریہ', 'Спасибо'],
- '진짜': ['真的吗？', 'सच में?', '¿En serio?', 'حقًا؟', 'Vraiment ?', 'সত্যি?', 'Sério?', 'Serius?', 'سچ میں؟', 'Правда?'],
- '귀여워': ['好可爱！', 'कितना प्यारा!', '¡Qué lindo!', 'لطيف جدًا!', 'Trop mignon !', 'কী মিষ্টি!', 'Que fofo!', 'Lucu banget!', 'کتنا پیارا!', 'Так мило!'],
- '보고 싶어': ['我想你', 'मुझे तुम्हारी याद आती है', 'Te extraño', 'اشتقت إليك', 'Tu me manques', 'তোমাকে মিস করি', 'Estou com saudade', 'Aku kangen kamu', 'مجھے تمہاری یاد آتی ہے', 'Я скучаю по тебе'],
- '아이고': ['哎呀！', 'अरे बाप रे!', '¡Ay, Dios!', 'يا إلهي!', 'Oh là là !', 'হায় রে!', 'Ai, meu Deus!', 'Aduh!', 'ارے بابا!', 'Ой-ой!'],
- '맛있어': ['好吃！', 'बहुत स्वादिष्ट!', '¡Está delicioso!', 'لذيذ!', 'C’est délicieux !', 'খুব মজা!', 'Está delicioso!', 'Enak!', 'بہت مزیدار!', 'Вкусно!'],
- '미안해': ['对不起', 'माफ़ करना', 'Lo siento', 'آسف', 'Désolé', 'দুঃখিত', 'Desculpa', 'Maaf', 'معاف کرنا', 'Прости'],
- '괜찮아': ['没关系', 'कोई बात नहीं', 'Está bien', 'لا بأس', 'Ça va', 'ঠিক আছে', 'Tudo bem', 'Nggak apa-apa', 'کوئی بات نہیں', 'Всё хорошо'],
- '잘 자': ['晚安', 'शुभ रात्रि', 'Buenas noches', 'تصبح على خير', 'Bonne nuit', 'শুভ রাত্রি', 'Boa noite', 'Selamat tidur', 'شب بخیر', 'Спокойной ночи'],
- '안녕': ['你好 / 再见', 'हाय / बाय', 'Hola / Adiós', 'مرحبًا / وداعًا', 'Salut', 'হাই / বাই', 'Oi / Tchau', 'Hai / Dah', 'ہائے / بائے', 'Привет / Пока'],
- '배고파': ['我饿了', 'मुझे भूख लगी है', 'Tengo hambre', 'أنا جائع', 'J’ai faim', 'আমার খিদে পেয়েছে', 'Estou com fome', 'Aku lapar', 'مجھے بھوک لگی ہے', 'Хочу есть'],
- '행복해': ['我好幸福', 'मैं खुश हूँ', '¡Qué feliz!', 'أنا سعيد', 'Quel bonheur !', 'আমি খুশি', 'Estou feliz', 'Aku bahagia', 'میں خوش ہوں', 'Как я счастлив(а)!'],
- '친구': ['朋友', 'दोस्त', 'Amigo', 'صديق', 'Ami', 'বন্ধু', 'Amigo', 'Teman', 'دوست', 'Друг'],
- '짱': ['最棒！', 'सबसे बढ़िया!', '¡El mejor!', 'الأفضل!', 'Le top !', 'সেরা!', 'O melhor!', 'Terbaik!', 'سب سے بہترین!', 'Лучший!'],
- '헐': ['天哪！', 'हैं?!', '¡¿Qué?!', 'ماذا؟!', 'Quoi ?!', 'কী বলো!', 'Como assim?!', 'Hah?!', 'ہیں؟!', 'Ого!'],
- '출구': ['出口', 'निकास', 'Salida', 'مخرج', 'Sortie', 'বাহির', 'Saída', 'Pintu keluar', 'خارجی راستہ', 'Выход'],
- '입구': ['入口', 'प्रवेश', 'Entrada', 'مدخل', 'Entrée', 'প্রবেশপথ', 'Entrada', 'Pintu masuk', 'داخلی راستہ', 'Вход'],
- '화장실': ['洗手间', 'शौचालय', 'Baño', 'دورة المياه', 'Toilettes', 'টয়লেট', 'Banheiro', 'Toilet', 'واش روم', 'Туалет'],
- '지하철': ['地铁', 'मेट्रो', 'Metro', 'مترو الأنفاق', 'Métro', 'মেট্রো', 'Metrô', 'Kereta bawah tanah', 'میٹرو', 'Метро'],
- '김밥': ['紫菜包饭', 'गिमबाप (कोरियन राइस रोल)', 'Gimbap', 'كيمباب', 'Gimbap', 'কিমবাপ', 'Gimbap', 'Gimbap', 'کمباپ', 'Кимпаб'],
- '떡볶이': ['辣炒年糕', 'तोक्बोक्की (मसालेदार राइस केक)', 'Tteokbokki', 'تيوكبوكي', 'Tteokbokki', 'তোকবোক্কি', 'Tteokbokki', 'Tteokbokki', 'ٹوکبوکی', 'Токпокки'],
- '비빔밥': ['拌饭', 'बिबिमबाप', 'Bibimbap', 'بيبيمباب', 'Bibimbap', 'বিবিমবাপ', 'Bibimbap', 'Bibimbap', 'بی بم باپ', 'Пибимпап'],
- '라면': ['韩国拉面', 'रामयन (कोरियन नूडल्स)', 'Ramyeon', 'رامين', 'Ramyeon', 'রামিয়ন', 'Ramyeon', 'Ramyeon', 'رامین', 'Рамён'],
- '물': ['水', 'पानी', 'Agua', 'ماء', 'Eau', 'পানি', 'Água', 'Air', 'پانی', 'Вода'],
- '커피': ['咖啡', 'कॉफ़ी', 'Café', 'قهوة', 'Café', 'কফি', 'Café', 'Kopi', 'کافی', 'Кофе'],
- '편의점': ['便利店', 'सुविधा स्टोर', 'Tienda de conveniencia', 'بقالة', 'Supérette', 'কনভিনিয়েন্স স্টোর', 'Loja de conveniência', 'Minimarket', 'جنرل اسٹور', 'Круглосуточный магазин'],
- '계산서': ['账单', 'बिल', 'La cuenta', 'الفاتورة', 'L’addition', 'বিল', 'A conta', 'Bon', 'بل', 'Счёт'],
- '약국': ['药店', 'दवा की दुकान', 'Farmacia', 'صيدلية', 'Pharmacie', 'ফার্মেসি', 'Farmácia', 'Apotek', 'فارمیسی', 'Аптека'],
- '은행': ['银行', 'बैंक', 'Banco', 'بنك', 'Banque', 'ব্যাংক', 'Banco', 'Bank', 'بینک', 'Банк'],
- '병원': ['医院', 'अस्पताल', 'Hospital', 'مستشفى', 'Hôpital', 'হাসপাতাল', 'Hospital', 'Rumah sakit', 'ہسپتال', 'Больница'],
- '공항': ['机场', 'हवाई अड्डा', 'Aeropuerto', 'مطار', 'Aéroport', 'বিমানবন্দর', 'Aeroporto', 'Bandara', 'ہوائی اڈہ', 'Аэропорт'],
- '호텔': ['酒店', 'होटल', 'Hotel', 'فندق', 'Hôtel', 'হোটেল', 'Hotel', 'Hotel', 'ہوٹل', 'Отель'],
- '시장': ['市场', 'बाज़ार', 'Mercado', 'سوق', 'Marché', 'বাজার', 'Mercado', 'Pasar', 'بازار', 'Рынок'],
- '버스': ['公交车', 'बस', 'Autobús', 'حافلة', 'Bus', 'বাস', 'Ônibus', 'Bus', 'بس', 'Автобус'],
- '택시': ['出租车', 'टैक्सी', 'Taxi', 'تاكسي', 'Taxi', 'ট্যাক্সি', 'Táxi', 'Taksi', 'ٹیکسی', 'Такси'],
+ '사랑해': ['我爱你', 'मुझे तुमसे प्यार है', 'Te quiero', 'أحبك', 'Je t’aime', 'আমি তোমাকে ভালোবাসি', 'Eu te amo', 'Aku cinta kamu', 'مجھے تم سے محبت ہے', 'Я тебя люблю', '愛してる', 'Ich liebe dich'],
+ '화이팅': ['加油！', 'तुम कर सकते हो!', '¡Tú puedes!', 'تستطيع فعلها!', 'Tu peux le faire !', 'তুমি পারবে!', 'Você consegue!', 'Semangat!', 'تم کر سکتے ہو!', 'Ты сможешь!', 'がんばれ！', 'Du schaffst das!'],
+ '대박': ['太棒了！', 'कमाल है!', '¡Increíble!', 'رائع!', 'Génial !', 'দারুণ!', 'Incrível!', 'Keren banget!', 'زبردست!', 'Круто!', 'すごい！', 'Krass!'],
+ '언니': ['姐姐（女生用）', 'बड़ी बहन (लड़कियाँ कहती हैं)', 'Hermana mayor (lo dicen las chicas)', 'الأخت الكبرى (تقولها الفتيات)', 'Grande sœur (dit par une fille)', 'বড় বোন (মেয়েরা বলে)', 'Irmã mais velha (dito por meninas)', 'Kakak perempuan (dipakai perempuan)', 'بڑی بہن (لڑکیاں کہتی ہیں)', 'Старшая сестра (так говорят девушки)', 'お姉さん（女性が使う）', 'Ältere Schwester (sagen Mädchen)'],
+ '오빠': ['哥哥（女生用）', 'बड़ा भाई (लड़कियाँ कहती हैं)', 'Hermano mayor (lo dicen las chicas)', 'الأخ الأكبر (تقولها الفتيات)', 'Grand frère (dit par une fille)', 'বড় ভাই (মেয়েরা বলে)', 'Irmão mais velho (dito por meninas)', 'Kakak laki-laki (dipakai perempuan)', 'بڑا بھائی (لڑکیاں کہتی ہیں)', 'Старший брат (так говорят девушки)', 'お兄さん（女性が使う）', 'Älterer Bruder (sagen Mädchen)'],
+ '감사합니다': ['谢谢', 'धन्यवाद', 'Gracias', 'شكرًا', 'Merci', 'ধন্যবাদ', 'Obrigado', 'Terima kasih', 'شکریہ', 'Спасибо', 'ありがとうございます', 'Danke'],
+ '진짜': ['真的吗？', 'सच में?', '¿En serio?', 'حقًا؟', 'Vraiment ?', 'সত্যি?', 'Sério?', 'Serius?', 'سچ میں؟', 'Правда?', '本当に？', 'Echt jetzt?'],
+ '귀여워': ['好可爱！', 'कितना प्यारा!', '¡Qué lindo!', 'لطيف جدًا!', 'Trop mignon !', 'কী মিষ্টি!', 'Que fofo!', 'Lucu banget!', 'کتنا پیارا!', 'Так мило!', 'かわいい！', 'So süß!'],
+ '보고 싶어': ['我想你', 'मुझे तुम्हारी याद आती है', 'Te extraño', 'اشتقت إليك', 'Tu me manques', 'তোমাকে মিস করি', 'Estou com saudade', 'Aku kangen kamu', 'مجھے تمہاری یاد آتی ہے', 'Я скучаю по тебе', '会いたい', 'Ich vermisse dich'],
+ '아이고': ['哎呀！', 'अरे बाप रे!', '¡Ay, Dios!', 'يا إلهي!', 'Oh là là !', 'হায় রে!', 'Ai, meu Deus!', 'Aduh!', 'ارے بابا!', 'Ой-ой!', 'あらまあ！', 'Oje!'],
+ '맛있어': ['好吃！', 'बहुत स्वादिष्ट!', '¡Está delicioso!', 'لذيذ!', 'C’est délicieux !', 'খুব মজা!', 'Está delicioso!', 'Enak!', 'بہت مزیدار!', 'Вкусно!', 'おいしい！', 'Lecker!'],
+ '미안해': ['对不起', 'माफ़ करना', 'Lo siento', 'آسف', 'Désolé', 'দুঃখিত', 'Desculpa', 'Maaf', 'معاف کرنا', 'Прости', 'ごめんね', 'Tut mir leid'],
+ '괜찮아': ['没关系', 'कोई बात नहीं', 'Está bien', 'لا بأس', 'Ça va', 'ঠিক আছে', 'Tudo bem', 'Nggak apa-apa', 'کوئی بات نہیں', 'Всё хорошо', '大丈夫', 'Alles gut'],
+ '잘 자': ['晚安', 'शुभ रात्रि', 'Buenas noches', 'تصبح على خير', 'Bonne nuit', 'শুভ রাত্রি', 'Boa noite', 'Selamat tidur', 'شب بخیر', 'Спокойной ночи', 'おやすみ', 'Gute Nacht'],
+ '안녕': ['你好 / 再见', 'हाय / बाय', 'Hola / Adiós', 'مرحبًا / وداعًا', 'Salut', 'হাই / বাই', 'Oi / Tchau', 'Hai / Dah', 'ہائے / بائے', 'Привет / Пока', 'やあ／バイバイ', 'Hallo / Tschüss'],
+ '배고파': ['我饿了', 'मुझे भूख लगी है', 'Tengo hambre', 'أنا جائع', 'J’ai faim', 'আমার খিদে পেয়েছে', 'Estou com fome', 'Aku lapar', 'مجھے بھوک لگی ہے', 'Хочу есть', 'お腹すいた', 'Ich hab Hunger'],
+ '행복해': ['我好幸福', 'मैं खुश हूँ', '¡Qué feliz!', 'أنا سعيد', 'Quel bonheur !', 'আমি খুশি', 'Estou feliz', 'Aku bahagia', 'میں خوش ہوں', 'Как я счастлив(а)!', '幸せ！', 'Ich bin so glücklich!'],
+ '친구': ['朋友', 'दोस्त', 'Amigo', 'صديق', 'Ami', 'বন্ধু', 'Amigo', 'Teman', 'دوست', 'Друг', '友だち', 'Freund'],
+ '짱': ['最棒！', 'सबसे बढ़िया!', '¡El mejor!', 'الأفضل!', 'Le top !', 'সেরা!', 'O melhor!', 'Terbaik!', 'سب سے بہترین!', 'Лучший!', '最高！', 'Der Beste!'],
+ '헐': ['天哪！', 'हैं?!', '¡¿Qué?!', 'ماذا؟!', 'Quoi ?!', 'কী বলো!', 'Como assim?!', 'Hah?!', 'ہیں؟!', 'Ого!', 'えっ？！', 'Hä?!'],
+ '출구': ['出口', 'निकास', 'Salida', 'مخرج', 'Sortie', 'বাহির', 'Saída', 'Pintu keluar', 'خارجی راستہ', 'Выход', '出口', 'Ausgang'],
+ '입구': ['入口', 'प्रवेश', 'Entrada', 'مدخل', 'Entrée', 'প্রবেশপথ', 'Entrada', 'Pintu masuk', 'داخلی راستہ', 'Вход', '入口', 'Eingang'],
+ '화장실': ['洗手间', 'शौचालय', 'Baño', 'دورة المياه', 'Toilettes', 'টয়লেট', 'Banheiro', 'Toilet', 'واش روم', 'Туалет', 'トイレ', 'Toilette'],
+ '지하철': ['地铁', 'मेट्रो', 'Metro', 'مترو الأنفاق', 'Métro', 'মেট্রো', 'Metrô', 'Kereta bawah tanah', 'میٹرو', 'Метро', '地下鉄', 'U-Bahn'],
+ '김밥': ['紫菜包饭', 'गिमबाप (कोरियन राइस रोल)', 'Gimbap', 'كيمباب', 'Gimbap', 'কিমবাপ', 'Gimbap', 'Gimbap', 'کمباپ', 'Кимпаб', 'キンパ', 'Gimbap'],
+ '떡볶이': ['辣炒年糕', 'तोक्बोक्की (मसालेदार राइस केक)', 'Tteokbokki', 'تيوكبوكي', 'Tteokbokki', 'তোকবোক্কি', 'Tteokbokki', 'Tteokbokki', 'ٹوکبوکی', 'Токпокки', 'トッポッキ', 'Tteokbokki'],
+ '비빔밥': ['拌饭', 'बिबिमबाप', 'Bibimbap', 'بيبيمباب', 'Bibimbap', 'বিবিমবাপ', 'Bibimbap', 'Bibimbap', 'بی بم باپ', 'Пибимпап', 'ビビンバ', 'Bibimbap'],
+ '라면': ['韩国拉面', 'रामयन (कोरियन नूडल्स)', 'Ramyeon', 'رامين', 'Ramyeon', 'রামিয়ন', 'Ramyeon', 'Ramyeon', 'رامین', 'Рамён', '韓国ラーメン', 'Ramyeon'],
+ '물': ['水', 'पानी', 'Agua', 'ماء', 'Eau', 'পানি', 'Água', 'Air', 'پانی', 'Вода', '水', 'Wasser'],
+ '커피': ['咖啡', 'कॉफ़ी', 'Café', 'قهوة', 'Café', 'কফি', 'Café', 'Kopi', 'کافی', 'Кофе', 'コーヒー', 'Kaffee'],
+ '편의점': ['便利店', 'सुविधा स्टोर', 'Tienda de conveniencia', 'بقالة', 'Supérette', 'কনভিনিয়েন্স স্টোর', 'Loja de conveniência', 'Minimarket', 'جنرل اسٹور', 'Круглосуточный магазин', 'コンビニ', 'Spätkauf / Minimarkt'],
+ '계산서': ['账单', 'बिल', 'La cuenta', 'الفاتورة', 'L’addition', 'বিল', 'A conta', 'Bon', 'بل', 'Счёт', 'お会計', 'Die Rechnung'],
+ '약국': ['药店', 'दवा की दुकान', 'Farmacia', 'صيدلية', 'Pharmacie', 'ফার্মেসি', 'Farmácia', 'Apotek', 'فارمیسی', 'Аптека', '薬局', 'Apotheke'],
+ '은행': ['银行', 'बैंक', 'Banco', 'بنك', 'Banque', 'ব্যাংক', 'Banco', 'Bank', 'بینک', 'Банк', '銀行', 'Bank'],
+ '병원': ['医院', 'अस्पताल', 'Hospital', 'مستشفى', 'Hôpital', 'হাসপাতাল', 'Hospital', 'Rumah sakit', 'ہسپتال', 'Больница', '病院', 'Krankenhaus'],
+ '공항': ['机场', 'हवाई अड्डा', 'Aeropuerto', 'مطار', 'Aéroport', 'বিমানবন্দর', 'Aeroporto', 'Bandara', 'ہوائی اڈہ', 'Аэропорт', '空港', 'Flughafen'],
+ '호텔': ['酒店', 'होटल', 'Hotel', 'فندق', 'Hôtel', 'হোটেল', 'Hotel', 'Hotel', 'ہوٹل', 'Отель', 'ホテル', 'Hotel'],
+ '시장': ['市场', 'बाज़ार', 'Mercado', 'سوق', 'Marché', 'বাজার', 'Mercado', 'Pasar', 'بازار', 'Рынок', '市場', 'Markt'],
+ '버스': ['公交车', 'बस', 'Autobús', 'حافلة', 'Bus', 'বাস', 'Ônibus', 'Bus', 'بس', 'Автобус', 'バス', 'Bus'],
+ '택시': ['出租车', 'टैक्सी', 'Taxi', 'تاكسي', 'Taxi', 'ট্যাক্সি', 'Táxi', 'Taksi', 'ٹیکسی', 'Такси', 'タクシー', 'Taxi'],
 }
 
 # common local first names -> usual Korean spelling (외래어 표기). Shown in Latin letters on screen.
@@ -155,6 +169,8 @@ NAMES = {
  'id': [('Dewi', '데위'), ('Rizky', '리즈키'), ('Ayu', '아유'), ('Budi', '부디'), ('Siti', '시티'), ('Fajar', '파자르'), ('Intan', '인탄'), ('Bagus', '바구스')],
  'ur': [('Hamza', '함자'), ('Zainab', '자이나브'), ('Bilal', '빌랄'), ('Hira', '히라'), ('Usman', '우스만'), ('Sana', '사나'), ('Areeba', '아리바'), ('Danish', '다니시')],
  'ru': [('Anastasia', '아나스타시야'), ('Dmitry', '드미트리'), ('Ivan', '이반'), ('Polina', '폴리나'), ('Alexei', '알렉세이'), ('Daria', '다리야'), ('Artem', '아르툠'), ('Ksenia', '크세니야')],
+ 'ja': [('Yui', '유이'), ('Haruto', '하루토'), ('Sakura', '사쿠라'), ('Ren', '렌'), ('Hina', '히나'), ('Sota', '소타'), ('Yuki', '유키'), ('Aoi', '아오이')],
+ 'de': [('Mia', '미아'), ('Leon', '레온'), ('Hannah', '한나'), ('Lukas', '루카스'), ('Lena', '레나'), ('Felix', '펠릭스'), ('Paul', '파울'), ('Marie', '마리')],
 }
 
 def _key(lang):
@@ -167,6 +183,8 @@ def ui(lang):
     if lang in (None, '', 'en'): return {}
     d = {k: _conv(lang, v) for k, v in _UI[_key(lang)].items()}
     if lang in RTL: d['rtl'] = True
+    d.pop('ja', None)
+    if lang == 'ja': d['ja'] = True
     return d
 
 def meta(lang):

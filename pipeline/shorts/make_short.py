@@ -4,10 +4,11 @@ usage: python3 make_short.py FORMAT "Name[ @handle]" ["Name2" ...] --out file.mp
 import sys, os, json, subprocess, asyncio, base64, argparse
 HERE = os.path.dirname(os.path.abspath(__file__))
 SCR = os.path.dirname(HERE)
-ap = argparse.ArgumentParser(); ap.add_argument('fmt'); ap.add_argument('names', nargs='+'); ap.add_argument('--out', required=True); ap.add_argument('--voice', default='female', choices=['female', 'male']); ap.add_argument('--lang', default='en')
+ap = argparse.ArgumentParser(); ap.add_argument('fmt'); ap.add_argument('names', nargs='+'); ap.add_argument('--out', required=True); ap.add_argument('--voice', default='female', choices=['female', 'male']); ap.add_argument('--lang', default='en'); ap.add_argument('--hook', type=int, default=0)
 a = ap.parse_args()
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); import i18n
 UI = i18n.ui(a.lang)
+HOOK = 0 if UI else a.hook % 3   # opening-line variant (A/B/C test); localized videos keep variant 0
 # 'Priya=프리야' fixes the Korean spelling of a name (curated local names)
 # 'Nikki=니키 @handle' keeps the handle (format C shows it as a comment card)
 import re as _re
@@ -31,12 +32,12 @@ async def record():
             got['data'] = base64.b64decode(b64); got['name'] = name
         await pg.expose_function('__saveFile', save)
         await pg.add_init_script("""window.claude={use:n=>Promise.resolve(n==='downloads'?{save:async({filename,data})=>{const buf=new Uint8Array(await data.arrayBuffer());let s='';for(let i=0;i<buf.length;i+=32768)s+=String.fromCharCode.apply(null,buf.subarray(i,i+32768));await window.__saveFile(btoa(s),filename);return {status:'saved'}}}:null)}""")
-        await pg.add_init_script('window.HV_UI = ' + json.dumps(UI, ensure_ascii=False) + ';')
+        await pg.add_init_script('window.HV_UI = ' + json.dumps(UI, ensure_ascii=False) + '; window.HV_HOOK = ' + str(HOOK) + ';')
         await pg.goto('file://' + page)
         await pg.evaluate('document.fonts.ready'); await pg.wait_for_timeout(500)
         sample = ' '.join(v for v in UI.values() if isinstance(v, str))
         if sample:
-            await pg.evaluate('''async (s) => { for (const f of ["Noto Sans TC","Noto Sans Devanagari","Noto Sans Bengali","Noto Sans Arabic","Noto Nastaliq Urdu","Noto Sans","Bricolage Grotesque"]) { try { await document.fonts.load('700 64px "' + f + '"', s); } catch (e) {} } }''', sample)
+            await pg.evaluate('''async (s) => { for (const f of ["Noto Sans JP","Noto Sans TC","Noto Sans Devanagari","Noto Sans Bengali","Noto Sans Arabic","Noto Nastaliq Urdu","Noto Sans","Bricolage Grotesque"]) { try { await document.fonts.load('700 64px "' + f + '"', s); } catch (e) {} } }''', sample)
             await pg.wait_for_timeout(300)
         await pg.check(f'input[value={a.fmt}]')
         await pg.fill('#names', '\n'.join(a.names)); await pg.wait_for_timeout(600)
@@ -54,60 +55,53 @@ got, kos = asyncio.run(record())
 vid = os.path.join(HERE, '_video.' + got['name'].split('.')[-1])
 open(vid, 'wb').write(got['data'])
 
-# ---- timings (mirror of buildPlan in the studio) ----
+# ---- timings (mirror of buildPlan in the studio; fast pacing v3) ----
+PER, HOLD, HOLD_C = 0.6, 2.0, 1.4
 def nsyl(ko): return len(ko.replace(' ', ''))
 lines = []  # (time, text, speed)
 text_word, text_idx = {}, {}
-def syl_lines(ko, base, per):
+def syl_lines(ko, base, per=PER):
     for k, ch in enumerate(ko.replace(' ', '')):
         text_word[len(lines)] = ko; text_idx[len(lines)] = k
         lines.append((base + 0.5 + per * k + 0.55, ch, 0.8))
-t = 0
 sfx = []  # (time, kind)
-def land_sfx(base, per, n):
+def land_sfx(base, n, per=PER):
     for k in range(n): sfx.append((base + 0.5 + per * k + 0.53, 'pop'))
+def word_build(ko, t, hold=HOLD):
+    """syllables land, chime, then the whole word read once (twice if short). returns scene end."""
+    syl_lines(ko, t); land_sfx(t, nsyl(ko))
+    done = t + 0.5 + PER * nsyl(ko) + 0.2; sfx.append((done, 'chime'))
+    lines.append((done + 0.35, ko, 0.85))
+    if nsyl(ko) <= 3 and hold >= 2.0: lines.append((done + 1.15, ko, 0.85))
+    return t + 0.6 + PER * nsyl(ko) + hold
+HOOK_VOICE = {
+    'D': [[(0.5, '이 말, 들어 봤죠?')], [(0.4, '드라마에 꼭 나와요!')], [(0.4, '진짜 팬이면 알죠?')]],
+    'E': [[(0.5, '이 표지판, 읽을 수 있어요?')], [(0.4, '서울 어디에나 있어요!')], [(0.4, '이거 모르면 길 잃어요!')]],
+    'Q': [[(0.4, '이 단어, 읽을 수 있어요?'), (2.0, '댓글로 맞혀 보세요!')],
+          [(0.4, '한국인이 매일 쓰는 영어 단어!'), (2.2, '댓글로 맞혀 보세요!')],
+          [(0.4, '삼 초 안에 읽어 보세요!'), (2.0, '댓글로 맞혀 보세요!')]],
+    'V': [[(0.4, '어느 쪽일까요?'), (1.7, '댓글로 번호를 남겨 주세요!')],
+          [(0.4, '일 번? 이 번?'), (1.7, '댓글로 번호를 남겨 주세요!')],
+          [(0.4, '헷갈리죠?'), (1.7, '댓글로 번호를 남겨 주세요!')]],
+}
+HOOK_LEN = {'D': 1.8, 'E': 2.4, 'Q': 3.6, 'V': 4.4}
+t = 0
+sfx.append((0.05, 'whoosh'))
 if a.fmt == 'A':
-    ko = kos[0]; t = 2.2; sfx.append((0.05, 'whoosh'))
-    syl_lines(ko, t, 0.85); land_sfx(t, 0.85, nsyl(ko))
-    done = t + 0.5 + 0.85 * nsyl(ko) + 0.2; sfx.append((done, 'chime'))
-    lines += [(done + 0.45, ko, 0.85), (done + 1.5, ko, 0.85)]
-    t += 0.6 + 0.85 * nsyl(ko) + 2.4
+    t = word_build(kos[0], 1.8)
 elif a.fmt == 'B':
-    ko = kos[0]; sfx.append((0.05, 'whoosh'))
-    lines.append((1.0, '읽을 수 있어요?', 0.9))
-    t = 4.2
-    syl_lines(ko, t, 0.85); land_sfx(t, 0.85, nsyl(ko))
-    done = t + 0.5 + 0.85 * nsyl(ko) + 0.2; sfx.append((done, 'chime'))
-    lines.append((done + 0.45, ko, 0.85))
-    t += 0.6 + 0.85 * nsyl(ko) + 2.6
-elif a.fmt in ('Q', 'V'):
-    ko = kos[0]; sfx.append((0.05, 'whoosh'))
-    if a.fmt == 'Q':
-        lines += [(0.7, '이 단어, 읽을 수 있어요?', 0.9), (2.3, '댓글로 맞혀 보세요!', 0.9)]; t = 4.6
-    else:
-        lines += [(0.9, '어느 쪽일까요?', 0.9), (2.5, '댓글로 번호를 남겨 주세요!', 0.9)]; t = 5.4
-        sfx.append((4.6, 'chime'))
-    syl_lines(ko, t, 0.85); land_sfx(t, 0.85, nsyl(ko))
-    done = t + 0.5 + 0.85 * nsyl(ko) + 0.2; sfx.append((done, 'chime'))
-    lines += [(done + 0.45, ko, 0.85), (done + 1.6, ko, 0.85)]
-    t += 0.6 + 0.85 * nsyl(ko) + 3.0
-elif a.fmt in ('D', 'E'):
-    ko = kos[0]; sfx.append((0.05, 'whoosh'))
-    lines.append((0.7, '이 말, 들어 봤죠?' if a.fmt == 'D' else '이 표지판, 읽을 수 있어요?', 0.9))
-    t = 2.4 if a.fmt == 'D' else 3.0
-    syl_lines(ko, t, 0.85); land_sfx(t, 0.85, nsyl(ko))
-    done = t + 0.5 + 0.85 * nsyl(ko) + 0.2; sfx.append((done, 'chime'))
-    lines += [(done + 0.45, ko, 0.85), (done + 1.6, ko, 0.85)]
-    t += 0.6 + 0.85 * nsyl(ko) + 3.0
+    lines.append((0.6, '읽을 수 있어요?', 0.9))
+    t = word_build(kos[0], 3.4)
+elif a.fmt in HOOK_LEN:
+    lines += [(ts, tx, 0.9) for ts, tx in HOOK_VOICE[a.fmt][HOOK]]
+    if a.fmt == 'V': sfx.append((3.6, 'chime'))
+    t = word_build(kos[0], HOOK_LEN[a.fmt])
 else:
-    t = 2.0; sfx.append((0.05, 'whoosh'))
+    t = 2.0
     lines.append((0.5, '여러분이 요청한 이름들.', 0.95))
-    for ko in kos:
-        syl_lines(ko, t, 0.75); land_sfx(t, 0.75, nsyl(ko))
-        done = t + 0.5 + 0.75 * nsyl(ko) + 0.2; sfx.append((done, 'chime'))
-        lines.append((done + 0.4, ko, 0.85))
-        t += 0.5 + 0.75 * nsyl(ko) + 1.8
-lines.append((t + 0.35, '맞혔나요? 댓글로 알려 주세요!' if a.fmt in ('Q', 'V') else '다음 단어를 추천해 주세요!' if a.fmt in ('D', 'E') else '이름을 알려 주세요!', 0.9))
+    for ko in kos: t = word_build(ko, t, HOLD_C) - 0.1
+end_line = '댓글로 알려 주세요!' if a.fmt in ('Q', 'V') else '다음 단어 추천해 주세요!' if a.fmt in ('D', 'E') else '이름을 알려 주세요!'
+lines.append((t + 0.2, end_line, 0.95))
 
 # ---- TTS (Supertonic-3, voice F2, each clip verified by speech recognition) ----
 os.environ['HV_VOICE'] = a.voice
@@ -157,4 +151,4 @@ I = float(_re.findall(r'I:\s+(-?[\d.]+) LUFS', meas)[-1])
 tmp = a.out + '.tmp.mp4'
 subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', a.out, '-c:v', 'copy', '-af', f'volume={-14 - I:.2f}dB,alimiter=limit=0.95:level=false', '-c:a', 'aac', '-b:a', '192k', tmp], check=True)
 os.replace(tmp, a.out)
-print(json.dumps({'out': a.out, 'korean': kos, 'voice_check': report}, ensure_ascii=False))
+print(json.dumps({'out': a.out, 'korean': kos, 'voice_check': report, 'hook': HOOK, 'duration': float(vdur)}, ensure_ascii=False))

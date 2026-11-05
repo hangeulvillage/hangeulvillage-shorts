@@ -5,7 +5,7 @@ Automatic checks (blocking = must fix):
   - D/E words come from the vetted list (words.json) with the same meaning
   - names whose Korean spelling is a rule-based guess are flagged for review
   - punctuation: no two sentences glued together, no double spaces, no cut-off hashtags
-  - length limits (YouTube title 100, TikTok 150), video 8-35 s, loudness -15..-13 LUFS
+  - length limits (YouTube title 100 hard / 60 soft, TikTok 150), video 6-35 s (target 8-12 s), loudness -15..-13 LUFS
   - every spoken syllable passed the speech check
 It also writes a contact sheet (4 key frames) for a visual check by the reviewer.
 """
@@ -33,6 +33,7 @@ def check(job, items, pk, info, video, exact_flags=None, lang='en'):
         import i18n
         if fmt in ('D', 'E') and items[0]['en'] != i18n.mean(lang, items[0]['ko']): issues.append('localized meaning differs from i18n.MEAN')
     if len(texts['yt_title']) > 100: issues.append('yt_title over 100 chars')
+    if len(texts['yt_title'].replace(' #shorts', '')) > 60: review.append('yt_title over 60 chars: gets cut off in the Shorts feed')
     if len(texts['tt']) > 150: issues.append('tiktok caption over 150 chars')
     for ko in kos:
         if ko not in texts['yt_desc'] or ko not in texts['ig']: issues.append(f'Korean "{ko}" missing from copy')
@@ -48,7 +49,8 @@ def check(job, items, pk, info, video, exact_flags=None, lang='en'):
     bad = [c for c in info.get('voice_check', []) if not c[2]]
     if bad: issues.append(f'speech check failed: {bad}')
     dur = float(subprocess.run(['ffprobe', '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', video], capture_output=True, text=True).stdout or 0)
-    if not 8 <= dur <= 35: issues.append(f'duration {dur:.1f}s')
+    if not 6 <= dur <= 35: issues.append(f'duration {dur:.1f}s')
+    if dur > 12.5 and fmt != 'C': review.append(f'{dur:.1f}s is over the 8-12 s target')
     meas = subprocess.run(['ffmpeg', '-i', video, '-af', 'ebur128', '-f', 'null', '-'], capture_output=True, text=True).stderr
     m = re.findall(r'I:\s+(-?[\d.]+) LUFS', meas)
     if m and not -15.5 <= float(m[-1]) <= -12.5: issues.append(f'loudness {m[-1]} LUFS')
