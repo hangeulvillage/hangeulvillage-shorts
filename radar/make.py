@@ -109,7 +109,7 @@ def make_voice(card, voice, work):
     for scene in ('hook', 'check', 'steps', 'deadline', 'cta'):
         for k, b in enumerate(card['beats'].get(scene, [])):
             target = hangulize(b['say']); best = None
-            for attempt in range(6):
+            for attempt in range(12 if b.get('expect') else 6):
                 w, _ = tts.synthesize(b['say'], voice_style=st, lang='ko', speed=b.get('speed', 1.08), total_steps=12)
                 y = np.asarray(w, dtype=np.float32).squeeze()
                 idx = np.where(np.abs(y) > 0.01)[0]; y = y[max(0, idx[0] - 600): idx[-1] + 2500]
