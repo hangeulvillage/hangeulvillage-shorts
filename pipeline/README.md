@@ -25,3 +25,6 @@ Every spoken syllable is regenerated until a Korean speech recognizer hears it (
 - **Hook A/B/C test:** D/E/Q/V have 3 opening variants (on-screen line + Korean voice line). `job.hook` picks one; without it, a stable hash of the word does. The manifest records `hook` and `duration`. Localized videos always use variant 0.
 - **Titles:** YouTube titles prefer candidates of 60 chars or less (before ` #shorts`), so they aren't cut off in the Shorts feed.
 - **Japanese (ja) and German (de)** language packs: UI, copy, all vetted word meanings, local names, Noto Sans JP font.
+
+## 2026-11-06 update: the first frame is the hook
+YouTube Studio showed 90.5% of Shorts-feed viewers swiping away, while those who stayed watched to the end. The old frame 0 was an empty background, with text fading in after 0.2-0.5 s. Now the opening scene is drawn fully formed from frame 0 (`INSTANT`: every fade in the first scene is complete). D shows the word card at once, A shows "? ? ?" tiles under the name, and the Korean voice line starts at 0.05 s (A now says "한국어로 어떻게 쓸까요?").
