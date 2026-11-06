@@ -95,6 +95,7 @@ def lcs_ratio(a, b):
             m[i + 1][j + 1] = m[i][j] + 1 if a[i] == b[j] else max(m[i][j + 1], m[i + 1][j])
     return m[-1][-1] / len(a)
 
+VOICE_STEPS, VOICE_SPEED = 32, 1.02  # 2026-11-06: higher quality, a bit slower = less robotic
 def make_voice(card, voice, work):
     import sherpa_onnx
     from supertonic import TTS
@@ -105,13 +106,13 @@ def make_voice(card, voice, work):
     def hear(y):
         s = rec.create_stream(); s.accept_waveform(SR, y.astype(np.float32)); rec.decode_stream(s); return s.result.text.strip()
     tts = TTS(model='supertonic-3'); st = tts.get_voice_style(voice)
-    warm = 'lowshelf=f=160:g=1.5,highshelf=f=3200:g=-4,lowpass=f=6500'
+    warm = 'lowshelf=f=160:g=1.0,highshelf=f=6000:g=-1.5'
     report = []
     for scene in ('hook', 'check', 'steps', 'deadline', 'cta'):
         for k, b in enumerate(card['beats'].get(scene, [])):
             target = hangulize(b['say']); best = None
             for attempt in range(12 if b.get('expect') else 6):
-                w, _ = tts.synthesize(b['say'], voice_style=st, lang='ko', speed=b.get('speed', 1.08), total_steps=12)
+                w, _ = tts.synthesize(b['say'], voice_style=st, lang='ko', speed=b.get('speed', VOICE_SPEED), total_steps=VOICE_STEPS)
                 y = np.asarray(w, dtype=np.float32).squeeze()
                 idx = np.where(np.abs(y) > 0.01)[0]; y = y[max(0, idx[0] - 600): idx[-1] + 2500]
                 sf.write(f'{work}/_in.wav', y, SR)
@@ -473,7 +474,7 @@ def make_copy(card):
 # ---------------- main ----------------
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument('card'); ap.add_argument('out')
-    ap.add_argument('--hook', default=None); ap.add_argument('--voice', default='M2')
+    ap.add_argument('--hook', default=None); ap.add_argument('--voice', default='M5')
     ap.add_argument('--intro', type=float, default=None, help='seconds the thumbnail is held at the start (0 = off; default card intro_s or 1.2)')
     a = ap.parse_args()
     card = json.load(open(a.card)); hook = a.hook or card.get('hook', 'target')

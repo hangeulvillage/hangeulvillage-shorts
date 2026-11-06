@@ -5,7 +5,7 @@ Separate brand from Hangeul Village; it only shares this repository.
 
 1. `bash radar/setup.sh` (voice model Supertonic-3, Korean ASR checker, fonts if the system has no Noto CJK)
 2. Write a card JSON (see `cards/2026-11-07_gg-youth-basic-income-q4.json`), then
-   `python3 radar/make.py CARD.json OUT_DIR [--hook target|deadline|check] [--voice M2|F1]`
+   `python3 radar/make.py CARD.json OUT_DIR [--hook target|deadline|check] [--voice M5 (default) | M1-M5 | F1-F5]`
 3. OUT_DIR gets `video.mp4` (25–40 s, 1080x1920), `thumb.jpg` (custom Shorts thumbnail), `copy.txt`
    (YouTube title/description/tags/pinned comment, Instagram and TikTok captions), `qa.png`
    (first frame, end of every scene, thumbnail) and `manifest.json` (`qa.pass`, `qa.issues`, voice check).
