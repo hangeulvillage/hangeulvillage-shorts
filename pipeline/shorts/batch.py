@@ -12,6 +12,29 @@ STUDIO = open(os.path.join(os.path.dirname(HERE), 'shorts-studio.html')).read()
 DICT = set(re.findall(r"(\w+):'[\uAC00-\uD7A3 ]+'", STUDIO[STUDIO.find('const DICT'):STUDIO.find('};', STUDIO.find('const DICT'))]))
 WORDF = ('D', 'E', 'Q', 'V')
 WORDS = json.load(open(os.path.join(HERE, 'words.json')))
+# app waitlist (Google Form, created 2026-11-06): one line in the YouTube description and the IG/FB caption.
+# Not in TikTok captions (links are not clickable there).
+APP_FORM = 'https://docs.google.com/forms/d/e/1FAIpQLSceVzM0W5d43HRfxSd3tBent7IcvT8MVTfNaT5NoYpmnkAosg/viewform'
+APP_CTA = {
+    'en': 'Our Hangeul Village app is coming in 2027. Get notified: ',
+    'bn': 'Hangeul Village অ্যাপ আসছে ২০২৭ সালে। খবর পেতে: ',
+    'fr': 'L\u2019appli Hangeul Village arrive en 2027. Pour être prévenu : ',
+    'pt': 'O app Hangeul Village chega em 2027. Para ser avisado: ',
+    'es': 'La app Hangeul Village llega en 2027. Para recibir aviso: ',
+    'ja': 'Hangeul Villageアプリは2027年に登場予定。お知らせ登録はこちら：',
+    'de': 'Die Hangeul Village App kommt 2027. Benachrichtigung erhalten: ',
+}
+def add_app_cta(pk, lang):
+    line = APP_CTA.get(lang, APP_CTA['en']) + APP_FORM
+    yd = pk['youtube']['description']
+    if APP_FORM not in yd:
+        parts = yd.rsplit('\n\n', 1)  # keep the hashtags block last
+        pk['youtube']['description'] = (parts[0] + '\n\n' + line + '\n\n' + parts[1]) if len(parts) == 2 else yd + '\n\n' + line
+    ic = pk['instagram']['caption']
+    if APP_FORM not in ic:
+        parts = ic.rsplit('\n\n', 1)
+        pk['instagram']['caption'] = (parts[0] + '\n\n' + line + '\n\n' + parts[1]) if len(parts) == 2 else ic + '\n\n' + line
+    return pk
 
 L_ROM = ['g','kk','n','d','tt','r','m','b','pp','s','ss','','j','jj','ch','k','t','p','h']
 V_ROM = ['a','ae','ya','yae','eo','e','yeo','ye','o','wa','wae','oe','yo','u','wo','we','wi','yu','eu','ui','i']
@@ -64,6 +87,7 @@ def main(plan_path, out_dir):
         snd = {i['ko']: sounds_like(i['ko']) for i in items}
         pk = seo.package(job['fmt'], items, snd, seed=n) if lang == 'en' else seo.localized(job['fmt'], items, snd, lang, seed=n)
         yt_tr = seo.translations(job['fmt'], items, snd) if lang == 'en' else {}
+        pk = add_app_cta(pk, lang)
         ok = all(c[2] for c in info['voice_check'])
         exact = [('=' in raw) or all(p.lower() in DICT for p in re.sub(r'[^A-Za-z ]', ' ', i['en']).split()) for i, raw in zip(items, job['names'])] if job['fmt'] not in WORDF else []
         report = qa.check(job, items, pk, info, base + '.mp4', exact, lang)

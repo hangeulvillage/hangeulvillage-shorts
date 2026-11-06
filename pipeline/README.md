@@ -28,3 +28,6 @@ Every spoken syllable is regenerated until a Korean speech recognizer hears it (
 
 ## 2026-11-06 update: the first frame is the hook
 YouTube Studio showed 90.5% of Shorts-feed viewers swiping away, while those who stayed watched to the end. The old frame 0 was an empty background, with text fading in after 0.2-0.5 s. Now the opening scene is drawn fully formed from frame 0 (`INSTANT`: every fade in the first scene is complete). D shows the word card at once, A shows "? ? ?" tiles under the name, and the Korean voice line starts at 0.05 s (A now says "한국어로 어떻게 쓸까요?").
+
+## App waitlist (2026-11-06)
+batch.py adds one line with the Google Form link ("Hangeul Village 앱 알림 신청", answers go to the owner's Google account) to every YouTube description and Instagram/Facebook caption. It goes before the hashtags, in the video's language for en/bn/fr/pt/es/ja/de. TikTok captions get no link because links there are not clickable.
