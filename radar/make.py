@@ -29,6 +29,7 @@ def F(w, size):
 YEL = (255, 212, 59); WHITE = (255, 255, 255); RED = (255, 77, 77); GREEN = (46, 204, 113)
 GRAY = (150, 162, 185); CARD = (27, 41, 68); NAVY = (11, 18, 32); LINE = (60, 84, 128)
 ISSUES = []
+REVIEW = []  # soft notes for the proofreader (do not fail QA)
 
 _meas = ImageDraw.Draw(Image.new('RGB', (10, 10)))
 def fit(txt, w, size, maxw, minsize=None, where=''):
@@ -329,8 +330,16 @@ def caption(im, T, tl):
                 return
 
 G = {}
+def intro_frame(T):
+    """Opening hold: the thumbnail itself (title hook + audience + amount + deadline) with a slow zoom-out."""
+    th = G['thumb_im']; p = ease_out(T / max(0.1, G['intro_end']))
+    s = 1.06 - 0.06 * p; w, h = int(W * s), int(H * s)
+    big = th.resize((w, h), Image.LANCZOS)
+    return big.crop(((w - W) // 2, (h - H) // 2, (w - W) // 2 + W, (h - H) // 2 + H))
+
 def frame(T):
     card, tl, hook, bg = G['card'], G['tl'], G['hook'], G['bg']
+    if G.get('intro_end', 0) > 0 and T < G['intro_end']: return intro_frame(T)
     for sc in tl:
         if sc['start'] <= T < sc['end'] + 1e-6:
             im = Image.new('RGBA', (W, H), (0, 0, 0, 0))
@@ -394,7 +403,8 @@ def make_audio(card, tl, work, dur):
     def whoosh():
         L = int(0.35 * SR); n = np.convolve(rng.standard_normal(L), np.ones(40) / 40, 'same')
         return (0.5 * np.sin(np.linspace(0, np.pi, L)) ** 2 * n).astype(np.float32)
-    place(sfx, whoosh(), 0.0, 0.6)
+    place(sfx, stamp(), 0.02, 0.5)
+    if card.get('_intro_end'): place(sfx, whoosh(), max(0, card['_intro_end'] - 0.2), 0.8)
     for sc in tl:
         if sc['start'] > 0: place(sfx, whoosh(), max(0, sc['start'] - 0.2))
         if sc['name'] in ('check', 'steps'):
@@ -425,7 +435,9 @@ def make_thumb(card, path):
     s = fit(tag, 'B', 84, 900, 50, 'thumb tag'); tw = d.textlength(tag, font=F('B', s))
     d.rounded_rectangle([W / 2 - tw / 2 - 50, 1180, W / 2 + tw / 2 + 50, 1320], 40, fill=RED)
     d.text((W / 2, 1248), tag, font=F('B', s), fill=WHITE, anchor='mm')
-    d.text((W / 2, 1420), '대상 · 금액 · 신청방법 30초 정리', font=F('D', 52), fill=WHITE, anchor='mm')
+    hl = card.get('hook_line') or '대상 · 금액 · 신청방법 30초 정리'
+    hs = fit(hl, 'B', 76, 980, 48, 'thumb hook_line')
+    d.text((W / 2, 1430), hl, font=F('B', hs), fill=YEL if card.get('hook_line') else WHITE, anchor='mm', stroke_width=4, stroke_fill=NAVY)
     im.convert('RGB').save(path, quality=92)
 
 # ---------------- copy ----------------
@@ -434,6 +446,12 @@ def make_copy(card):
     title = card.get('title') or f'{card["audience"]} {card.get("audience_noun", "")} {card.get("amount_short", card["amount"])} 신청하세요 ({dl})'
     title = re.sub(r'\s+', ' ', title).strip()
     if len(title) > 60: ISSUES.append(f'title over 60 chars: {title}')
+    for bad in ('누구나', '무조건', '100%', '전원 지급', '모두 받'):
+        if bad in title: ISSUES.append(f'banned word in title: {bad}')
+    if len(title) > 40: REVIEW.append(f'title {len(title)} chars: Shorts shows ~40, put the hook first')
+    amt = card.get('amount_short', '')
+    if amt and amt not in title[:22]: REVIEW.append('amount not in the first ~20 chars of the title')
+    if not card.get('title_pattern'): REVIEW.append('title_pattern missing (loss|surprise|question|countdown|check)')
     tags = card.get('tags', [])
     hashtags = ' '.join('#' + t.replace(' ', '') for t in (tags[:4] + ['지원금', '정부지원금']))
     hashtags = ' '.join(dict.fromkeys(hashtags.split()))
@@ -456,6 +474,7 @@ def make_copy(card):
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument('card'); ap.add_argument('out')
     ap.add_argument('--hook', default=None); ap.add_argument('--voice', default='M2')
+    ap.add_argument('--intro', type=float, default=None, help='seconds the thumbnail is held at the start (0 = off; default card intro_s or 1.2)')
     a = ap.parse_args()
     card = json.load(open(a.card)); hook = a.hook or card.get('hook', 'target')
     if card.get('hook_beats', {}).get(hook): card['beats']['hook'] = card['hook_beats'][hook]
@@ -465,6 +484,11 @@ def main():
     vreport = make_voice(card, a.voice, work)
     tl = build_timeline(card); dur = tl[-1]['end']
     G.update(card=card, tl=tl, hook=hook, bg=make_bg(card))
+    make_thumb(card, os.path.join(out, 'thumb.jpg'))
+    # Opening hold: show the thumbnail while the first hook line is spoken (a.intro seconds, clamped to that line).
+    b0 = tl[0]['beats'][0]; intro = a.intro if a.intro is not None else card.get('intro_s', 1.2)
+    G['intro_end'] = round(min(max(0.0, intro), b0['t'] + b0['dur'] + 0.05, 2.0), 3) if intro else 0.0
+    G['thumb_im'] = Image.open(os.path.join(out, 'thumb.jpg')).convert('RGB')
     with cf.ProcessPoolExecutor(min(5, len(tl))) as ex:
         res = list(ex.map(render_scene, [(i, work) for i in range(len(tl))]))
     if any(r[0] for r in res): sys.exit('render failed')
@@ -472,27 +496,28 @@ def main():
         for i in range(len(tl)): f.write(f"file 'scene{i}.mp4'\n")
     subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-f', 'concat', '-safe', '0', '-i', f'{work}/list.txt', '-c', 'copy', f'{work}/video.mp4'], check=True)
     vdur = sum(r[1] for r in res) / FPS
+    G['card']['_intro_end'] = G.get('intro_end', 0)
     make_audio(card, tl, work, vdur)
     final = os.path.join(out, 'video.mp4')
     subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', f'{work}/video.mp4', '-i', f'{work}/mix.m4a', '-map', '0:v', '-map', '1:a',
                     '-c:v', 'copy', '-c:a', 'copy', '-shortest', '-movflags', '+faststart', final], check=True)
-    make_thumb(card, os.path.join(out, 'thumb.jpg'))
     copy = make_copy(card)
     with open(os.path.join(out, 'copy.txt'), 'w') as f:
         f.write(f'[YouTube 제목]\n{copy["yt_title"]} #shorts\n\n[YouTube 설명]\n{copy["description"]}\n\n[태그]\n{", ".join(copy["tags"])}\n\n'
                 f'[고정 댓글]\n{copy["pinned_comment"]}\n\n[Instagram]\n{copy["instagram_caption"]}\n\n[TikTok]\n{copy["tiktok_caption"]}\n')
     # QA stills: first frame, hook pulse, end of each scene, plus thumbnail
-    times = [0.0] + [min(sc['end'] - 0.1, sc['beats'][-1]['t'] + sc['beats'][-1]['dur'] + 0.3) for sc in tl]
+    times = [0.0, G.get('intro_end', 0) + 0.15] + [min(sc['end'] - 0.1, sc['beats'][-1]['t'] + sc['beats'][-1]['dur'] + 0.3) for sc in tl]
     shots = [frame(t) for t in times] + [Image.open(os.path.join(out, 'thumb.jpg'))]
     sheet = Image.new('RGB', (360 * 4, 640 * 2), (0, 0, 0))
     for i, s in enumerate(shots[:8]): sheet.paste(s.resize((360, 640)), ((i % 4) * 360, (i // 4) * 640))
     sheet.save(os.path.join(out, 'qa.png'))
     if not (18 <= vdur <= 45): ISSUES.append(f'duration {vdur:.1f}s outside 18-45s')
     manifest = {'id': card['id'], 'hook': hook, 'voice': a.voice, 'duration': round(vdur, 2), 'title': copy['yt_title'],
-                'copy': copy, 'voice_check': vreport, 'qa': {'pass': not ISSUES, 'issues': ISSUES},
+                'copy': copy, 'voice_check': vreport, 'qa': {'pass': not ISSUES, 'issues': ISSUES, 'review': REVIEW}, 'intro_s': G.get('intro_end', 0),
+                'title_pattern': card.get('title_pattern'), 'title_candidates': card.get('title_candidates', []),
                 'files': {'video': final, 'thumb': os.path.join(out, 'thumb.jpg'), 'qa_sheet': os.path.join(out, 'qa.png')}}
     json.dump(manifest, open(os.path.join(out, 'manifest.json'), 'w'), ensure_ascii=False, indent=1)
-    print(json.dumps({'qa_pass': not ISSUES, 'issues': ISSUES, 'duration': round(vdur, 2), 'title': copy['yt_title']}, ensure_ascii=False))
+    print(json.dumps({'qa_pass': not ISSUES, 'issues': ISSUES, 'review': REVIEW, 'intro_s': G.get('intro_end', 0), 'duration': round(vdur, 2), 'title': copy['yt_title']}, ensure_ascii=False))
 
 if __name__ == '__main__':
     main()
