@@ -500,7 +500,7 @@ def main():
     make_audio(card, tl, work, vdur)
     final = os.path.join(out, 'video.mp4')
     subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', f'{work}/video.mp4', '-i', f'{work}/mix.m4a', '-map', '0:v', '-map', '1:a',
-                    '-c:v', 'copy', '-c:a', 'copy', '-shortest', '-movflags', '+faststart', final], check=True)
+                    '-c:v', 'copy', '-bsf:v', 'h264_metadata=sample_aspect_ratio=1/1', '-c:a', 'copy', '-shortest', '-movflags', '+faststart', final], check=True)
     copy = make_copy(card)
     with open(os.path.join(out, 'copy.txt'), 'w') as f:
         f.write(f'[YouTube 제목]\n{copy["yt_title"]} #shorts\n\n[YouTube 설명]\n{copy["description"]}\n\n[태그]\n{", ".join(copy["tags"])}\n\n'
