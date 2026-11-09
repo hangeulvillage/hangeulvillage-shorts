@@ -31,3 +31,19 @@ YouTube Studio showed 90.5% of Shorts-feed viewers swiping away, while those who
 
 ## App waitlist (2026-11-06)
 batch.py adds one line with the Google Form link ("Hangeul Village 앱 알림 신청", answers go to the owner's Google account) to every YouTube description and Instagram/Facebook caption. It goes before the hashtags, in the video's language for en/bn/fr/pt/es/ja/de. TikTok captions get no link because links there are not clickable.
+
+## Sound effects: earshot bank + A/B test (2026-11-09)
+
+- `brand/sfx/*.wav` is a small bank of designed effects rendered once with
+  [earshot](https://github.com/Leonxlnx/earshot) (MIT; every sound is synthesized in code, no recordings):
+  wooden block knocks with rising pitch per syllable (`pop_0..5`), a ding when a word is complete (`chime`),
+  a glockenspiel note for the V answer reveal (`reveal`), a bright swish on the first frame (`whoosh`) and a soft
+  tick for each countdown digit in B, Q and V (`tick`). Re-render with `tools/build_sfx_bank.sh`; the daily
+  pipeline only reads the WAVs (no earshot or torch needed).
+- `make_short.py --sfx earshot|classic`. `classic` is the old synth set exactly (no ticks) and is the control group.
+  If the bank is missing, it falls back to `classic`.
+- `batch.py`: a plan entry may set `"sfx"`; otherwise the set is chosen per word by a stable hash (about half and
+  half, independent of the hook hash), so re-renders match. The manifest and the summary report `sfx`.
+- Decision rule (config.sfx_test, applied by the daily task): compare the median YouTube "계속 시청함" of English
+  shorts per set once each set has at least 4 shorts with 2-day data. earshot ≥ classic − 1 pt → earshot for all;
+  classic better by more than 1 pt → classic for all. Then set every plan's `"sfx"` to the winner.

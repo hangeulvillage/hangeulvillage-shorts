@@ -4,7 +4,7 @@ usage: python3 make_short.py FORMAT "Name[ @handle]" ["Name2" ...] --out file.mp
 import sys, os, json, subprocess, asyncio, base64, argparse
 HERE = os.path.dirname(os.path.abspath(__file__))
 SCR = os.path.dirname(HERE)
-ap = argparse.ArgumentParser(); ap.add_argument('fmt'); ap.add_argument('names', nargs='+'); ap.add_argument('--out', required=True); ap.add_argument('--voice', default='female', choices=['female', 'male']); ap.add_argument('--lang', default='en'); ap.add_argument('--hook', type=int, default=0)
+ap = argparse.ArgumentParser(); ap.add_argument('fmt'); ap.add_argument('names', nargs='+'); ap.add_argument('--out', required=True); ap.add_argument('--voice', default='female', choices=['female', 'male']); ap.add_argument('--lang', default='en'); ap.add_argument('--hook', type=int, default=0); ap.add_argument('--sfx', default='earshot', choices=['earshot', 'classic'])
 a = ap.parse_args()
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); import i18n
 UI = i18n.ui(a.lang)
@@ -66,7 +66,7 @@ def syl_lines(ko, base, per=PER):
         lines.append((base + 0.5 + per * k + 0.55, ch, 0.8))
 sfx = []  # (time, kind)
 def land_sfx(base, n, per=PER):
-    for k in range(n): sfx.append((base + 0.5 + per * k + 0.53, 'pop'))
+    for k in range(n): sfx.append((base + 0.5 + per * k + 0.53, f'pop_{min(k, 5)}'))  # rising pitch per block
 def word_build(ko, t, hold=HOLD):
     """syllables land, chime, then the whole word read once (twice if short). returns scene end."""
     syl_lines(ko, t); land_sfx(t, nsyl(ko))
@@ -96,12 +96,15 @@ elif a.fmt == 'B':
     t = word_build(kos[0], 3.4)
 elif a.fmt in HOOK_LEN:
     lines += [(ts, tx, 0.9) for ts, tx in HOOK_VOICE[a.fmt][HOOK]]
-    if a.fmt == 'V': sfx.append((3.6, 'chime'))
+    if a.fmt == 'V': sfx.append((3.6, 'reveal'))
     t = word_build(kos[0], HOOK_LEN[a.fmt])
 else:
     t = 2.0
     lines.append((0.05, '여러분이 요청한 이름들.', 0.95))
     for ko in kos: t = word_build(ko, t, HOLD_C) - 0.1
+CD_START = {'B': 0.9, 'Q': 1.0, 'V': 1.1}
+if a.fmt in CD_START:
+    sfx += [(CD_START[a.fmt] + 0.8 * k, 'tick') for k in range(3)]
 end_line = '댓글로 알려 주세요!' if a.fmt in ('Q', 'V') else '다음 단어 추천해 주세요!' if a.fmt in ('D', 'E') else '이름을 알려 주세요!'
 lines.append((t + 0.2, end_line, 0.95))
 
@@ -128,13 +131,22 @@ filt = [f.replace('[a', ',' + VCHAIN + '[a', 1) if False else f for f in filt]
 filt = [f.split('[a')[0] + ',' + VCHAIN + '[a' + f.split('[a')[1] for f in filt]
 vdur = subprocess.run(['ffprobe','-v','error','-show_entries','format=duration','-of','csv=p=0',vid],capture_output=True,text=True).stdout.strip()
 import sfx as _sfx
-_paths = {k: os.path.join(HERE, f'_sfx_{k}.wav') for k in ('pop', 'chime', 'whoosh')}
-_sfx.pop(_paths['pop']); _sfx.chime(_paths['chime']); _sfx.whoosh(_paths['whoosh'])
+# sound effects: 'earshot' = designed bank in brand/sfx (rendered once with earshot, see README), 'classic' = the old synth set
+BANK = os.path.join(HERE, '..', 'brand', 'sfx')
+SFX_MODE = a.sfx if os.path.exists(os.path.join(BANK, 'pop_0.wav')) else 'classic'
+_classic = {k: os.path.join(HERE, f'_sfx_{k}.wav') for k in ('pop', 'chime', 'whoosh')}
+_sfx.pop(_classic['pop']); _sfx.chime(_classic['chime']); _sfx.whoosh(_classic['whoosh'])
+def _path(kind):
+    if SFX_MODE == 'earshot': return os.path.join(BANK, kind + '.wav')
+    return _classic['pop' if kind.startswith('pop') else 'chime' if kind == 'reveal' else kind]
+if SFX_MODE == 'classic': sfx = [x for x in sfx if x[1] != 'tick']   # classic = exactly the old mix (control group)
+_paths = {k: _path(k) for _, k in sfx}
 sfx_inputs, sfx_filt = [], []
 base_idx = len(lines) + 1
 for j, (ts, kind) in enumerate(sfx):
     sfx_inputs += ['-i', _paths[kind]]; ms = max(0, int(ts * 1000))
-    vol = {'pop': 0.55, 'chime': 0.5, 'whoosh': 0.45}[kind]
+    vol = ({'chime': 0.32, 'reveal': 0.4, 'whoosh': 0.22, 'tick': 0.28}.get(kind, 0.4) if SFX_MODE == 'earshot'
+           else {'chime': 0.5, 'whoosh': 0.45}.get(kind, 0.55))
     sfx_filt.append(f'[{base_idx + j}:a]adelay={ms}|{ms},volume={vol}[s{j}]')
 sys.path.insert(0, HERE); import music
 mpath = os.path.join(HERE, '_music.wav'); music.make(mpath, float(vdur))
@@ -153,4 +165,4 @@ I = float(_re.findall(r'I:\s+(-?[\d.]+) LUFS', meas)[-1])
 tmp = a.out + '.tmp.mp4'
 subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', a.out, '-c:v', 'copy', '-af', f'volume={-14 - I:.2f}dB,alimiter=limit=0.95:level=false', '-c:a', 'aac', '-b:a', '192k', tmp], check=True)
 os.replace(tmp, a.out)
-print(json.dumps({'out': a.out, 'korean': kos, 'voice_check': report, 'hook': HOOK, 'duration': float(vdur)}, ensure_ascii=False))
+print(json.dumps({'out': a.out, 'korean': kos, 'voice_check': report, 'hook': HOOK, 'sfx': SFX_MODE, 'duration': float(vdur)}, ensure_ascii=False))
