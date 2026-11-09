@@ -41,3 +41,23 @@ Separate brand from Hangeul Village; it only shares this repository.
 The video opens on the thumbnail itself (slow zoom-out) while the first hook line is spoken, then cuts to the hook scene.
 Length = `intro_s` (default 1.2 s, `--intro` overrides, 0 = off), never longer than the first voice line or 2 s.
 Because frame 0 = the thumbnail, "동영상에서 선택 → first frame" in YouTube Studio gives the designed thumbnail even without custom-thumbnail rights.
+
+## Upload timing (since 2026-11-09, asked by the account owner: find the best upload time/interval from data and switch to it)
+State lives in `radar_config.timing_test` (phase, history). The daily run collects data and applies the rules below by itself.
+- Data (every run): for each of our public YouTube videos up to 4 days old, append `{at, age_h, views}` to `radar_videos.<id>.yt_views_log`
+  (age from `scheduled_for`). Once a video has readings on both sides of 48 h, store `views_48h` (linear interpolation), `slot` (HH:MM KST)
+  and `weekday`. Videos made public by hand at an unknown time (gg-youth-basic-income-2026q4) are left out.
+- Phase `slot`: `publish_slots_kst` rotates 07:40 / 12:10 / 19:40 (slot_next). When every slot has >= 4 videos with `views_48h`, compare the
+  median per slot. If the best median is >= 1.3x every other slot's median: `publish_slots_kst = [best, best, challenger]` (challenger = the
+  runner-up slot; slot_next 0) and phase `interval`. No clear winner: keep rotating and decide again after 3 more videos per slot.
+- Phase `interval`: `per_day` 2 for 7 days. YouTube gets both videos (both publish_date tomorrow, the two best different times);
+  Facebook/TikTok still post one per day (the one in the better slot; the other gets fb_skipped "1 per day"). After 7 days compare the
+  median `views_48h` per video and the average views per day (sum of `views_48h` / days) with the 7 days before. Keep `per_day` 2 only if
+  the per-video median stayed >= 80 % of before AND views per day rose; otherwise back to 1. Then phase `steady`.
+  If two topics cannot pass the fact gate on a day, make one: never lower the fact gate for volume.
+- Phase `steady` (and `interval`): every 7 days, if the challenger slot has >= 4 videos and its median is >= 1.3x the best slot's, swap them;
+  otherwise try the runner-up or a time 2 h from the best as the next challenger.
+- Topic drives views more than time: use medians and the minimum counts above, never decide from one video; note outliers (>= 3x median) in
+  `timing_test.notes`. If YouTube Studio 분석 → 시청자 shows "시청자가 YouTube를 이용하는 시간대", use it only as a tie-breaker.
+- Every change to `publish_slots_kst` or `per_day`: append `{at, from, to, reason with the numbers}` to `timing_test.history`, say it in the run
+  message and send a PushNotification.
