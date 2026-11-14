@@ -202,6 +202,7 @@ def make_bg(card, chrome=True, variant=0):
 
 # ---------------- scenes ----------------
 def deadline_label(card):
+    if card.get('deadline_text'): return card['deadline_text']  # e.g. a far-off deadline that only applies to some applicants
     d = ddate(card)
     return f'{d.month}월 {d.day}일 마감' if d else '상시 신청'
 
