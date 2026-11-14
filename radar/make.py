@@ -28,6 +28,19 @@ def F(w, size):
 
 YEL = (255, 212, 59); WHITE = (255, 255, 255); RED = (255, 77, 77); GREEN = (46, 204, 113)
 GRAY = (150, 162, 185); CARD = (27, 41, 68); NAVY = (11, 18, 32); LINE = (60, 84, 128)
+# Visual styles (--style): palette + background pattern, so videos do not all look the same.
+STYLES = {
+    'navy':   {'bg_top': (10, 17, 31), 'bg_bot': (22, 36, 64), 'pat': (34, 50, 82), 'glow': (40, 60, 110), 'pattern': 'dots',
+               'YEL': (255, 212, 59), 'CARD': (27, 41, 68), 'NAVY': (11, 18, 32), 'LINE': (60, 84, 128)},
+    'ember':  {'bg_top': (30, 9, 14), 'bg_bot': (62, 18, 26), 'pat': (84, 32, 40), 'glow': (120, 44, 44), 'pattern': 'stripes',
+               'YEL': (255, 190, 80), 'CARD': (66, 24, 32), 'NAVY': (28, 8, 12), 'LINE': (130, 62, 72)},
+    'forest': {'bg_top': (5, 26, 22), 'bg_bot': (12, 50, 42), 'pat': (22, 70, 60), 'glow': (30, 100, 84), 'pattern': 'grid',
+               'YEL': (120, 240, 200), 'CARD': (16, 58, 50), 'NAVY': (4, 22, 18), 'LINE': (50, 110, 96)},
+}
+STYLE = dict(STYLES['navy'])
+def set_style(name):
+    st = STYLES.get(name or 'navy', STYLES['navy']); STYLE.clear(); STYLE.update(st)
+    globals().update({k: st[k] for k in ('YEL', 'CARD', 'NAVY', 'LINE')})
 ISSUES = []
 REVIEW = []  # soft notes for the proofreader (do not fail QA)
 
@@ -151,12 +164,18 @@ def build_timeline(card):
 # ---------------- background ----------------
 def make_bg(card, chrome=True):
     y = np.linspace(0, 1, H)[:, None]
-    top = np.array([10, 17, 31]); bot = np.array([22, 36, 64])
+    top = np.array(STYLE['bg_top']); bot = np.array(STYLE['bg_bot'])
     arr = (top + (bot - top) * y[..., None]).repeat(W, axis=1).astype(np.uint8)
     im = Image.fromarray(arr, 'RGB'); d = ImageDraw.Draw(im)
-    for gy in range(0, H, 60):
-        for gx in range(30, W, 60): d.ellipse([gx - 2, gy - 2, gx + 2, gy + 2], fill=(34, 50, 82))
-    glow = Image.new('RGB', (W, H), (0, 0, 0)); ImageDraw.Draw(glow).ellipse([140, 300, 940, 1100], fill=(40, 60, 110))
+    if STYLE['pattern'] == 'stripes':
+        for k in range(-H, W, 56): d.line([(k, 0), (k + H, H)], fill=STYLE['pat'], width=3)
+    elif STYLE['pattern'] == 'grid':
+        for gx in range(0, W, 90): d.line([(gx, 0), (gx, H)], fill=STYLE['pat'], width=1)
+        for gy in range(0, H, 90): d.line([(0, gy), (W, gy)], fill=STYLE['pat'], width=1)
+    else:
+        for gy in range(0, H, 60):
+            for gx in range(30, W, 60): d.ellipse([gx - 2, gy - 2, gx + 2, gy + 2], fill=STYLE['pat'])
+    glow = Image.new('RGB', (W, H), (0, 0, 0)); ImageDraw.Draw(glow).ellipse([140, 300, 940, 1100], fill=STYLE['glow'])
     glow = glow.filter(ImageFilter.GaussianBlur(160))
     im = Image.fromarray(np.clip(np.asarray(im).astype(int) + np.asarray(glow).astype(int) // 2, 0, 255).astype(np.uint8))
     d = ImageDraw.Draw(im)
@@ -474,10 +493,11 @@ def make_copy(card):
 # ---------------- main ----------------
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument('card'); ap.add_argument('out')
-    ap.add_argument('--hook', default=None); ap.add_argument('--voice', default='M5')
+    ap.add_argument('--hook', default=None); ap.add_argument('--voice', default='M5'); ap.add_argument('--style', default=None, choices=list(STYLES))
     ap.add_argument('--intro', type=float, default=None, help='seconds the thumbnail is held at the start (0 = off; default card intro_s or 1.2)')
     a = ap.parse_args()
     card = json.load(open(a.card)); hook = a.hook or card.get('hook', 'target')
+    style = a.style or card.get('style', 'navy'); set_style(style)
     if card.get('hook_beats', {}).get(hook): card['beats']['hook'] = card['hook_beats'][hook]
     out = a.out; work = os.path.join(out, 'work'); os.makedirs(work, exist_ok=True)
     for k in ('id', 'program', 'audience', 'audience_sub', 'amount', 'publish_date', 'beats', 'facts', 'source'):
@@ -513,7 +533,7 @@ def main():
     for i, s in enumerate(shots[:8]): sheet.paste(s.resize((360, 640)), ((i % 4) * 360, (i // 4) * 640))
     sheet.save(os.path.join(out, 'qa.png'))
     if not (18 <= vdur <= 45): ISSUES.append(f'duration {vdur:.1f}s outside 18-45s')
-    manifest = {'id': card['id'], 'hook': hook, 'voice': a.voice, 'duration': round(vdur, 2), 'title': copy['yt_title'],
+    manifest = {'id': card['id'], 'hook': hook, 'voice': a.voice, 'style': style, 'duration': round(vdur, 2), 'title': copy['yt_title'],
                 'copy': copy, 'voice_check': vreport, 'qa': {'pass': not ISSUES, 'issues': ISSUES, 'review': REVIEW}, 'intro_s': G.get('intro_end', 0),
                 'title_pattern': card.get('title_pattern'), 'title_candidates': card.get('title_candidates', []),
                 'files': {'video': final, 'thumb': os.path.join(out, 'thumb.jpg'), 'qa_sheet': os.path.join(out, 'qa.png')}}

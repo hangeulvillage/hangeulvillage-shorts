@@ -4,11 +4,12 @@ usage: python3 make_short.py FORMAT "Name[ @handle]" ["Name2" ...] --out file.mp
 import sys, os, json, subprocess, asyncio, base64, argparse
 HERE = os.path.dirname(os.path.abspath(__file__))
 SCR = os.path.dirname(HERE)
-ap = argparse.ArgumentParser(); ap.add_argument('fmt'); ap.add_argument('names', nargs='+'); ap.add_argument('--out', required=True); ap.add_argument('--voice', default='female', choices=['female', 'male']); ap.add_argument('--lang', default='en'); ap.add_argument('--hook', type=int, default=0); ap.add_argument('--sfx', default='earshot', choices=['earshot', 'classic'])
+ap = argparse.ArgumentParser(); ap.add_argument('fmt'); ap.add_argument('names', nargs='+'); ap.add_argument('--out', required=True); ap.add_argument('--voice', default='female', choices=['female', 'male']); ap.add_argument('--lang', default='en'); ap.add_argument('--hook', type=int, default=0); ap.add_argument('--sfx', default='earshot', choices=['earshot', 'classic']); ap.add_argument('--style', default='', help='JSON {theme, bg, music}')
 a = ap.parse_args()
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); import i18n
 UI = i18n.ui(a.lang)
 HOOK = 0 if UI else a.hook % 3   # opening-line variant (A/B/C test); localized videos keep variant 0
+STYLE = json.loads(a.style) if a.style else {}   # visual/music variation: {theme: P|N|Y|<fmt>, bg: blocks|lines|stars|dots, music: marimba|lofi|bright}
 # 'Priya=프리야' fixes the Korean spelling of a name (curated local names)
 # 'Nikki=니키 @handle' keeps the handle (format C shows it as a comment card)
 import re as _re
@@ -32,7 +33,7 @@ async def record():
             got['data'] = base64.b64decode(b64); got['name'] = name
         await pg.expose_function('__saveFile', save)
         await pg.add_init_script("""window.claude={use:n=>Promise.resolve(n==='downloads'?{save:async({filename,data})=>{const buf=new Uint8Array(await data.arrayBuffer());let s='';for(let i=0;i<buf.length;i+=32768)s+=String.fromCharCode.apply(null,buf.subarray(i,i+32768));await window.__saveFile(btoa(s),filename);return {status:'saved'}}}:null)}""")
-        await pg.add_init_script('window.HV_UI = ' + json.dumps(UI, ensure_ascii=False) + '; window.HV_HOOK = ' + str(HOOK) + ';')
+        await pg.add_init_script('window.HV_UI = ' + json.dumps(UI, ensure_ascii=False) + '; window.HV_HOOK = ' + str(HOOK) + '; window.HV_STYLE = ' + json.dumps(STYLE) + ';')
         await pg.goto('file://' + page)
         await pg.evaluate('document.fonts.ready'); await pg.wait_for_timeout(500)
         sample = ' '.join(v for v in UI.values() if isinstance(v, str))
@@ -149,7 +150,7 @@ for j, (ts, kind) in enumerate(sfx):
            else {'chime': 0.5, 'whoosh': 0.45}.get(kind, 0.55))
     sfx_filt.append(f'[{base_idx + j}:a]adelay={ms}|{ms},volume={vol}[s{j}]')
 sys.path.insert(0, HERE); import music
-mpath = os.path.join(HERE, '_music.wav'); music.make(mpath, float(vdur))
+mpath = os.path.join(HERE, '_music.wav'); music.make(mpath, float(vdur), mood=STYLE.get('music', 'marimba'))
 mi = len(lines) + 1 + len(sfx)
 vmix = ''.join(f'[a{i}]' for i in range(len(lines))) + f'amix=inputs={len(lines)}:normalize=0,apad[voice]'
 smix = ''.join(f'[s{j}]' for j in range(len(sfx))) + f'amix=inputs={len(sfx)}:normalize=0,apad[fx]'
@@ -165,4 +166,4 @@ I = float(_re.findall(r'I:\s+(-?[\d.]+) LUFS', meas)[-1])
 tmp = a.out + '.tmp.mp4'
 subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', a.out, '-c:v', 'copy', '-af', f'volume={-14 - I:.2f}dB,alimiter=limit=0.95:level=false', '-c:a', 'aac', '-b:a', '192k', tmp], check=True)
 os.replace(tmp, a.out)
-print(json.dumps({'out': a.out, 'korean': kos, 'voice_check': report, 'hook': HOOK, 'sfx': SFX_MODE, 'duration': float(vdur)}, ensure_ascii=False))
+print(json.dumps({'out': a.out, 'korean': kos, 'voice_check': report, 'hook': HOOK, 'sfx': SFX_MODE, 'style': STYLE, 'duration': float(vdur)}, ensure_ascii=False))

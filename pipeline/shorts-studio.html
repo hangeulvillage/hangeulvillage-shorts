@@ -385,6 +385,10 @@ if (typeof module !== 'undefined') module.exports = { toHangul, decompose, compo
     D: { bg: '#1c1238', ink: '#ffffff', muted: '#c9bde8', tile: '#2a1d52', line: '#4a3a7a', cho: '#8fb4ff', jung: '#ff6f9f', jong: '#ffd166', s1: '#26386a', s2: '#55234a', s3: '#4f4326', accent: '#ff6f9f' },
     E: { bg: '#0f3b2e', ink: '#ffffff', muted: '#b9d8cc', tile: '#155040', line: '#2b6b58', cho: '#9cc8ff', jung: '#ff8a7a', jong: '#ffd23f', s1: '#1f4d6b', s2: '#5a3330', s3: '#56501f', accent: '#ffd23f' },
     Q: { bg: '#fff3e0', ink: '#2a1a0c', muted: '#7a5a3a', tile: '#ffffff', line: '#f0d6b4', cho: '#2f5da8', jung: '#d9480f', jong: '#b8860f', s1: '#e3ebf8', s2: '#fde3d5', s3: '#f6ecd2', accent: '#d9480f' },
+    // extra looks for style variation (window.HV_STYLE.theme): notebook paper, night sky, pop yellow
+    P: { bg: '#fbf7ec', ink: '#1f2a44', muted: '#6b6f80', tile: '#ffffff', line: '#c9d7ee', cho: '#2f5da8', jung: '#d0453a', jong: '#c08a0e', s1: '#e3ebf8', s2: '#f9e4e1', s3: '#f6ecd2', accent: '#2f5da8' },
+    N: { bg: '#0b1026', ink: '#f4f1ff', muted: '#b4b0d6', tile: '#161c3f', line: '#2c3366', cho: '#8fb4ff', jung: '#ff8fb1', jong: '#ffd166', s1: '#1e2a5c', s2: '#4d2347', s3: '#4a4224', accent: '#ffd166' },
+    Y: { bg: '#ffd84d', ink: '#1d1a12', muted: '#5c4f1e', tile: '#fffaf0', line: '#e8c13a', cho: '#2850a0', jung: '#d1342b', jong: '#7a4fd0', s1: '#e3ebf8', s2: '#fde3d5', s3: '#ece3fb', accent: '#d1342b' },
     V: { bg: '#0d2b45', ink: '#ffffff', muted: '#a9c3dc', tile: '#143a5c', line: '#2a5479', cho: '#8fc1ff', jung: '#ff8fa3', jong: '#ffd166', s1: '#1d4470', s2: '#5a2d3d', s3: '#56481f', accent: '#5eead4' }
   };
   const UI = window.HV_UI || {}; const S = (k, d) => (k in UI ? UI[k] : d);
@@ -563,10 +567,18 @@ if (typeof module !== 'undefined') module.exports = { toHangul, decompose, compo
     }
   }
   let FX = { lastLand: -9, cheer: false, bubble: '', bubbleA: 0 };
+  const STY = window.HV_STYLE || {};
+  function drawPattern(t, th) {
+    ctx.save();
+    if (STY.bg === 'lines') { ctx.strokeStyle = th.line; ctx.lineWidth = 2; for (let y = 140; y < H; y += 64) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); } ctx.strokeStyle = th.jung; ctx.globalAlpha = 0.35; ctx.beginPath(); ctx.moveTo(96, 0); ctx.lineTo(96, H); ctx.stroke(); }
+    else if (STY.bg === 'stars') { for (let i = 0; i < 90; i++) { const x = (i * 337) % W, y = (i * 571) % H, tw = 0.35 + 0.35 * Math.sin(t * 2 + i); ctx.globalAlpha = tw; ctx.fillStyle = i % 7 ? th.muted : th.accent; ctx.beginPath(); ctx.arc(x, y, i % 5 ? 2.2 : 3.6, 0, Math.PI * 2); ctx.fill(); } }
+    else if (STY.bg === 'dots') { ctx.fillStyle = th.line; ctx.globalAlpha = 0.6; for (let y = 40; y < H; y += 56) for (let x = 28 + ((y / 56) % 2) * 28; x < W; x += 56) { ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fill(); } }
+    ctx.restore();
+  }
   function drawFrame(t) {
-    const th = THEMES[fmt];
+    const th = THEMES[STY.theme] || THEMES[fmt];
     ctx.fillStyle = th.bg; ctx.fillRect(0, 0, W, H);
-    drawDrift(t, th);
+    if (STY.bg && STY.bg !== 'blocks') drawPattern(t, th); else drawDrift(t, th);
     FX = { lastLand: -9, cheer: false, bubble: '', bubbleA: 0, t };
     // brand mark (kept clear of top UI and side buttons)
     [[th.cho, 0], [th.jung, 1], [th.jong, 2]].forEach(([c, i]) => { ctx.fillStyle = c; rr(ctx, 120 + i * 34, 236, 26, 26, 5); ctx.fill(); });

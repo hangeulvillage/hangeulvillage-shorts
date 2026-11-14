@@ -72,7 +72,7 @@ def main(plan_path, out_dir):
         if job.get('sfx') not in ('earshot', 'classic'):
             import hashlib
             job['sfx'] = 'earshot' if hashlib.md5(job['names'][0].split('=')[0].strip().encode()).digest()[0] % 2 == 0 else 'classic'
-        res = subprocess.run([sys.executable, os.path.join(HERE, 'make_short.py'), job['fmt'], *job['names'], '--voice', job.get('voice', 'female'), '--lang', lang, '--hook', str(hook), '--sfx', job['sfx'], '--out', base + '.mp4'],
+        res = subprocess.run([sys.executable, os.path.join(HERE, 'make_short.py'), job['fmt'], *job['names'], '--voice', job.get('voice', 'female'), '--lang', lang, '--hook', str(hook), '--sfx', job['sfx'], *(['--style', json.dumps(job['style'])] if job.get('style') else []), '--out', base + '.mp4'],
                              capture_output=True, text=True)
         line = [l for l in res.stdout.splitlines() if l.startswith('{')]
         if res.returncode or not line:
