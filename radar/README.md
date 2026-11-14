@@ -61,3 +61,21 @@ State lives in `radar_config.timing_test` (phase, history). The daily run collec
   `timing_test.notes`. If YouTube Studio 분석 → 시청자 shows "시청자가 YouTube를 이용하는 시간대", use it only as a tie-breaker.
 - Every change to `publish_slots_kst` or `per_day`: append `{at, from, to, reason with the numbers}` to `timing_test.history`, say it in the run
   message and send a PushNotification.
+
+## Viral structure (since 2026-11-14, asked by the account owner: "하루에 터지는 쇼츠 구조를 파악하고 같은 구조로")
+Read-only study on 2026-11-14 of this week's top subsidy shorts on YouTube (e.g. 4.3만 views in 1 day, 3.2만 in 4 days,
+1.8천 in 2 days; only titles, view counts and a few frames were looked at, nothing downloaded or reused). What they share:
+a fixed 2-line headline at the top for the whole video, the picture changes every 3–6 s, news/loss framing
+("바뀝니다", "오늘부터", "다시 나오기 시작", "15만 원 날려요"), a closing summary screen people can capture, 45–70 s.
+Every card now uses it (structure only; our content, facts and design stay ours):
+- `"structure": "viral"` (or `--structure viral`): fixed headline banner, background shift per scene, closing
+  "한눈에 정리" recap card (+2.6 s, then the video loops). Duration limit 48 s.
+- `"headline": [line1, line2]`: line1 = who, ≤ 14 chars (e.g. "만 65세 이상 부모님 계신 분"); line2 = the hook, ≤ 12 chars,
+  one of: loss ("신청 안 하면 0원이에요"), news ("11월부터 이렇게 바뀝니다"), opened ("오늘부터 신청 시작"),
+  closing ("마감 D-5, 아직 안 하셨나요"). Must be literally true for this program (the fact gate applies to it too);
+  rotate the line2 type and record it as `headline_type` (loss|news|opened|closing).
+- `"style"`: rotate navy → ember → forest by publish_date (day-of-year % 3) so videos do not all look the same.
+- Topic choice: when two programs are equally solid, prefer the one with news value (just changed, opened in the
+  last 3 days, or closes within 10 days).
+- Weekly snapshot: compare views_48h by headline_type and style once each has ≥ 3 videos; keep the best, still
+  try the others once a week.

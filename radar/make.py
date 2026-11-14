@@ -162,7 +162,8 @@ def build_timeline(card):
     return tl
 
 # ---------------- background ----------------
-def make_bg(card, chrome=True):
+GLOWS = [(140, 300), (-60, 560), (300, 160), (80, 820), (260, 480), (0, 240)]
+def make_bg(card, chrome=True, variant=0):
     y = np.linspace(0, 1, H)[:, None]
     top = np.array(STYLE['bg_top']); bot = np.array(STYLE['bg_bot'])
     arr = (top + (bot - top) * y[..., None]).repeat(W, axis=1).astype(np.uint8)
@@ -175,12 +176,23 @@ def make_bg(card, chrome=True):
     else:
         for gy in range(0, H, 60):
             for gx in range(30, W, 60): d.ellipse([gx - 2, gy - 2, gx + 2, gy + 2], fill=STYLE['pat'])
-    glow = Image.new('RGB', (W, H), (0, 0, 0)); ImageDraw.Draw(glow).ellipse([140, 300, 940, 1100], fill=STYLE['glow'])
+    glow = Image.new('RGB', (W, H), (0, 0, 0)); gx0, gy0 = GLOWS[variant % len(GLOWS)]; ImageDraw.Draw(glow).ellipse([gx0, gy0, gx0 + 800, gy0 + 800], fill=STYLE['glow'])
     glow = glow.filter(ImageFilter.GaussianBlur(160))
     im = Image.fromarray(np.clip(np.asarray(im).astype(int) + np.asarray(glow).astype(int) // 2, 0, 255).astype(np.uint8))
     d = ImageDraw.Draw(im)
     if not chrome: return im
     pill = card.get('pill', card['program'])
+    if G.get('viral'):
+        # Viral structure: a fixed two-line headline stays on screen for the whole video (what the scroll-stopper reads),
+        # the program pill moves down next to the source line.
+        l1, l2 = headline(card)
+        d.rectangle([0, 96, W, 330], fill=STYLE['NAVY'])
+        d.text((W / 2, 160), l1, font=F('B', fit(l1, 'B', 66, 980, 44, 'headline 1')), fill=WHITE, anchor='mm')
+        d.text((W / 2, 262), l2, font=F('B', fit(l2, 'B', 100, 1000, 60, 'headline 2')), fill=YEL, anchor='mm', stroke_width=5, stroke_fill=(0, 0, 0))
+        d.text((W / 2, 1420), pill, font=F('D', fit(pill, 'D', 34, 900, 24, 'pill')), fill=YEL, anchor='mm')
+        src = '출처: ' + card['source']
+        d.text((W / 2, 1462), src, font=F('R', fit(src, 'R', 30, 900, 22, 'source')), fill=GRAY, anchor='mm')
+        return im
     s = fit(pill, 'D', 40, 860, 28, 'pill'); tw = d.textlength(pill, font=F('D', s))
     d.rounded_rectangle([W / 2 - tw / 2 - 34, 230, W / 2 + tw / 2 + 34, 302], 36, fill=YEL)
     d.text((W / 2, 266), pill, font=F('D', s), fill=NAVY, anchor='mm')
@@ -206,7 +218,7 @@ def scene_hook(im, sc, t, T, card, hook):
     else:
         top_txt, top_col, top_size = card['audience'], YEL, 150
         sub = card['audience_sub']; chip = None
-    if hook == 'check':
+    if hook == 'check' and not G.get('viral'):
         text(im, (W / 2, 250), '3초 체크', 'B', 56, WHITE, alpha=1.0)
     s = fit(top_txt, 'B', top_size, 920, 90, 'hook top')
     text(im, (W / 2, 360), top_txt, 'B', s, top_col, scale=0.85 + 0.15 * back(t / 0.25), stroke=6)
@@ -336,7 +348,32 @@ def scene_cta(im, sc, t, T, card, hook):
         bb = math.sin((t - 1.0) * 6) * 12; x, y = 960, 1130 + bb
         ImageDraw.Draw(im).polygon([(x - 34, y - 40), (x + 34, y - 40), (x, y + 10)], fill=YEL)
 
-RENDER = {'hook': scene_hook, 'check': scene_check, 'steps': scene_steps, 'deadline': scene_deadline, 'cta': scene_cta}
+def headline(card):
+    h = card.get('headline') or [f"{card.get('short_name', card['program'])} 핵심 정리", card.get('hook_line') or '신청해야 받아요']
+    return (h + ['', ''])[:2]
+
+def scene_recap(im, sc, t, T, card, hook):
+    """Closing summary card: everything on one screen (people pause/screenshot it), then the video loops."""
+    p = back(t / 0.35)
+    text(im, (W / 2, 300), '한눈에 정리', 'B', 92, YEL, scale=0.85 + 0.15 * p, stroke=4)
+    text(im, (W / 2, 400), '캡처해 두세요', 'D', 50, WHITE, alpha=clamp(t / 0.3))
+    steps = card['beats'].get('steps') or [{}]
+    rows = [('대상', card['audience'], card['audience_sub']), ('금액', card['amount'], ''),
+            ('신청', steps[0].get('main', ''), steps[0].get('sub', '')), ('기한', deadline_label(card), '')]
+    y = 500
+    for i, (k, v, sub) in enumerate(rows):
+        q = ease_out((t - 0.15 - i * 0.12) / 0.3)
+        if q <= 0: continue
+        h = 150 if sub else 120
+        rrect(im, [70, y, W - 70, y + h], 28, CARD, alpha=0.95 * q)
+        rrect(im, [70, y, 250, y + h], 28, YEL, alpha=q)
+        text(im, (160, y + h / 2), k, 'B', 52, NAVY, alpha=q)
+        vy = y + (52 if sub else h / 2)
+        text(im, (630, vy), v, 'B', fit(v, 'B', 56, 700, 34, f'recap {k}'), WHITE, alpha=q)
+        if sub: text(im, (630, y + 112), sub, 'D', fit(sub, 'D', 36, 700, 24, f'recap {k} sub'), GRAY, alpha=q)
+        y += h + 26
+
+RENDER = {'recap': scene_recap, 'hook': scene_hook, 'check': scene_check, 'steps': scene_steps, 'deadline': scene_deadline, 'cta': scene_cta}
 
 def caption(im, T, tl):
     for sc in tl:
@@ -360,12 +397,13 @@ def intro_frame(T):
 def frame(T):
     card, tl, hook, bg = G['card'], G['tl'], G['hook'], G['bg']
     if G.get('intro_end', 0) > 0 and T < G['intro_end']: return intro_frame(T)
-    for sc in tl:
+    for i, sc in enumerate(tl):
         if sc['start'] <= T < sc['end'] + 1e-6:
             im = Image.new('RGBA', (W, H), (0, 0, 0, 0))
             RENDER[sc['name']](im, sc, T - sc['start'], T, card, hook)
             caption(im, T, tl)
-            out = bg.convert('RGBA'); out.alpha_composite(im, (0, OFF))
+            base = G['bgs'][i] if G.get('bgs') else bg
+            out = base.convert('RGBA'); out.alpha_composite(im, (0, OFF))
             return out.convert('RGB')
     return bg.copy()
 
@@ -494,6 +532,7 @@ def make_copy(card):
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument('card'); ap.add_argument('out')
     ap.add_argument('--hook', default=None); ap.add_argument('--voice', default='M5'); ap.add_argument('--style', default=None, choices=list(STYLES))
+    ap.add_argument('--structure', default=None, choices=['classic', 'viral'], help='viral = fixed headline + scene background shifts + closing recap card')
     ap.add_argument('--intro', type=float, default=None, help='seconds the thumbnail is held at the start (0 = off; default card intro_s or 1.2)')
     a = ap.parse_args()
     card = json.load(open(a.card)); hook = a.hook or card.get('hook', 'target')
@@ -503,8 +542,12 @@ def main():
     for k in ('id', 'program', 'audience', 'audience_sub', 'amount', 'publish_date', 'beats', 'facts', 'source'):
         if k not in card: sys.exit(f'card missing {k}')
     vreport = make_voice(card, a.voice, work)
-    tl = build_timeline(card); dur = tl[-1]['end']
+    structure = a.structure or card.get('structure', 'classic'); G['viral'] = structure == 'viral'
+    tl = build_timeline(card)
+    if G['viral']: tl.append({'name': 'recap', 'start': tl[-1]['end'], 'end': tl[-1]['end'] + 2.6, 'beats': []})
+    dur = tl[-1]['end']
     G.update(card=card, tl=tl, hook=hook, bg=make_bg(card))
+    if G['viral']: G['bgs'] = [make_bg(card, variant=i) for i in range(len(tl))]
     make_thumb(card, os.path.join(out, 'thumb.jpg'))
     # Opening hold: show the thumbnail while the first hook line is spoken (a.intro seconds, clamped to that line).
     b0 = tl[0]['beats'][0]; intro = a.intro if a.intro is not None else card.get('intro_s', 1.2)
@@ -527,13 +570,13 @@ def main():
         f.write(f'[YouTube 제목]\n{copy["yt_title"]} #shorts\n\n[YouTube 설명]\n{copy["description"]}\n\n[태그]\n{", ".join(copy["tags"])}\n\n'
                 f'[고정 댓글]\n{copy["pinned_comment"]}\n\n[Instagram]\n{copy["instagram_caption"]}\n\n[TikTok]\n{copy["tiktok_caption"]}\n')
     # QA stills: first frame, hook pulse, end of each scene, plus thumbnail
-    times = [0.0, G.get('intro_end', 0) + 0.15] + [min(sc['end'] - 0.1, sc['beats'][-1]['t'] + sc['beats'][-1]['dur'] + 0.3) for sc in tl]
+    times = [0.0, G.get('intro_end', 0) + 0.15] + [(min(sc['end'] - 0.1, sc['beats'][-1]['t'] + sc['beats'][-1]['dur'] + 0.3) if sc['beats'] else sc['end'] - 0.1) for sc in tl]
     shots = [frame(t) for t in times] + [Image.open(os.path.join(out, 'thumb.jpg'))]
     sheet = Image.new('RGB', (360 * 4, 640 * 2), (0, 0, 0))
     for i, s in enumerate(shots[:8]): sheet.paste(s.resize((360, 640)), ((i % 4) * 360, (i // 4) * 640))
     sheet.save(os.path.join(out, 'qa.png'))
-    if not (18 <= vdur <= 45): ISSUES.append(f'duration {vdur:.1f}s outside 18-45s')
-    manifest = {'id': card['id'], 'hook': hook, 'voice': a.voice, 'style': style, 'duration': round(vdur, 2), 'title': copy['yt_title'],
+    if not (18 <= vdur <= 48): ISSUES.append(f'duration {vdur:.1f}s outside 18-45s')
+    manifest = {'id': card['id'], 'hook': hook, 'voice': a.voice, 'style': style, 'structure': structure, 'duration': round(vdur, 2), 'title': copy['yt_title'],
                 'copy': copy, 'voice_check': vreport, 'qa': {'pass': not ISSUES, 'issues': ISSUES, 'review': REVIEW}, 'intro_s': G.get('intro_end', 0),
                 'title_pattern': card.get('title_pattern'), 'title_candidates': card.get('title_candidates', []),
                 'files': {'video': final, 'thumb': os.path.join(out, 'thumb.jpg'), 'qa_sheet': os.path.join(out, 'qa.png')}}
