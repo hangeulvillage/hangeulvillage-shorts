@@ -11,6 +11,10 @@ Separate brand from Hangeul Village; it only shares this repository.
    (first frame, end of every scene, thumbnail) and `manifest.json` (`qa.pass`, `qa.issues`, voice check).
 
 ## Run (since 2026-11-16: use the runner, not make.py directly)
+**Precedence:** where a scheduled-task prompt still says `python3 radar/make.py CARD OUT …` or `python3 radar/blog.py …`,
+run the matching `run.py` command instead (same output files, plus validation and bundle.json). For the phone kit captions
+use `python3 radar/run.py kit radar/videos/<date>_<slug>.txt`. If `yt_readback.js` says ok:false but the fields look right
+on screen, trust the screen and continue (the dialog DOM can change); note it as a lesson.
 1. Write the card (fact gate first), then:
    `python3 radar/run.py make radar/cards/CARD.json /tmp/radar_out --today YYYY-MM-DD`
    - Validates the card first (`validate_card.py`): missing fields, deadline < publish+3 days, Arabic digits in `say`,
