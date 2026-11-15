@@ -8,6 +8,10 @@
          at most 5 hashtags), files, qa, validation warnings.
       Retries the render once if it fails for a non-card reason (TTS/ffmpeg hiccup).
 
+  python3 radar/run.py kit COPY.txt
+      Phone-kit captions {ig_caption, tt_caption} from a saved copy file (radar/videos/<date>_<slug>.txt),
+      for the day the video goes out (the render folder of the day before is gone by then).
+
   python3 radar/run.py blog CARD.json OUT_DIR --yt VIDEO_ID
       blog.py twice: OUT_DIR/tistory (embedded video) and OUT_DIR/naver (--naver variant).
       Prints both titles and QA results; exit 1 if either QA fails.
@@ -70,6 +74,19 @@ def cmd_make(a, extra):
          'title': bundle['yt']['title'], 'duration': man['duration'], 'qa': man['qa'], 'warnings': W}, 0 if ready else 1)
 
 
+def section(txt, name):
+    m = re.search(r'\[' + re.escape(name) + r'\]\n(.*?)(?=\n\[[^\]\n]+\]\n|\Z)', txt, re.S)
+    return m.group(1).strip() if m else ''
+
+
+def cmd_kit(a, extra):
+    txt = open(a.copy).read()
+    ig, tt = section(txt, 'Instagram'), section(txt, 'TikTok')
+    if not ig or not tt:
+        out({'ok': False, 'why': 'copy file has no [Instagram] or [TikTok] section'}, 1)
+    out({'ok': True, 'ig_caption': kit_caption(ig), 'tt_caption': kit_caption(tt)}, 0)
+
+
 def cmd_blog(a, extra):
     results = {}
     for name, flags in (('tistory', []), ('naver', ['--naver'])):
@@ -89,8 +106,9 @@ def main():
     sub = ap.add_subparsers(dest='cmd', required=True)
     m = sub.add_parser('make'); m.add_argument('card'); m.add_argument('out'); m.add_argument('--today', default=None)
     b = sub.add_parser('blog'); b.add_argument('card'); b.add_argument('out'); b.add_argument('--yt', required=True)
+    k = sub.add_parser('kit'); k.add_argument('copy')
     a, extra = ap.parse_known_args()
-    (cmd_make if a.cmd == 'make' else cmd_blog)(a, extra)
+    {'make': cmd_make, 'blog': cmd_blog, 'kit': cmd_kit}[a.cmd](a, extra)
 
 
 if __name__ == '__main__':

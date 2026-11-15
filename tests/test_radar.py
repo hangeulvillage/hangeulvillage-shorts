@@ -45,6 +45,14 @@ def test_kit_caption_strips_links_and_limits_tags():
     assert s.count('#') == 5
 
 
+def test_kit_from_copy_file():
+    import subprocess
+    f = sorted(glob.glob(os.path.join(ROOT, 'radar', 'videos', '*.txt')))[-1]
+    r = subprocess.run([sys.executable, os.path.join(ROOT, 'radar', 'run.py'), 'kit', f], capture_output=True, text=True)
+    d = json.loads(r.stdout)
+    assert d['ok'] and 'http' not in d['ig_caption'] and d['tt_caption'].count('#') <= 5
+
+
 if __name__ == '__main__':
     for k, f in list(globals().items()):
         if k.startswith('test_'):
