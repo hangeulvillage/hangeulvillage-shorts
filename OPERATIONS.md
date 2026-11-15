@@ -73,4 +73,6 @@ A lesson doc: `{at, task, problem, cause, rule, status: "active"|"folded"|"retir
 - **Weekly (HV weekly task, Monday):** read both collections. Merge duplicates, retire rules that no longer apply, and list the rules that should become permanent ("to fold into OPERATIONS.md / README / a prompt") in the weekly report. When the repo push works, fold them into this file or the channel README yourself and set status "folded"; otherwise leave them active and list them for the user.
 
 ## 6. Messages to the user
+
+- The owner wants improvements raised FIRST, without being asked (2026-11-16): every daily/weekly report ends with "개선 제안" — at most 2 concrete items (what, why, cost), or "없음". Write everything to the owner in Korean.
 The user is Korean: write to him in Korean, short and plain. Never invent numbers. Use PushNotification only for things he must act on, or when a task prompt says so.
