@@ -9,7 +9,7 @@ BRIEF.json (see promo/briefs/*.json):
    "cta": "지도에서 '모락 커피'를 검색하세요",
    "photos": ["photo1.jpg", ...],         # relative to the brief file; 1+ photos, reused if fewer than scenes
    "say": {"tagline": "...", "points": ["..."], "offer": "...", "cta": "..."},  # optional spoken versions (Hangul numbers)
-   "voice": "F1"|"M5", "accent": "#E8743B", "music": "marimba"|"lofi"|"bright", "sample": false}
+   "voice": "F1"|"M5"|"none" (captions + music only), "accent": "#E8743B", "music": "marimba"|"lofi"|"bright", "sample": false}
 Output: video.mp4 (1080x1920, 30 fps, -14 LUFS), thumb.jpg, qa.png, manifest.json {qa: {pass, issues}}.
 The video says nothing that is not in the brief. Spoken text uses Hangul numbers (digits are converted automatically).
 """
@@ -226,7 +226,12 @@ def main():
     photos = [load_photo(p if os.path.isabs(p) else os.path.join(base, p)) for p in brief['photos']]
     accent = hexrgb(brief.get('accent', '#E8743B'))
     scenes = scene_plan(brief, photos)
-    vrep = make_voice(scenes, brief.get('voice', 'F1'), work)
+    silent = brief.get('voice', 'F1') == 'none'   # captions + music only
+    if silent:
+        vrep = []
+        for s in scenes: s['vdur'] = 2.6 if s['kind'] != 'cta' else 3.2
+    else:
+        vrep = make_voice(scenes, brief.get('voice', 'F1'), work)
     t = 0.0
     for s in scenes:
         s['start'] = t; s['voice_at'] = t + 0.25
@@ -245,13 +250,16 @@ def main():
     import music
     music.make(f'{work}/music.wav', total + 0.5, mood=brief.get('music', 'bright'))
     ins, flt = [], []
-    for i, s in enumerate(scenes):
-        ms = int(s['voice_at'] * 1000); ins += ['-i', s['wav']]; flt.append(f'[{i}:a]adelay={ms}|{ms},aresample=48000[a{i}]')
-    m = len(scenes); ins += ['-i', f'{work}/music.wav']
-    mix = ''.join(f'[a{i}]' for i in range(m)) + f'amix=inputs={m}:normalize=0,apad[vo];[vo]asplit=2[vk][vm];' \
-          f'[{m}:a]volume=0.10[mu];[mu][vk]sidechaincompress=threshold=0.02:ratio=8:attack=10:release=400[md];' \
-          f'[vm][md]amix=inputs=2:normalize=0,loudnorm=I=-14:TP=-1.5:LRA=11,aresample=48000[out]'
-    subprocess.run(['ffmpeg', '-y', '-loglevel', 'error'] + ins + ['-filter_complex', ';'.join(flt) + ';' + mix, '-map', '[out]',
+    if silent:
+        ins = ['-i', f'{work}/music.wav']; mix = '[0:a]loudnorm=I=-14:TP=-1.5:LRA=11,aresample=48000[out]'
+    else:
+        for i, s in enumerate(scenes):
+            ms = int(s['voice_at'] * 1000); ins += ['-i', s['wav']]; flt.append(f'[{i}:a]adelay={ms}|{ms},aresample=48000[a{i}]')
+        m = len(scenes); ins += ['-i', f'{work}/music.wav']
+        mix = ''.join(f'[a{i}]' for i in range(m)) + f'amix=inputs={m}:normalize=0,apad[vo];[vo]asplit=2[vk][vm];' \
+              f'[{m}:a]volume=0.10[mu];[mu][vk]sidechaincompress=threshold=0.02:ratio=8:attack=10:release=400[md];' \
+              f'[vm][md]amix=inputs=2:normalize=0,loudnorm=I=-14:TP=-1.5:LRA=11,aresample=48000[out]'
+    subprocess.run(['ffmpeg', '-y', '-loglevel', 'error'] + ins + ['-filter_complex', ';'.join(flt + [mix]), '-map', '[out]',
                     '-t', f'{total:.3f}', '-c:a', 'aac', '-b:a', '192k', f'{work}/a.m4a'], check=True)
     final = os.path.join(out, 'video.mp4')
     subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', f'{work}/v.mp4', '-i', f'{work}/a.m4a', '-map', '0:v', '-map', '1:a',
