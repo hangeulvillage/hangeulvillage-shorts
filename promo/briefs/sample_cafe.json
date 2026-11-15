@@ -6,4 +6,4 @@
  "cta": "지도에서 '모락 커피' 검색",
  "say": {"points": ["매일 아침 직접 로스팅해요", "핸드드립은 사천오백 원부터", "조용한 이층 작업석도 있어요"],
          "offer": "평일 오후 두 시부터 다섯 시까지, 아메리카노 원 플러스 원!", "cta": "모락 커피. 지도에서 검색해 주세요."},
- "photos": ["samples/coffee.png"], "voice": "F1", "accent": "#C8642E", "music": "lofi"}
+ "photos": ["samples/coffee.png"], "voice": "F3", "accent": "#C8642E", "music": "lofi"}

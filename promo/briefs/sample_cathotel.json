@@ -6,4 +6,4 @@
  "cta": "문자로 날짜만 보내 주세요",
  "say": {"points": ["고양이만 받는 일 묘 일 실", "하루 두 번, 사진으로 소식을 보내드려요", "수의사와 연계해 응급 상황에도 대응해요"],
          "offer": "처음이시면 하루 무료 체험!", "cta": "냥이쉼터 호텔. 문자로 날짜만 보내 주세요."},
- "photos": ["samples/chelsea.png"], "voice": "F1", "accent": "#7A5AF8", "music": "marimba"}
+ "photos": ["samples/chelsea.png"], "voice": "F3", "accent": "#7A5AF8", "music": "marimba"}

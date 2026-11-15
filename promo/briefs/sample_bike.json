@@ -6,4 +6,4 @@
  "cta": "방문 전 전화 주시면 바로 정비",
  "say": {"tagline": "출퇴근 바이크, 삼십 분이면 점검 끝", "points": ["엔진오일 교환, 당일에 끝내 드려요", "타이어와 브레이크는 무료로 점검해요", "배달 기사님은 밤에도 접수해요"],
          "offer": "이번 달, 엔진오일 교환 이십 퍼센트 할인", "cta": "바퀴손 바이크. 오시기 전에 전화 주세요."},
- "photos": ["samples/stereo_motorcycle.png"], "voice": "M5", "accent": "#E03A3A", "music": "bright"}
+ "photos": ["samples/stereo_motorcycle.png"], "voice": "M2", "accent": "#E03A3A", "music": "bright"}
