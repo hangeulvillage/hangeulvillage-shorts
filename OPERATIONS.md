@@ -20,6 +20,10 @@ Two channels share one PC (DESKTOP-JH1UFS7) and one Chrome:
 - If Chrome cannot be reached or screenshots keep timing out, the PC is off or the Chrome window is minimized: stop browser work, say so in one line, and still do the cloud-only parts.
 - file_upload only accepts files inside your working directory.
 
+- Prefer the repo helper scripts over hand-written steps: `radar/run.py` (validate → render → bundle.json → blog),
+  `tools/browser/tistory_post.js`, `tools/browser/yt_readback.js` (run it before pressing 예약; fix any `ok:false`).
+  HV `pipeline/shorts/batch.py` now retries each failed render once and exits 1 if any job failed or failed QA.
+
 ## 2. Identities (critical: other tasks expect Chrome on Hangeul Village)
 **Rule: every task that switches to 지원금 레이더 switches back to Hangeul Village before it ends, even after errors. If a switch back fails after one retry, put it in the FIRST line of your message and send a PushNotification.**
 

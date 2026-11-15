@@ -10,6 +10,20 @@ Separate brand from Hangeul Village; it only shares this repository.
    (YouTube title/description/tags/pinned comment, Instagram and TikTok captions), `qa.png`
    (first frame, end of every scene, thumbnail) and `manifest.json` (`qa.pass`, `qa.issues`, voice check).
 
+## Run (since 2026-11-16: use the runner, not make.py directly)
+1. Write the card (fact gate first), then:
+   `python3 radar/run.py make radar/cards/CARD.json /tmp/radar_out --today YYYY-MM-DD`
+   - Validates the card first (`validate_card.py`): missing fields, deadline < publish+3 days, Arabic digits in `say`,
+     exaggeration words, numbers in title/headline not found in facts, missing `verified.at`. Errors stop it before rendering.
+   - Renders (one automatic retry on a non-card failure) and writes `bundle.json`: YouTube title/description/tags/pinned
+     comment, phone-kit captions (`kit.ig_caption`, `kit.tt_caption`: links removed, ≤ 5 hashtags), files, QA.
+   - Exit 0 = ready to upload. Exit 1 = read the printed JSON (`step`: validate / render / qa) and fix; never upload past it.
+2. After the YouTube upload gives the video id:
+   `python3 radar/run.py blog radar/cards/CARD.json /tmp/radar_out/blog --yt VIDEO_ID` -> `tistory/` and `naver/` posts.
+3. Browser helpers: `tools/browser/tistory_post.js` (body insert + length check), `tools/browser/yt_readback.js`
+   (check the upload form really holds the title/description/not-for-kids before 예약).
+4. Before any commit: `python3 tests/test_radar.py` and `bash tools/check_secrets.sh`.
+
 ## Card rules (the facts are the product: never guess)
 - Every number, date, condition and exclusion must come from the official notice (government/city site,
   복지로, 정부24, 고용24, 잡아바 …) or, if the official page will not open, from at least two news

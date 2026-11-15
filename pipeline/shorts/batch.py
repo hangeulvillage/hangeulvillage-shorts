@@ -72,9 +72,13 @@ def main(plan_path, out_dir):
         if job.get('sfx') not in ('earshot', 'classic'):
             import hashlib
             job['sfx'] = 'earshot' if hashlib.md5(job['names'][0].split('=')[0].strip().encode()).digest()[0] % 2 == 0 else 'classic'
-        res = subprocess.run([sys.executable, os.path.join(HERE, 'make_short.py'), job['fmt'], *job['names'], '--voice', job.get('voice', 'female'), '--lang', lang, '--hook', str(hook), '--sfx', job['sfx'], *(['--style', json.dumps(job['style'])] if job.get('style') else []), '--out', base + '.mp4'],
-                             capture_output=True, text=True)
-        line = [l for l in res.stdout.splitlines() if l.startswith('{')]
+        cmd = [sys.executable, os.path.join(HERE, 'make_short.py'), job['fmt'], *job['names'], '--voice', job.get('voice', 'female'), '--lang', lang, '--hook', str(hook), '--sfx', job['sfx'], *(['--style', json.dumps(job['style'])] if job.get('style') else []), '--out', base + '.mp4']
+        for attempt in (1, 2):  # one automatic retry: TTS/ffmpeg hiccups are usually transient
+            res = subprocess.run(cmd, capture_output=True, text=True)
+            line = [l for l in res.stdout.splitlines() if l.startswith('{')]
+            if not res.returncode and line:
+                break
+        job['attempts'] = attempt
         if res.returncode or not line:
             manifest.append({'n': n, 'job': job, 'error': (res.stderr or res.stdout)[-800:]}); continue
         info = json.loads(line[-1])
@@ -105,6 +109,11 @@ def main(plan_path, out_dir):
         manifest.append({'n': n, 'job': job, 'video': base + '.mp4', 'copy': base + '.txt', 'items': items, 'voice_ok': ok, 'voice_check': info['voice_check'], 'package': pk, 'lang': lang, 'hook': info.get('hook', 0), 'sfx': info.get('sfx', job['sfx']), 'duration': info.get('duration'), 'yt_translations': yt_tr, 'qa': report})
     json.dump(manifest, open(os.path.join(out_dir, 'manifest.json'), 'w'), ensure_ascii=False, indent=1)
     print(json.dumps([{'n': m['n'], 'hook': m.get('hook'), 'sfx': m.get('sfx'), 'sec': round(m.get('duration') or 0, 1), 'qa_pass': (m.get('qa') or {}).get('pass'), 'issues': (m.get('qa') or {}).get('issues'), 'review': (m.get('qa') or {}).get('review'), 'video': os.path.basename(m.get('video', '')), 'error': m.get('error', '')[:200]} for m in manifest], ensure_ascii=False))
+    # non-zero exit when any job failed or failed QA, so a caller can't mistake a partial batch for success
+    failed = [m['n'] for m in manifest if m.get('error') or not (m.get('qa') or {}).get('pass', True)]
+    if failed:
+        print(json.dumps({'failed_jobs': failed}), file=sys.stderr)
+    return 1 if failed else 0
 
 if __name__ == '__main__':
-    main(sys.argv[1], sys.argv[2])
+    sys.exit(main(sys.argv[1], sys.argv[2]))
