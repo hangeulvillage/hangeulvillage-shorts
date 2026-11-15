@@ -87,6 +87,18 @@ def test_snapshot_blocks_fabricated_quote(tmp=None):
     assert any('no snapshot' in e for e in validate(c)[0])
 
 
+def test_roundup_builds_from_open_cards():
+    import subprocess, tempfile
+    d = tempfile.mkdtemp()
+    r = subprocess.run([sys.executable, os.path.join(ROOT, 'radar', 'roundup.py'), d, '--today', '2026-11-17'], capture_output=True, text=True)
+    meta = json.load(open(os.path.join(d, 'post.json')))
+    assert meta['qa']['pass'] and len(meta['programs']) >= 3, r.stderr
+    # a deadline that has passed is never listed
+    r = subprocess.run([sys.executable, os.path.join(ROOT, 'radar', 'roundup.py'), d, '--today', '2026-12-02'], capture_output=True, text=True)
+    meta = json.load(open(os.path.join(d, 'post.json')))
+    assert 'eitc-late-2026' not in meta['programs'] and 'munhwa-nuri-card-2026' not in meta['programs']
+
+
 if __name__ == '__main__':
     for k, f in list(globals().items()):
         if k.startswith('test_'):

@@ -122,3 +122,15 @@ When the card's publish_date is a **Monday**, make a ranking card instead of a s
 - `headline`: [line1 ≤ 14 chars, line2 with the key word in {braces}, e.g. "마감 임박 {TOP 5}"] — braces = accent colour.
 - Title pattern "countdown"; title ≤ 40 chars, e.g. "이번 달 놓치면 끝, 마감 임박 지원금 TOP 5". Length 45–60 s is fine.
 - In radar_videos record format "ranking"; compare its views_48h with the single cards of the same week in the report.
+
+
+## Weekly roundup post (since 2026-11-16, asked by the account owner: "수익실현이 빠른 순서부터 … 최고의 수율이 되는 구조로")
+Extra step **5f** of the daily radar run, every **Thursday** (KST), after 5d/5e:
+1. Build `links.json` = {card id: radar_videos.<id>.blog.url} for every video that has a public Tistory post.
+2. `python3 radar/roundup.py <OUT>/roundup --today <today> --links links.json` (and again with `--naver` into
+   `<OUT>/roundup_naver`). Require qa.pass (it needs ≥ 3 open programs; otherwise skip this week and say so).
+3. Post it on Tistory exactly like 5d (category 생활·복지, publish now, labels from post.json), and put the Naver variant into
+   the Naver paste kit (doc id `<date>_roundup`). Record radar_config.blog.roundups[] {date, url, programs}.
+It adds no new facts (only cards verified ≤ 30 days ago with deadlines still ahead), so it does not go through the fact gate
+again. Purpose: one fresh hub post per week for search traffic and AdSense volume, linking every single post.
+Backfill (5d) may now take **up to 3** older videos per run until every qa_pass video has a blog post.
