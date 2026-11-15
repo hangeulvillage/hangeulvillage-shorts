@@ -33,9 +33,8 @@ def p(t, color=INK):
 
 def video(yt):
     if not yt: return ''
-    return (f'<div style="max-width:360px;margin:16px auto"><div style="position:relative;padding-top:177.78%">'
-            f'<iframe src="https://www.youtube.com/embed/{E(yt)}" title="30초 요약 영상" style="position:absolute;inset:0;width:100%;height:100%;border:0;border-radius:12px" '
-            'allowfullscreen loading="lazy"></iframe></div></div>')
+    return (f'<p style="text-align:center;margin:16px 0"><iframe width="315" height="560" src="https://www.youtube.com/embed/{E(yt)}" '
+            'title="30초 요약 영상" style="max-width:100%;border:0;border-radius:12px" allowfullscreen="true"></iframe></p>')
 
 def footer(card):
     v = card.get('verified', {})
