@@ -72,6 +72,21 @@ def test_number_forms_match():
     assert ('n', 3952000.0) in num_values('395만 2천원')
 
 
+def test_snapshot_blocks_fabricated_quote(tmp=None):
+    import tempfile
+    c = copy.deepcopy(BASE); c['publish_date'] = '2026-11-18'
+    q = ('2026년 기준연금액 월 349,700원. 단독가구 월 247만원, 부부가구 월 395.2만원. 근로소득 기본공제액 월 116만원. '
+         '국민연금 월 524,550원 이하. 부부 각 20% 감액. 만 65세 이상. 1개월 전부터. 매월 25일. 문의 129, 1355. 2026.1~12월')
+    page = '공지사항 ' * 200 + q.replace('. ', '.\n  ') + ' 끝'
+    d = tempfile.mkdtemp(); f = os.path.join(d, '1.txt'); open(f, 'w').write(page)
+    c['evidence'] = [{'url': 'https://basicpension.mohw.go.kr/', 'quote': q, 'snapshot': f}]
+    assert validate(c)[0] == [], validate(c)[0]
+    open(f, 'w').write('공지사항 ' * 200)          # the page does not contain the quote -> fabricated
+    assert any('word for word' in e for e in validate(c)[0])
+    c['evidence'][0].pop('snapshot')
+    assert any('no snapshot' in e for e in validate(c)[0])
+
+
 if __name__ == '__main__':
     for k, f in list(globals().items()):
         if k.startswith('test_'):

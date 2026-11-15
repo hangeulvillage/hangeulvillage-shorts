@@ -6,7 +6,7 @@ Catches the mistakes that are cheap to catch here and expensive after rendering/
 missing fields, deadline too close or before publish_date, Arabic digits in spoken lines,
 numbers in the title/headline that appear nowhere in the facts, missing verification notes.
 """
-import argparse, datetime as dt, json, re, sys
+import argparse, datetime as dt, json, os, re, sys
 
 SINGLE_REQ = ['id', 'program', 'audience', 'audience_sub', 'amount', 'publish_date', 'beats', 'facts', 'source', 'verified', 'title']
 RANK_REQ = ['id', 'program', 'publish_date', 'beats', 'facts', 'source', 'items', 'headline', 'rank_by', 'title']
@@ -22,6 +22,12 @@ def nums(s):
 
 
 EVIDENCE_FROM = dt.date(2026, 11, 17)  # cards published from this date must quote the official text
+SNAPSHOT_FROM = dt.date(2026, 11, 18)  # ... and keep the raw page text the quote was copied from
+
+
+def squash(t):
+    """Compare text ignoring spacing, line breaks and bullet/quote marks."""
+    return re.sub(r'[\s\u00a0·•\-–—"\'“”‘’()\[\]]+', '', t or '')
 
 
 def num_values(text):
@@ -52,9 +58,25 @@ def check_evidence(card, E, W):
             'evidence missing: add [{"url", "quote"}] with the official sentences the facts come from')
         return
     have = set()
-    for e in ev:
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    for i, e in enumerate(ev):
         if not e.get('url') or not e.get('quote'):
             E.append('evidence item needs url and quote'); continue
+        # anti-fabrication: the quote must be found word for word in the saved raw page text
+        snap = e.get('snapshot')
+        if not snap:
+            (E if pub >= SNAPSHOT_FROM else W).append(
+                f'evidence[{i}] has no snapshot: save the page text (get_page_text / WebFetch output) to radar/evidence/<card id>/<n>.txt')
+        else:
+            path = snap if os.path.isabs(snap) else os.path.join(root, snap)
+            if not os.path.exists(path):
+                E.append(f'evidence[{i}] snapshot file not found: {snap}')
+            else:
+                page = open(path, encoding='utf-8').read()
+                if len(page) < 800:
+                    E.append(f'evidence[{i}] snapshot is only {len(page)} chars: save the whole page text, not an excerpt')
+                if squash(e['quote']) not in squash(page):
+                    E.append(f'evidence[{i}] quote is not in its page snapshot word for word: copy it exactly from the page')
         have.update(num_values(e['quote']))
     texts = [str(v) for v in card['facts'].values()] + [str(card.get('amount') or '')]
     for it in card.get('items', []):
