@@ -7,3 +7,4 @@ pipeline/shorts/_video.*
 radar/asr/sherpa-onnx-*/
 pipeline/asr/sherpa-onnx-*/
 radar/fonts/
+orders/

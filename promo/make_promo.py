@@ -264,6 +264,15 @@ def main():
     final = os.path.join(out, 'video.mp4')
     subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', f'{work}/v.mp4', '-i', f'{work}/a.m4a', '-map', '0:v', '-map', '1:a',
                     '-c:v', 'copy', '-c:a', 'copy', '-shortest', '-movflags', '+faststart', final], check=True)
+    # final gain so every delivery lands at -14 LUFS (loudnorm alone can end ~1 dB low on short clips)
+    meas = subprocess.run(['ffmpeg', '-i', final, '-af', 'ebur128', '-f', 'null', '-'], capture_output=True, text=True).stderr
+    li = re.findall(r'I:\s+(-?[\d.]+) LUFS', meas)
+    if li and abs(float(li[-1]) + 14) > 0.4:
+        tmp = final + '.tmp.mp4'
+        subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', final, '-c:v', 'copy', '-af',
+                        f'volume={-14 - float(li[-1]):.2f}dB,alimiter=limit=0.95:level=false', '-c:a', 'aac', '-b:a', '192k',
+                        '-movflags', '+faststart', tmp], check=True)
+        os.replace(tmp, final)
     # thumbnail = hook frame, QA sheet = middle frame of every scene
     Image.open(f'{work}/mid0.png').save(os.path.join(out, 'thumb.jpg'), quality=92)
     mids = [Image.open(f'{work}/mid{i}.png').resize((270, 480)) for i in range(len(scenes))]
