@@ -2,7 +2,7 @@
 
 Usage: python3 radar/make.py CARD.json OUT_DIR [--hook target|deadline|check] [--voice M2|F1]
 """
-import argparse, concurrent.futures as cf, datetime as dt, glob, hashlib, json, math, os, re, subprocess, sys
+import argparse, concurrent.futures as cf, datetime as dt, hashlib, json, math, os, re, subprocess, sys
 import numpy as np, soundfile as sf
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
@@ -127,7 +127,9 @@ def make_voice(card, voice, work):
             for attempt in range(12 if b.get('expect') else 6):
                 w, _ = tts.synthesize(b['say'], voice_style=st, lang='ko', speed=b.get('speed', VOICE_SPEED), total_steps=VOICE_STEPS)
                 y = np.asarray(w, dtype=np.float32).squeeze()
-                idx = np.where(np.abs(y) > 0.01)[0]; y = y[max(0, idx[0] - 600): idx[-1] + 2500]
+                idx = np.where(np.abs(y) > 0.01)[0]
+                if not len(idx): continue  # silent take (rare TTS glitch): try again
+                y = y[max(0, idx[0] - 600): idx[-1] + 2500]
                 sf.write(f'{work}/_in.wav', y, SR)
                 subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', f'{work}/_in.wav', '-af', warm, '-ar', str(SR),
                                 f'{work}/_out.wav'], check=True)
@@ -137,6 +139,7 @@ def make_voice(card, voice, work):
                 score = sim + (0.3 if exp_ok else 0)
                 if best is None or score > best[0]: best = (score, y, heard, sim, exp_ok)
                 if sim >= 0.85 and exp_ok: break
+            if best is None: sys.exit(f'TTS produced only silence for {scene}{k}: "{b["say"]}"')
             _, y, heard, sim, exp_ok = best
             y = y / max(1e-6, np.abs(y).max()) * 0.85
             path = f'{work}/{scene}{k}.wav'; sf.write(path, y, SR)

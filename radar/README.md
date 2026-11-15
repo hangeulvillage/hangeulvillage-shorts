@@ -29,6 +29,11 @@ on screen, trust the screen and continue (the dialog DOM can change); note it as
 4. Before any commit: `python3 tests/test_radar.py` and `bash tools/check_secrets.sh`.
 
 ## Card rules (the facts are the product: never guess)
+- **Evidence (required for cards published from 2026-11-17):** `"evidence": [{"url": "<official page>", "quote": "<the exact
+  sentences copied from it>"}]`. `validate_card.py` checks that EVERY number and date in `facts`, `amount`, `deadline`
+  (and ranking items) appears in some quote — 349,700원 = 34.97만 원 and 2026.11.30 = 11월 30일 count as the same. A number
+  with no quote is an error: copy the official sentence that contains it, or fix the fact. Quote official text only
+  (news quotes only when the official page will not open, and then from 2 agreeing reports).
 - Every number, date, condition and exclusion must come from the official notice (government/city site,
   복지로, 정부24, 고용24, 잡아바 …) or, if the official page will not open, from at least two news
   reports that agree. Record what was checked in `verified`. If a fact cannot be confirmed, leave the topic.

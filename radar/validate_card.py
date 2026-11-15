@@ -21,6 +21,60 @@ def nums(s):
     return out
 
 
+EVIDENCE_FROM = dt.date(2026, 11, 17)  # cards published from this date must quote the official text
+
+
+def num_values(text):
+    """Comparable values in a text: dates -> ('d', month, day); amounts -> ('n', value) with 만/천 expanded.
+    '349,700원' and '34.97만 원' give the same value; '2026.11.30', '11월 30일' and '11.30' the same date."""
+    t = re.sub(r'(?<=\d),(?=\d{3})', '', text or '')
+    out = []
+    def date(m, mo, d):
+        mo, d = int(mo), int(d)
+        if 1 <= mo <= 12 and 1 <= d <= 31:
+            out.append(('d', mo, d)); return ' '
+        return m.group(0)
+    t = re.sub(r'(?<![\d.])(\d{4})\s*[.\-/년]\s*(\d{1,2})\s*[.\-/월]\s*(\d{1,2})\s*일?', lambda m: date(m, m.group(2), m.group(3)), t)
+    t = re.sub(r'(?<![\d.])(\d{1,2})\s*(?:월\s*|[./])(\d{1,2})\s*일?(?![\d.]|\s*만)', lambda m: date(m, m.group(1), m.group(2)), t)
+    for m in re.finditer(r'(?<![\d.])(\d+(?:\.\d+)?)\s*(억|만|천)?(?:\s*(\d+)\s*천)?', t):
+        v = float(m.group(1)); unit = {'억': 1e8, '만': 1e4, '천': 1e3}.get(m.group(2), 1)
+        v = v * unit + (float(m.group(3)) * 1e3 if m.group(3) else 0)
+        out.append(('n', round(v, 2)))
+    return out
+
+
+def check_evidence(card, E, W):
+    """Every number/date in the facts (and amount, deadline) must appear in a quoted sentence from the source."""
+    ev = card.get('evidence') or []
+    pub = dt.date.fromisoformat(card['publish_date'])
+    if not ev:
+        (E if pub >= EVIDENCE_FROM else W).append(
+            'evidence missing: add [{"url", "quote"}] with the official sentences the facts come from')
+        return
+    have = set()
+    for e in ev:
+        if not e.get('url') or not e.get('quote'):
+            E.append('evidence item needs url and quote'); continue
+        have.update(num_values(e['quote']))
+    texts = [str(v) for v in card['facts'].values()] + [str(card.get('amount') or '')]
+    for it in card.get('items', []):
+        texts += [str(it.get('amount', '')), str(it.get('who', ''))]
+    need = []
+    for tx in texts:
+        need += num_values(tx)
+    for d in [card.get('deadline')] + [it.get('deadline') for it in card.get('items', [])]:
+        if d:
+            dd = dt.date.fromisoformat(d); need.append(('d', dd.month, dd.day))
+    missing = []
+    for x in need:
+        if x not in have and x not in missing:
+            missing.append(x)
+    if missing:
+        shown = ', '.join(f'{x[1]}/{x[2]}' if x[0] == 'd' else ('%g' % x[1]) for x in missing[:12])
+        (E if pub >= EVIDENCE_FROM else W).append(
+            f'numbers in facts not found in any evidence quote: {shown} — quote the official sentence or fix the fact')
+
+
 def validate(card, today=None):
     E, W = [], []
     ranking = card.get('format') == 'ranking'
@@ -127,6 +181,7 @@ def validate(card, today=None):
         W.append('no official page opened and fewer than 2 source_urls: check the fact gate')
     if not card.get('source_urls'):
         W.append('source_urls empty (the blog post shows no source links)')
+    check_evidence(card, E, W)
     return E, W
 
 

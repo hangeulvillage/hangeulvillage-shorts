@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+pipeline/_render.html
+pipeline/shorts/_*.wav
+pipeline/shorts/_video.*
+*.tmp.mp4
+radar/asr/sherpa-onnx-*/
+pipeline/asr/sherpa-onnx-*/
+radar/fonts/
