@@ -27,7 +27,6 @@ def check(job, items, pk, info, video, exact_flags=None, lang='en'):
     for k, t in texts.items():
         if '  ' in t.replace('\n', ' \n'): issues.append(f'{k}: double space')
         for g in _glued(t): issues.append(f'{k}: missing punctuation near "{g}"')
-        if re.search(r'#\w*$', t) and len(t) >= 150 and k == 'tt': pass
         if re.search(r'(^|\s)#($|\s)', t): issues.append(f'{k}: empty hashtag')
     if lang != 'en':
         import i18n

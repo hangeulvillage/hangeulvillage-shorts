@@ -53,6 +53,8 @@ async def record():
         await b.close()
         return got, info
 got, kos = asyncio.run(record())
+if 'data' not in got:
+    sys.exit('render failed: the studio page did not return a video within 60 s (check the format letter and names)')
 vid = os.path.join(HERE, '_video.' + got['name'].split('.')[-1])
 open(vid, 'wb').write(got['data'])
 
@@ -128,7 +130,6 @@ for i, (ts, text, sp) in enumerate(lines):
     filt.append(f'[{i+1}:a]adelay={ms}|{ms}[a{i}]')
 # voice: clean up each clip (upsample, band-limit, light denoise, gentle compression, tiny room)
 VCHAIN = 'aresample=48000:resampler=soxr,highpass=f=70,acompressor=threshold=-20dB:ratio=2.5:attack=5:release=80'
-filt = [f.replace('[a', ',' + VCHAIN + '[a', 1) if False else f for f in filt]
 filt = [f.split('[a')[0] + ',' + VCHAIN + '[a' + f.split('[a')[1] for f in filt]
 vdur = subprocess.run(['ffprobe','-v','error','-show_entries','format=duration','-of','csv=p=0',vid],capture_output=True,text=True).stdout.strip()
 import sfx as _sfx
@@ -162,7 +163,9 @@ subprocess.run(cmd, check=True)
 # final pass: static gain so every short lands at -14 LUFS
 import re as _re
 meas = subprocess.run(['ffmpeg', '-i', a.out, '-af', 'ebur128', '-f', 'null', '-'], capture_output=True, text=True).stderr
-I = float(_re.findall(r'I:\s+(-?[\d.]+) LUFS', meas)[-1])
+_I = _re.findall(r'I:\s+(-?[\d.]+) LUFS', meas)
+if not _I: sys.exit('loudness measurement failed (no LUFS reading)')
+I = float(_I[-1])
 tmp = a.out + '.tmp.mp4'
 subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', a.out, '-c:v', 'copy', '-af', f'volume={-14 - I:.2f}dB,alimiter=limit=0.95:level=false', '-c:a', 'aac', '-b:a', '192k', tmp], check=True)
 os.replace(tmp, a.out)
