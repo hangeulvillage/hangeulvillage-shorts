@@ -59,7 +59,7 @@ Belongs to 지원금 레이더 only; no switch needed. Never change its settings
 
 ## 4. Database (Shorts Studio artifact)
 - ArtifactData with url https://claude.ai/artifact/3Bc5bsm1xEq1EDkFwGFba6. Pin every write to the version you read (if_version); on version_mismatch re-read and redo.
-- HV tasks use HV collections (config/main, shorts, requests, replies, snapshots, post_queue, phone_kits, benchmarks, fb_invites, lessons). Radar tasks use radar_* only (radar_config, radar_videos, radar_topics, radar_replies, radar_snapshots, radar_lessons).
+- HV tasks use HV collections (config/main, shorts, requests, replies, snapshots, post_queue, phone_kits, benchmarks, fb_invites, lessons, runs). Radar tasks use radar_* only (radar_config, radar_videos, radar_topics, radar_replies, radar_snapshots, radar_lessons, radar_runs).
 - Other pages: TikTok phone kit https://claude.ai/artifact/VRbfdQYCRusnVCyJg54kvx (collection kits), HV video handoff https://claude.ai/artifact/8LMvKRRd7hp3679c11eo9K (assets), Naver paste kit https://claude.ai/artifact/UhV5VQZSANUvcAXb2w4vSg (collection kits).
 
 ## 5. Lessons loop ("when something goes wrong, fix the manual, not the chat")
@@ -76,3 +76,18 @@ A lesson doc: `{at, task, problem, cause, rule, status: "active"|"folded"|"retir
 
 - The owner wants improvements raised FIRST, without being asked (2026-11-16): every daily/weekly report ends with "개선 제안" — at most 2 concrete items (what, why, cost), or "없음". Write everything to the owner in Korean.
 The user is Korean: write to him in Korean, short and plain. Never invent numbers. Use PushNotification only for things he must act on, or when a task prompt says so.
+
+## 7. Run records and resume (since 2026-11-16: "a run that dies halfway must continue, not start over or post twice")
+Daily tasks (hv_daily, radar_daily) keep one record per day in the database so an interrupted run (usage limit, PC asleep,
+session cut) can be resumed by the watchdog task without redoing finished steps.
+- Collection: HV → `runs`, radar → `radar_runs`. Doc id `<task>_<YYYY-MM-DD>` (KST run date).
+  `{task, date, status: "running"|"done", steps_done: ["1", "1a", ...], last_step, updated_at, started_at, finished_at, resumed: <count>, notes}`.
+- **Start:** read your doc. If `status` is "done": end at once, silently (never run a day twice). If it exists and is
+  "running": this is a RESUME — set `resumed` +1, skip every step listed in `steps_done`, and before any upload/post step
+  check the database flags (platforms.yt/fb, blog, kit docs) and the platform itself so nothing is posted twice.
+  If it does not exist: create it with status "running".
+- **After each numbered step:** append the step to `steps_done`, set `last_step` and `updated_at` (one small update).
+- **End:** status "done", `finished_at`. Then send the usual message (on a resume, say "이어서 완료" in the first line).
+- The watchdog task (23:43 KST) re-fires a daily task whose record is still "running" and not updated for 60 min,
+  at most once per task per day (it sets `refired_at` on the record). A MISSING record is never re-fired (the run may
+  have finished without writing one): the watchdog only tells the user. It never does the work itself.
