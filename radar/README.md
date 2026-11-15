@@ -79,3 +79,18 @@ Every card now uses it (structure only; our content, facts and design stay ours)
   last 3 days, or closes within 10 days).
 - Weekly snapshot: compare views_48h by headline_type and style once each has ≥ 3 videos; keep the best, still
   try the others once a week.
+
+## Weekly TOP 5 ranking (since 2026-11-15, asked by the account owner: "TOP 5 순위 주 1회 일반 영상 대신")
+When the card's publish_date is a **Monday**, make a ranking card instead of a single-program card
+(example: see the format below; renderer: `"format": "ranking"`, always uses the viral structure + a closing TOP-N recap).
+- 4–5 programs ranked by ONE objective criterion written in `rank_by` ("마감 임박순 · M월 D일 기준" or "금액 큰 순"),
+  never by opinion. Rank 1 = most urgent / biggest.
+- Every item passes the same fact gate as a normal card, re-checked on its official page in this run (items from earlier
+  cards may be reused only after that re-check). Deadline ≥ 3 days after publish_date (or 상시). Mixed regions are fine;
+  put the region in `who`.
+- `items`: [{rank, name, who, amount, deadline (YYYY-MM-DD or null), apply}]. `facts`: one entry per program + "신청".
+- `beats.hook` (2 beats: what the list is, "일 위는 마지막에 공개할게요"), `beats.items` (one beat per item, each with
+  `rank`, in PLAYBACK order: shuffled, e.g. 4,2,5,3,1 — #1 always last; make.py refuses otherwise), `beats.cta` as usual.
+- `headline`: [line1 ≤ 14 chars, line2 with the key word in {braces}, e.g. "마감 임박 {TOP 5}"] — braces = accent colour.
+- Title pattern "countdown"; title ≤ 40 chars, e.g. "이번 달 놓치면 끝, 마감 임박 지원금 TOP 5". Length 45–60 s is fine.
+- In radar_videos record format "ranking"; compare its views_48h with the single cards of the same week in the report.

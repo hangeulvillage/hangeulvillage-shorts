@@ -121,7 +121,7 @@ def make_voice(card, voice, work):
     tts = TTS(model='supertonic-3'); st = tts.get_voice_style(voice)
     warm = 'lowshelf=f=160:g=1.0,highshelf=f=6000:g=-1.5'
     report = []
-    for scene in ('hook', 'check', 'steps', 'deadline', 'cta'):
+    for scene in ('hook', 'items', 'check', 'steps', 'deadline', 'cta'):
         for k, b in enumerate(card['beats'].get(scene, [])):
             target = hangulize(b['say']); best = None
             for attempt in range(12 if b.get('expect') else 6):
@@ -147,6 +147,23 @@ def make_voice(card, voice, work):
     return report
 
 # ---------------- timeline ----------------
+def build_timeline_ranking(card):
+    """TOP-N ranking: hook, one scene per item in card playback order (#1 always last), cta. Recap is appended in main()."""
+    by_rank = {it['rank']: it for it in card['items']}
+    tl = []; cur = 0.0
+    def add(name, beats, tail, **extra):
+        nonlocal cur
+        start = cur; t = start + (0.05 if not tl else 0.12)
+        for b in beats:
+            b['t'] = round(t, 3); t += b['dur'] + 0.12
+        end = t - 0.12 + tail
+        tl.append(dict(name=name, start=start, end=end, beats=beats, **extra)); cur = end
+    add('rk_hook', card['beats']['hook'], 0.35)
+    for i, b in enumerate(card['beats']['items']):
+        add('rk_item', [b], 0.55, item=by_rank[b['rank']], seq=i)
+    add('cta', card['beats']['cta'], 1.2)
+    return tl
+
 def build_timeline(card):
     tl = []; cur = 0.0
     tails = {'hook': 0.35, 'check': 0.35, 'steps': 0.4, 'deadline': 0.9, 'cta': 1.2}
@@ -188,7 +205,7 @@ def make_bg(card, chrome=True, variant=0):
         l1, l2 = headline(card)
         d.rectangle([0, 96, W, 330], fill=STYLE['NAVY'])
         d.text((W / 2, 160), l1, font=F('B', fit(l1, 'B', 66, 980, 44, 'headline 1')), fill=WHITE, anchor='mm')
-        d.text((W / 2, 262), l2, font=F('B', fit(l2, 'B', 100, 1000, 60, 'headline 2')), fill=YEL, anchor='mm', stroke_width=5, stroke_fill=(0, 0, 0))
+        draw_accent(d, (W / 2, 262), l2, fit(l2.replace('{', '').replace('}', ''), 'B', 100, 1000, 60, 'headline 2'))
         d.text((W / 2, 1420), pill, font=F('D', fit(pill, 'D', 34, 900, 24, 'pill')), fill=YEL, anchor='mm')
         src = '출처: ' + card['source']
         d.text((W / 2, 1462), src, font=F('R', fit(src, 'R', 30, 900, 22, 'source')), fill=GRAY, anchor='mm')
@@ -349,6 +366,18 @@ def scene_cta(im, sc, t, T, card, hook):
         bb = math.sin((t - 1.0) * 6) * 12; x, y = 960, 1130 + bb
         ImageDraw.Draw(im).polygon([(x - 34, y - 40), (x + 34, y - 40), (x, y + 10)], fill=YEL)
 
+ACCENT = (255, 96, 96)
+def draw_accent(d, center, line, size):
+    """Draw line centred; parts wrapped in {braces} get the accent colour (key word pops, as big ranking channels do)."""
+    parts = re.split(r'(\{[^}]*\})', line); f = F('B', size)
+    total = sum(d.textlength(p.strip('{}'), font=f) for p in parts if p)
+    x = center[0] - total / 2
+    for p in parts:
+        if not p: continue
+        acc = p.startswith('{'); p = p.strip('{}')
+        d.text((x, center[1]), p, font=f, fill=ACCENT if acc else YEL, anchor='lm', stroke_width=5, stroke_fill=(0, 0, 0))
+        x += d.textlength(p, font=f)
+
 def headline(card):
     h = card.get('headline') or [f"{card.get('short_name', card['program'])} 핵심 정리", card.get('hook_line') or '신청해야 받아요']
     return (h + ['', ''])[:2]
@@ -374,7 +403,75 @@ def scene_recap(im, sc, t, T, card, hook):
         if sub: text(im, (630, y + 112), sub, 'D', fit(sub, 'D', 36, 700, 24, f'recap {k} sub'), GRAY, alpha=q)
         y += h + 26
 
-RENDER = {'recap': scene_recap, 'hook': scene_hook, 'check': scene_check, 'steps': scene_steps, 'deadline': scene_deadline, 'cta': scene_cta}
+def item_dday(card, it):
+    if not it.get('deadline'): return None
+    return (dt.date.fromisoformat(it['deadline']) - dt.date.fromisoformat(card['publish_date'])).days
+
+def item_deadline(card, it):
+    if not it.get('deadline'): return '상시 신청'
+    d0 = dt.date.fromisoformat(it['deadline']); n = item_dday(card, it)
+    return f'{d0.month}/{d0.day} 마감' + (f' · D-{n}' if n is not None and 0 <= n <= 60 else '')
+
+def rank_strip(im, card, shown, T, y=1095):
+    """Row of rank slots; ranks already revealed show their number, the rest '?' (the viewer waits for #1)."""
+    n = len(card['items']); w = 150; gap = 22; x0 = W / 2 - (n * w + (n - 1) * gap) / 2
+    for k in range(n):
+        r = n - k; on = r in shown
+        x = x0 + k * (w + gap)
+        rrect(im, [x, y, x + w, y + 80], 22, YEL if on else CARD, LINE, 3)
+        text(im, (x + w / 2, y + 40), f'{r}위' if on else '?', 'B', 44, NAVY if on else GRAY)
+
+def scene_rk_hook(im, sc, t, T, card, hook):
+    p = back(t / 0.35)
+    text(im, (W / 2, 330), card.get('rank_by', ''), 'D', 56, WHITE, alpha=clamp(t / 0.3))
+    text(im, (W / 2, 560), f'TOP {len(card["items"])}', 'B', 300, YEL, scale=0.7 + 0.3 * p, stroke=8)
+    q = ease_out((t - 0.5) / 0.4)
+    if q > 0: text(im, (W / 2, 860), '1위는 마지막에 공개', 'B', 72, WHITE, alpha=q, scale=0.9 + 0.1 * q)
+    rank_strip(im, card, set(), T, y=1000)
+
+def scene_rk_item(im, sc, t, T, card, hook):
+    it = sc['item']; r = it['rank']; p = back(t / 0.3)
+    top1 = r == 1
+    # rank badge
+    g = Image.new('RGBA', im.size, (0, 0, 0, 0)); gd = ImageDraw.Draw(g)
+    rad = 130 * p; cx, cy = W / 2, 400
+    gd.ellipse([cx - rad, cy - rad, cx + rad, cy + rad], fill=(RED if top1 else YEL) + (255,))
+    im.alpha_composite(g)
+    if p > 0.5: text(im, (cx, cy + 4), f'{r}위', 'B', 120, WHITE if top1 else NAVY, scale=p)
+    q = ease_out((t - 0.15) / 0.3)
+    name = it['name']
+    text(im, (W / 2, 610), name, 'B', fit(name, 'B', 96, 980, 56, 'rank name'), WHITE, alpha=q, stroke=4)
+    rows = [('대상', it['who']), ('금액', it['amount']), ('마감', item_deadline(card, it)), ('신청', it.get('apply', ''))]
+    y = 690
+    for i, (k, v) in enumerate(rows):
+        if not v: continue
+        a = ease_out((t - 0.3 - i * 0.1) / 0.3)
+        if a <= 0: y += 100; continue
+        rrect(im, [90, y, W - 90, y + 88], 24, CARD, alpha=0.95 * a)
+        text(im, (190, y + 44), k, 'B', 44, YEL, alpha=a)
+        col = (255, 150, 150) if k == '마감' and item_dday(card, it) is not None and item_dday(card, it) <= 14 else WHITE
+        text(im, (620, y + 44), v, 'B', fit(v, 'B', 50, 720, 30, f'rank {k}'), col, alpha=a)
+        y += 100
+    shown = {b['rank'] for s2 in G['tl'] if s2['name'] == 'rk_item' and s2['seq'] <= sc['seq'] for b in s2['beats']}
+    rank_strip(im, card, shown, T)
+
+def scene_rk_recap(im, sc, t, T, card, hook):
+    p = back(t / 0.35)
+    text(im, (W / 2, 300), f'TOP {len(card["items"])} 한눈에', 'B', 88, YEL, scale=0.85 + 0.15 * p, stroke=4)
+    text(im, (W / 2, 395), '캡처해 두세요', 'D', 48, WHITE, alpha=clamp(t / 0.3))
+    y = 470
+    for i, it in enumerate(sorted(card['items'], key=lambda x: x['rank'])):
+        q = ease_out((t - 0.1 - i * 0.1) / 0.3)
+        if q <= 0: continue
+        rrect(im, [70, y, W - 70, y + 140], 26, CARD, alpha=0.95 * q)
+        rrect(im, [70, y, 210, y + 140], 26, RED if it['rank'] == 1 else YEL, alpha=q)
+        text(im, (140, y + 70), f'{it["rank"]}', 'B', 70, WHITE if it['rank'] == 1 else NAVY, alpha=q)
+        text(im, (590, y + 46), it['name'], 'B', fit(it['name'], 'B', 50, 700, 32, 'recap name'), WHITE, alpha=q)
+        sub = f"{it['amount']} · {item_deadline(card, it)}"
+        text(im, (590, y + 104), sub, 'D', fit(sub, 'D', 36, 700, 24, 'recap sub'), GRAY, alpha=q)
+        y += 156
+
+RENDER = {'rk_hook': scene_rk_hook, 'rk_item': scene_rk_item, 'rk_recap': scene_rk_recap, 'recap': scene_recap, 'hook': scene_hook, 'check': scene_check, 'steps': scene_steps, 'deadline': scene_deadline, 'cta': scene_cta}
 
 def caption(im, T, tl):
     for sc in tl:
@@ -466,6 +563,7 @@ def make_audio(card, tl, work, dur):
     if card.get('_intro_end'): place(sfx, whoosh(), max(0, card['_intro_end'] - 0.2), 0.8)
     for sc in tl:
         if sc['start'] > 0: place(sfx, whoosh(), max(0, sc['start'] - 0.2))
+        if sc['name'] == 'rk_item': place(sfx, stamp(), sc['start'] + 0.05, 0.6)
         if sc['name'] in ('check', 'steps'):
             for bt in sc['beats']: place(sfx, pop(), bt['t'])
         if sc['name'] == 'hook' and len(sc['beats']) > 1: place(sfx, stamp(), sc['beats'][1]['t'] - 0.12)
@@ -481,6 +579,26 @@ def make_audio(card, tl, work, dur):
 
 # ---------------- thumbnail ----------------
 def make_thumb(card, path):
+    if card.get('format') == 'ranking': return make_thumb_rank(card, path)
+    return make_thumb_classic(card, path)
+
+def make_thumb_rank(card, path):
+    im = make_bg(card, chrome=False).convert('RGBA'); d = ImageDraw.Draw(im)
+    d.rectangle([0, 0, W, 520], fill=YEL)
+    l1, l2 = headline(card)
+    d.text((W / 2, 200), l1, font=F('B', fit(l1, 'B', 110, 980, 60, 'thumb rk l1')), fill=NAVY, anchor='mm')
+    l2p = l2.replace('{', '').replace('}', '')
+    d.text((W / 2, 380), l2p, font=F('B', fit(l2p, 'B', 120, 1000, 60, 'thumb rk l2')), fill=RED, anchor='mm')
+    d.text((W / 2, 800), f'TOP {len(card["items"])}', font=F('B', 330), fill=WHITE, anchor='mm', stroke_width=10, stroke_fill=NAVY)
+    tag = card.get('rank_by', '')
+    if tag:
+        s = fit(tag, 'B', 80, 900, 48, 'thumb rk tag'); tw = d.textlength(tag, font=F('B', s))
+        d.rounded_rectangle([W / 2 - tw / 2 - 50, 1060, W / 2 + tw / 2 + 50, 1190], 40, fill=RED)
+        d.text((W / 2, 1125), tag, font=F('B', s), fill=WHITE, anchor='mm')
+    d.text((W / 2, 1330), '1위는 마지막에 공개', font=F('B', 76), fill=YEL, anchor='mm', stroke_width=4, stroke_fill=NAVY)
+    im.convert('RGB').save(path, quality=92)
+
+def make_thumb_classic(card, path):
     im = make_bg(card, chrome=False).convert('RGBA'); d = ImageDraw.Draw(im)
     d.rectangle([0, 0, W, 560], fill=YEL)
     aud = card['audience']; d.text((W / 2, 250), aud, font=F('B', fit(aud, 'B', 190, 980, 100, 'thumb audience')), fill=NAVY, anchor='mm')
@@ -540,14 +658,27 @@ def main():
     style = a.style or card.get('style', 'navy'); set_style(style)
     if card.get('hook_beats', {}).get(hook): card['beats']['hook'] = card['hook_beats'][hook]
     out = a.out; work = os.path.join(out, 'work'); os.makedirs(work, exist_ok=True)
-    for k in ('id', 'program', 'audience', 'audience_sub', 'amount', 'publish_date', 'beats', 'facts', 'source'):
+    ranking = card.get('format') == 'ranking'
+    need = ('id', 'program', 'publish_date', 'beats', 'facts', 'source', 'items', 'headline', 'rank_by') if ranking else \
+           ('id', 'program', 'audience', 'audience_sub', 'amount', 'publish_date', 'beats', 'facts', 'source')
+    for k in need:
         if k not in card: sys.exit(f'card missing {k}')
+    if ranking:
+        ranks = sorted(it['rank'] for it in card['items']); order = [b['rank'] for b in card['beats']['items']]
+        if ranks != list(range(1, len(ranks) + 1)) or sorted(order) != ranks: sys.exit('ranking: items/beats ranks must be 1..N, each once')
+        if order[-1] != 1: sys.exit('ranking: #1 must be the last item beat')
+        if order == sorted(order, reverse=True): REVIEW.append('ranking order is plain N..1; shuffle it (#1 stays last)')
+        for it in card['items']:
+            if item_dday(card, it) is not None and item_dday(card, it) < 3: ISSUES.append(f'ranking item {it["name"]} closes in < 3 days')
+        card.setdefault('audience', card['headline'][0]); card.setdefault('audience_sub', ''); card.setdefault('amount', '')
     vreport = make_voice(card, a.voice, work)
-    structure = a.structure or card.get('structure', 'classic'); G['viral'] = structure == 'viral'
-    tl = build_timeline(card)
-    if G['viral']: tl.append({'name': 'recap', 'start': tl[-1]['end'], 'end': tl[-1]['end'] + 2.6, 'beats': []})
+    structure = 'viral' if ranking else (a.structure or card.get('structure', 'classic')); G['viral'] = structure == 'viral'
+    tl = build_timeline_ranking(card) if ranking else build_timeline(card)
+    if ranking: tl.append({'name': 'rk_recap', 'start': tl[-1]['end'], 'end': tl[-1]['end'] + 3.2, 'beats': []})
+    elif G['viral']: tl.append({'name': 'recap', 'start': tl[-1]['end'], 'end': tl[-1]['end'] + 2.6, 'beats': []})
     dur = tl[-1]['end']
     G.update(card=card, tl=tl, hook=hook, bg=make_bg(card))
+    G['tl'] = tl
     if G['viral']: G['bgs'] = [make_bg(card, variant=i) for i in range(len(tl))]
     make_thumb(card, os.path.join(out, 'thumb.jpg'))
     # Opening hold: show the thumbnail while the first hook line is spoken (a.intro seconds, clamped to that line).
@@ -573,11 +704,12 @@ def main():
     # QA stills: first frame, hook pulse, end of each scene, plus thumbnail
     times = [0.0, G.get('intro_end', 0) + 0.15] + [(min(sc['end'] - 0.1, sc['beats'][-1]['t'] + sc['beats'][-1]['dur'] + 0.3) if sc['beats'] else sc['end'] - 0.1) for sc in tl]
     shots = [frame(t) for t in times] + [Image.open(os.path.join(out, 'thumb.jpg'))]
-    sheet = Image.new('RGB', (360 * 4, 640 * 2), (0, 0, 0))
-    for i, s in enumerate(shots[:8]): sheet.paste(s.resize((360, 640)), ((i % 4) * 360, (i // 4) * 640))
+    rows = 3 if len(shots) > 8 else 2
+    sheet = Image.new('RGB', (360 * 4, 640 * rows), (0, 0, 0))
+    for i, s in enumerate(shots[:4 * rows]): sheet.paste(s.resize((360, 640)), ((i % 4) * 360, (i // 4) * 640))
     sheet.save(os.path.join(out, 'qa.png'))
-    if not (18 <= vdur <= 48): ISSUES.append(f'duration {vdur:.1f}s outside 18-45s')
-    manifest = {'id': card['id'], 'hook': hook, 'voice': a.voice, 'style': style, 'structure': structure, 'duration': round(vdur, 2), 'title': copy['yt_title'],
+    if not (18 <= vdur <= (60 if ranking else 48)): ISSUES.append(f'duration {vdur:.1f}s outside 18-45s')
+    manifest = {'id': card['id'], 'hook': hook, 'voice': a.voice, 'style': style, 'structure': structure, 'format': card.get('format', 'single'), 'duration': round(vdur, 2), 'title': copy['yt_title'],
                 'copy': copy, 'voice_check': vreport, 'qa': {'pass': not ISSUES, 'issues': ISSUES, 'review': REVIEW}, 'intro_s': G.get('intro_end', 0),
                 'title_pattern': card.get('title_pattern'), 'title_candidates': card.get('title_candidates', []),
                 'files': {'video': final, 'thumb': os.path.join(out, 'thumb.jpg'), 'qa_sheet': os.path.join(out, 'qa.png')}}
