@@ -31,8 +31,11 @@ def h2(t):
 def p(t, color=INK):
     return f'<p style="line-height:1.8;color:{color};margin:8px 0">{t}</p>'
 
+NAVER = False
 def video(yt):
     if not yt: return ''
+    if NAVER:
+        return p(f'▶ 30초 요약 영상: https://youtube.com/shorts/{E(yt)}')
     return (f'<p style="text-align:center;margin:16px 0"><iframe width="315" height="560" src="https://www.youtube.com/embed/{E(yt)}" '
             'title="30초 요약 영상" style="max-width:100%;border:0;border-radius:12px" allowfullscreen="true"></iframe></p>')
 
@@ -50,7 +53,9 @@ def single(card, yt):
     steps = b.get('steps', [])
     rows = [('대상', E(f'{card["audience"]} · {card["audience_sub"]}')), ('금액', f'<b>{E(card["amount"])}</b>'),
             ('기한', E(deadline_text(card))), ('신청', E(steps[0]['main'] if steps else card['facts'].get('신청', '')))]
-    out = [p(f'<b>{E(card["program"])}</b>, 핵심만 정리했어요. 대상과 금액, 신청 방법, 마감일을 공식 공고 기준으로 확인했습니다.'),
+    intro = (f'<b>{E(card["program"])}</b> 받을 수 있는지 궁금하셨죠? 공식 공고를 직접 확인해서 대상, 금액, 신청 방법, 마감일만 추려 드려요.'
+             if NAVER else f'<b>{E(card["program"])}</b>, 핵심만 정리했어요. 대상과 금액, 신청 방법, 마감일을 공식 공고 기준으로 확인했습니다.')
+    out = [p(intro),
            f'<div style="background:{BG};border:1px solid {LINE};border-radius:14px;padding:6px 14px 2px;margin:16px 0">'
            f'<p style="font-weight:700;color:{ACC};margin:10px 0 0">한눈에 보기</p>{table(rows)}</div>', video(yt)]
     checks = b.get('check', [])
@@ -71,7 +76,7 @@ def single(card, yt):
     out.append(footer(card))
     dl = f' ({d.month}/{d.day} 마감)' if d else ''
     prog = re.sub(r'\s*\([^)]*\)', '', card['program']).strip()
-    title = card.get('blog_title') or f'{prog} 신청 방법·대상·금액 총정리{dl}'
+    title = (f'{prog} 받는 법, 대상·금액·마감 한 번에 확인{dl}' if NAVER else card.get('blog_title') or f'{prog} 신청 방법·대상·금액 총정리{dl}')
     return title, ''.join(out)
 
 def ranking(card, yt):
@@ -83,11 +88,14 @@ def ranking(card, yt):
                           ('기한', E(deadline_text({}, d)) if d else '상시 신청'), ('신청', E(it.get('apply', '')))]))
         if it['name'] in card['facts']: out.append(p(E(card['facts'][it['name']]), SUB))
     out.append(footer(card))
-    return card.get('title') or card['program'], ''.join(out)
+    t = card.get('title') or card['program']
+    return (t + ' (공식 공고 확인)' if NAVER else t), ''.join(out)
 
 def main():
+    global NAVER
     ap = argparse.ArgumentParser(); ap.add_argument('card'); ap.add_argument('out'); ap.add_argument('--yt', default=None)
-    a = ap.parse_args(); card = json.load(open(a.card)); os.makedirs(a.out, exist_ok=True)
+    ap.add_argument('--naver', action='store_true', help='variant for the Naver paste kit: different title/intro, video as a link')
+    a = ap.parse_args(); NAVER = a.naver; card = json.load(open(a.card)); os.makedirs(a.out, exist_ok=True)
     title, body = (ranking if card.get('format') == 'ranking' else single)(card, a.yt or card.get('yt_id'))
     body = f'<div style="font-size:16px;max-width:720px">{body}</div>'
     labels = list(dict.fromkeys(card.get('tags', [])[:5] + ['지원금', '정부지원금']))
