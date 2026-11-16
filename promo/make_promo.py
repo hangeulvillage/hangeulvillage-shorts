@@ -82,25 +82,38 @@ def cover(im, w, h, zoom=1.0, fx=0.5, fy=0.5):
 
 # ---------- scenes ----------
 CARD = (60, 300, W - 60, 300 + 1100)   # photo card box (x0, y0, x1, y1)
+BGX = 1.08   # background is drawn larger so it can drift opposite to the camera (parallax)
 def bg_for(photo):
-    b = cover(photo, W // 4, H // 4).filter(ImageFilter.GaussianBlur(10)).resize((W, H), Image.BILINEAR)
-    return Image.blend(b, Image.new('RGB', (W, H), (10, 10, 14)), 0.55)
+    w, h = int(W * BGX), int(H * BGX)
+    b = cover(photo, w // 4, h // 4).filter(ImageFilter.GaussianBlur(10)).resize((w, h), Image.BILINEAR)
+    return Image.blend(b, Image.new('RGB', (w, h), (10, 10, 14)), 0.55)
 
+# camera moves: (zoom0, zoom1, fx0, fx1, fy0, fy1); eased so they start and stop softly like a slider/gimbal shot
+MOVES = {
+    'push':   (1.00, 1.16, .50, .50, .50, .50),   # slow push-in
+    'pull':   (1.20, 1.02, .50, .50, .45, .50),   # reveal / pull-out
+    'pan_r':  (1.18, 1.18, .30, .70, .50, .50),   # truck left -> right
+    'pan_l':  (1.18, 1.18, .70, .30, .50, .50),
+    'tilt':   (1.18, 1.22, .50, .50, .70, .35),   # tilt up toward the top of the frame
+    'diag':   (1.10, 1.26, .35, .60, .60, .40),   # push in on a diagonal
+}
 def scene_plan(brief, photos):
-    """Scene list with photo, motion and text; durations are set after TTS."""
+    """Scene list with photo, camera move, entry direction and text; durations are set after TTS."""
     n = len(photos); P = lambda i: photos[i % n]
-    focus = [(0.5, 0.5), (0.3, 0.45), (0.7, 0.5), (0.5, 0.35), (0.45, 0.6)]
-    sc = [{'kind': 'hook', 'photo': P(0), 'z': (1.0, 1.12), 'f': focus[0], 'text': brief['tagline'], 'say': brief.get('say', {}).get('tagline') or brief['tagline']}]
+    order = ['pan_r', 'tilt', 'pan_l', 'diag', 'push']
+    sc = [{'kind': 'hook', 'photo': P(0), 'move': 'push', 'text': brief['tagline'], 'say': brief.get('say', {}).get('tagline') or brief['tagline']}]
     for i, p in enumerate(brief['points']):
         say = (brief.get('say', {}).get('points') or [None] * 9)[i] or p
-        sc.append({'kind': 'point', 'idx': i, 'photo': P(i + 1 if n > 1 else 0), 'z': (1.15, 1.3) if n == 1 else (1.0, 1.1),
-                   'f': focus[(i + 1) % len(focus)], 'text': p, 'say': say})
+        sc.append({'kind': 'point', 'idx': i, 'photo': P(i + 1 if n > 1 else 0), 'move': order[i % len(order)], 'text': p, 'say': say})
     if brief.get('offer'):
-        sc.append({'kind': 'offer', 'photo': P(len(brief['points']) + 1), 'z': (1.05, 1.15), 'f': focus[0], 'text': brief['offer'],
+        sc.append({'kind': 'offer', 'photo': P(len(brief['points']) + 1), 'move': 'diag', 'text': brief['offer'],
                    'say': brief.get('say', {}).get('offer') or brief['offer']})
-    sc.append({'kind': 'cta', 'photo': P(0), 'z': (1.1, 1.0), 'f': focus[0], 'text': brief['cta'],
+    sc.append({'kind': 'cta', 'photo': P(0), 'move': 'pull', 'text': brief['cta'],
                'say': brief.get('say', {}).get('cta') or f"{brief['name']}. {brief['cta']}"})
+    for j, x in enumerate(sc): x['enter'] = 0 if j == 0 else (1 if j % 2 else -1)   # card slides in from right / left
     return sc
+
+def smooth(t): t = max(0.0, min(1.0, t)); return t * t * (3 - 2 * t)
 
 def static_layer(brief, s, accent):
     """Everything that does not move in a scene (text panels), as one RGBA image."""
@@ -159,12 +172,26 @@ def render_scene(args):
     p = subprocess.Popen(['ffmpeg', '-y', '-loglevel', 'error', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-s', f'{W}x{H}', '-r', str(FPS),
                           '-i', '-', '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '19', '-pix_fmt', 'yuv420p', f'{out_dir}/s{i}.mp4'],
                          stdin=subprocess.PIPE)
-    z0, z1 = s['z']; fx, fy = s['f']
+    z0, z1, fx0, fx1, fy0, fy1 = MOVES[s['move']]
+    bw, bh = bg.size; ent = s.get('enter', 0); TIN = 0.3 * FPS
     for k in range(n):
-        t = k / max(1, n - 1)
-        frame = bg.copy().convert('RGBA'); frame.alpha_composite(shadow)
+        t = smooth(k / max(1, n - 1))
+        fx, fy = fx0 + (fx1 - fx0) * t, fy0 + (fy1 - fy0) * t
+        # background drifts against the camera direction -> depth
+        bx = int((bw - W) * (1 - fx)); by = int((bh - H) * (1 - fy))
+        frame = bg.crop((bx, by, bx + W, by + H)).convert('RGBA'); frame.alpha_composite(shadow)
         ph = cover(s['photo'], cw, ch, zoom=z0 + (z1 - z0) * t, fx=fx, fy=fy)
-        frame.paste(ph, (x0, y0), mask)
+        e = ease(k / TIN) if ent else 1.0
+        if e < 1:   # entry: card whips in from the side with motion blur and settles
+            ph = ph.filter(ImageFilter.BoxBlur(int(14 * (1 - e)))) if e < .85 else ph
+            sc = 0.94 + 0.06 * e
+            pw, phh = int(cw * sc), int(ch * sc)
+            ph2 = ph.resize((pw, phh), Image.BILINEAR); m2 = mask.resize((pw, phh))
+            ox = x0 + (cw - pw) // 2 + int(ent * 260 * (1 - e)); oy = y0 + (ch - phh) // 2
+            m2 = m2.point(lambda v: int(v * min(1, e * 1.6)))
+            frame.paste(ph2, (ox, oy), m2)
+        else:
+            frame.paste(ph, (x0, y0), mask)
         a = ease(k / (0.35 * FPS))          # text slides up and fades in over 0.35 s
         if a < 1:
             lay2 = lay.copy(); lay2.putalpha(lay.getchannel('A').point(lambda v: int(v * a)))
