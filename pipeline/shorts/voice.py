@@ -12,6 +12,19 @@ VOICES = {
     'female': ('F1', 'lowshelf=f=220:g=2.5,highshelf=f=2800:g=-6,lowpass=f=6000'),
     'male':   ('M2', 'lowshelf=f=160:g=1.5,highshelf=f=3200:g=-4,lowpass=f=6500'),  # M2 picked 10/30
 }
+STEPS = 10
+# 2026-11-16: the old treble cut made F1 sound muffled -> lighter EQ and more diffusion steps (smoother prosody).
+# The owner liked F3 for sentences, but F3 misreads isolated syllables (ASR test: 자 0/8, 바 1/8 vs F1 7/8, 7/8),
+# and Hangeul Village speaks single syllables in every video, so HV keeps F1 (radar/promo use F3/M4/M2 for sentences).
+# Switched on 2026-11-21, after the one-a-day YouTube test (11/13-11/20), so that test is not confounded.
+import datetime as _dt
+_today = os.environ.get('HV_TODAY') or _dt.datetime.now(_dt.timezone(_dt.timedelta(hours=9))).date().isoformat()  # HV_TODAY: test override
+if _today >= '2026-11-21':
+    VOICES = {
+        'female': ('F1', 'lowshelf=f=200:g=1.5,highshelf=f=6000:g=-1.5'),
+        'male':   ('M2', 'lowshelf=f=150:g=1,highshelf=f=6000:g=-1.5'),
+    }
+    STEPS = 24
 VOICE = os.environ.get('HV_VOICE', 'female')
 _tts = None; _styles = {}
 def _load():
@@ -72,7 +85,7 @@ def say(text, speed=0.9, tries=None):
     tries = tries or (10 if single else 5)
     best = None
     for k in range(tries):
-        w, _ = tts.synthesize(text, voice_style=st, lang='ko', speed=speed, total_steps=10)
+        w, _ = tts.synthesize(text, voice_style=st, lang='ko', speed=speed, total_steps=STEPS)
         y = _warm(trim(w)); h = _norm(hear(y, SR))
         if single and not h:  # recognizer often drops a lone short syllable: try it doubled ("사 사")
             gap = np.zeros(int(0.18 * SR), dtype=np.float32)
