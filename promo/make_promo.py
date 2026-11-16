@@ -226,12 +226,12 @@ def main():
     photos = [load_photo(p if os.path.isabs(p) else os.path.join(base, p)) for p in brief['photos']]
     accent = hexrgb(brief.get('accent', '#E8743B'))
     scenes = scene_plan(brief, photos)
-    silent = brief.get('voice', 'F1') == 'none'   # captions + music only
+    silent = brief.get('voice', 'F3') == 'none'   # captions + music only
     if silent:
         vrep = []
         for s in scenes: s['vdur'] = 2.6 if s['kind'] != 'cta' else 3.2
     else:
-        vrep = make_voice(scenes, brief.get('voice', 'F1'), work)
+        vrep = make_voice(scenes, brief.get('voice', 'F3'), work)
     t = 0.0
     for s in scenes:
         s['start'] = t; s['voice_at'] = t + 0.25
