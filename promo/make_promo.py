@@ -215,8 +215,27 @@ def _kor_num(n):
 
 G = {}
 
+def caption(brief):
+    """Post text from the brief only (no new facts): hook, points, offer, info, up to 5 hashtags."""
+    lines = [f"{brief['tagline']} | {brief['name']}", '']
+    lines += [f'✔ {p}' for p in brief['points']]
+    if brief.get('offer'): lines += ['', f"🎁 {brief['offer']}"]
+    info = brief.get('info') or {}
+    if info: lines += [''] + [f'📍 {k} {v}' if i == 0 else f'🕒 {k} {v}' for i, (k, v) in enumerate(info.items())]
+    if brief.get('cta'): lines += ['', brief['cta']]
+    tags = [brief['name'], brief.get('category', '')]
+    addr = info.get('주소', '')
+    m = re.match(r'\s*(\S+?(시|군|구))\b', addr)
+    if m and 'OO' not in m.group(1): tags += [m.group(1) + brief.get('category', ''), m.group(1) + '맛집' if brief.get('category') in ('카페', '식당', '음식점') else '']
+    tags.append('동네가게')
+    tags = [re.sub(r'[^0-9A-Za-z가-힣]', '', t) for t in tags]
+    tags = list(dict.fromkeys(t for t in tags if t))[:5]
+    return '\n'.join(lines) + '\n\n' + ' '.join('#' + t for t in tags) + '\n'
+
+
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument('brief'); ap.add_argument('out')
+    ap.add_argument('--square', action='store_true', help='also write video_square.mp4 (1080x1080)')
     a = ap.parse_args()
     brief = json.load(open(a.brief)); base = os.path.dirname(os.path.abspath(a.brief))
     for k in ('name', 'tagline', 'points', 'cta', 'photos'):
@@ -278,9 +297,18 @@ def main():
     mids = [Image.open(f'{work}/mid{i}.png').resize((270, 480)) for i in range(len(scenes))]
     sheet = Image.new('RGB', (270 * len(mids), 480)); [sheet.paste(im, (270 * i, 0)) for i, im in enumerate(mids)]
     sheet.save(os.path.join(out, 'qa.png'))
+    files = {'video': final, 'thumb': os.path.join(out, 'thumb.jpg'), 'qa_sheet': os.path.join(out, 'qa.png')}
+    # post caption (DELUXE+): ready to paste on Instagram / 당근, no links, max 5 hashtags
+    cap = os.path.join(out, 'caption.txt'); open(cap, 'w').write(caption(brief)); files['caption'] = cap
+    if a.square:  # PREMIUM: 1080x1080 feed version, whole 9:16 frame kept over a blurred fill so no text is cut
+        sq = os.path.join(out, 'video_square.mp4')
+        subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', final, '-filter_complex',
+                        '[0:v]split[a][b];[a]scale=1080:1080:force_original_aspect_ratio=increase,crop=1080:1080,boxblur=30:2,eq=brightness=-0.12[bg];'
+                        '[b]scale=-2:1080[fg];[bg][fg]overlay=(W-w)/2:0,format=yuv420p',
+                        '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '20', '-c:a', 'copy', '-movflags', '+faststart', sq], check=True)
+        files['square'] = sq
     man = {'name': brief['name'], 'duration': round(total, 2), 'scenes': [s['kind'] for s in scenes], 'voice_check': vrep,
-           'qa': {'pass': not ISSUES, 'issues': ISSUES, 'review': REVIEW},
-           'files': {'video': final, 'thumb': os.path.join(out, 'thumb.jpg'), 'qa_sheet': os.path.join(out, 'qa.png')}}
+           'qa': {'pass': not ISSUES, 'issues': ISSUES, 'review': REVIEW}, 'files': files}
     json.dump(man, open(os.path.join(out, 'manifest.json'), 'w'), ensure_ascii=False, indent=1)
     print(json.dumps({'qa_pass': not ISSUES, 'issues': ISSUES, 'review': REVIEW, 'duration': round(total, 2)}, ensure_ascii=False))
     sys.exit(0 if not ISSUES else 1)

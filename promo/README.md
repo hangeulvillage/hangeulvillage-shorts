@@ -18,5 +18,9 @@
    `say`에는 숫자를 한글로 풀어 쓴다. 분위기는 차분한=lofi, 밝고 경쾌한=bright, 따뜻한=marimba. 대표 색은 `accent`, 음성 없음은 `voice: "none"`.
 3. `python3 promo/make_promo.py brief.json OUT` → exit 0이어야 한다. qa.png와 thumb.jpg를 직접 보고, 글자가 사진 위 중요한 부분을 가리지 않는지 확인한다.
 4. video.mp4와 thumb.jpg를 운영자에게 보낸다(SendUserFile). 고객 사진이 700px 미만이면 원본을 다시 받으라고 한 줄 덧붙인다.
-5. DELUXE·PREMIUM은 강점 순서와 한 줄 소개를 바꾼 브리프로 여러 편 만든다. 같은 문구를 반복하지 않는다.
+5. 패키지별 납품물 (2026-11-16 개편):
+   - STANDARD: video.mp4 1편 + thumb.jpg
+   - DELUXE: 2편 + 편마다 caption.txt(게시글 문구·해시태그 5개 이하, 링크 없음)
+   - PREMIUM: 4편 + caption.txt + `--square`로 만든 video_square.mp4(1080x1080 피드용)
+   여러 편은 강점 순서와 한 줄 소개를 바꾼 브리프로 만든다. 같은 문구를 반복하지 않는다.
 6. 수정 요청은 브리프만 고쳐서 다시 렌더한다.

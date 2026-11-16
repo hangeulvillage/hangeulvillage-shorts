@@ -55,12 +55,13 @@ for k, (a, b) in enumerate([('1', '질문지 답변 + 사진 3~8장 보내기'),
     dd.text((280, y + 45), b, font=F('D', 50), fill=INK, anchor='lm')
 rows.append(im)
 im, dd = section('패키지', 820)
-for k, (nm, pr, de) in enumerate([('STANDARD', '29,000원', '1편 · 수정 1회 · 2일'), ('DELUXE', '59,000원', '2편 · 수정 2회 · 2일'), ('PREMIUM', '99,000원', '4편 · 수정 2회 · 3일')]):
+for k, (nm, pr, de, ex) in enumerate([('STANDARD', '29,000원', '영상 1편 · 수정 1회 · 2일', '세로 영상 + 썸네일'), ('DELUXE', '59,000원', '영상 2편 · 수정 2회 · 2일', '+ 게시글 문구·해시태그'), ('PREMIUM', '99,000원', '영상 4편 · 수정 2회 · 3일', '+ 문구 + 정사각 피드 버전')]):
     y = 190 + k * 200
     dd.rounded_rectangle((120, y, W - 120, y + 160), 30, fill=BG, outline=(235, 220, 205), width=3)
     dd.text((180, y + 80), nm, font=F('B', 48), fill=ACC, anchor='lm')
     dd.text((500, y + 80), pr, font=F('B', 52), fill=INK, anchor='lm')
-    dd.text((W - 170, y + 80), de, font=F('R', 38), fill=(90, 90, 100), anchor='rm')
+    dd.text((W - 170, y + 55), de, font=F('R', 34), fill=(90, 90, 100), anchor='rm')
+    dd.text((W - 170, y + 110), ex, font=F('B', 34), fill=ACC, anchor='rm')
 rows.append(im)
 im, dd = section('', 240)
 dd.text((W // 2, 90), '샘플은 가상 매장이에요. 내레이션은 AI 성우입니다.', font=F('R', 36), fill=(110, 110, 120), anchor='mm')
