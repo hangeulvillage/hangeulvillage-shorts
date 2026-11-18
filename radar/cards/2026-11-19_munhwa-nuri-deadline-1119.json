@@ -1,0 +1,221 @@
+{
+ "id": "munhwa-nuri-deadline-1119",
+ "program": "2026 문화누리카드 마감 임박 (통합문화이용권)",
+ "short_name": "문화누리카드",
+ "region": "전국",
+ "hook": "deadline",
+ "structure": "viral",
+ "style": "forest",
+ "headline": [
+  "기초수급·차상위 6세 이상",
+  "마감 D-11 남았어요"
+ ],
+ "headline_type": "closing",
+ "audience": "기초수급·차상위",
+ "audience_sub": "6세 이상이라면",
+ "audience_noun": "",
+ "amount": "연 15만원",
+ "amount_short": "15만원",
+ "pay_note": "문화누리카드로 지급 · 공연·여행·체육",
+ "deadline": "2026-11-30",
+ "publish_date": "2026-11-19",
+ "hook_beats": {
+  "deadline": [
+   {
+    "say": "마감 십일 일 전, 기초생활수급자, 차상위계층이라면,",
+    "cap": "마감 D-11, 기초수급·차상위라면",
+    "expect": [
+     "11"
+    ]
+   },
+   {
+    "say": "문화누리카드 십오만 원, 아직 안 받으셨나요?",
+    "cap": "문화누리카드 15만 원, 아직이세요?",
+    "expect": [
+     "15만"
+    ]
+   }
+  ]
+ },
+ "beats": {
+  "hook": [
+   {
+    "say": "기초생활수급자, 차상위계층이라면,",
+    "cap": "기초수급·차상위라면"
+   },
+   {
+    "say": "문화누리카드 십오만 원, 아직 안 받으셨나요?",
+    "cap": "문화누리카드 15만 원, 아직이세요?",
+    "expect": [
+     "15만"
+    ]
+   }
+  ],
+  "check": [
+   {
+    "main": "기초수급·차상위 6세 이상",
+    "sub": "2020.12.31 이전 출생자",
+    "say": "기초생활수급자나 차상위계층, 여섯 살 이상이면 대상이에요.",
+    "cap": "기초수급·차상위, 6세 이상이면 대상"
+   },
+   {
+    "main": "올해 처음이거나 아직 충전 전이라면",
+    "sub": "신규발급 · 재충전 모두 11.30 마감",
+    "say": "올해 카드를 처음 받거나, 아직 충전을 안 했다면 지금 신청하세요.",
+    "cap": "신규발급·재충전 모두 11월 30일 마감"
+   },
+   {
+    "main": "13~18세 · 60~64세 1만 원 추가",
+    "sub": "2008~2013년생 · 1962~1966년생",
+    "say": "청소년과 육십 대 초반은 만 원을 더 받아요.",
+    "cap": "13~18세, 60~64세는 1만 원 추가"
+   },
+   {
+    "main": "지역 예산 떨어지면 더 일찍 마감",
+    "sub": "마감일 전이라도 발급 불가",
+    "bad": true,
+    "say": "단, 지역 예산이 떨어지면 더 일찍 끝나요.",
+    "cap": "단, 지역 예산 소진 시 더 일찍 마감"
+   }
+  ],
+  "steps": [
+   {
+    "main": "주민센터 · 누리집 · 앱 신청",
+    "sub": "www.mnuri.kr · 문화누리카드 앱",
+    "say": "주민센터나 문화누리 누리집, 앱에서 신청하고,",
+    "cap": "주민센터·누리집·앱에서 신청"
+   },
+   {
+    "main": "우편 수령은 3~5일 걸려요",
+    "sub": "영업일 기준 등기 배송 · 서둘러 신청",
+    "say": "우편으로 받으면 며칠 걸리니 서두르세요.",
+    "cap": "우편 수령은 영업일 3~5일, 서둘러 신청"
+   },
+   {
+    "main": "12월 31일까지 사용",
+    "sub": "카드 사용기간 2.2 ~ 12.31",
+    "say": "받은 돈은 십이월 삼십일일까지 써야 해요.",
+    "cap": "사용은 12월 31일까지",
+    "expect": [
+     "31"
+    ]
+   }
+  ],
+  "deadline": [
+   {
+    "say": "신청 마감은 이번 달 마지막 날, 월요일 저녁 여섯 시예요.",
+    "cap": "마감 11월 30일(월) 18시"
+   }
+  ],
+  "cta": [
+   {
+    "say": "내 나이랑 사는 지역을 댓글로 남겨 주세요.",
+    "cap": "내 나이랑 사는 지역을 댓글로"
+   },
+   {
+    "say": "받을 수 있는 지원금, 찾아 드릴게요.",
+    "cap": "받을 수 있는 지원금 찾아드려요"
+   }
+  ]
+ },
+ "facts": {
+  "대상": "기초생활수급자 및 차상위 계층(6세 이상, 2020.12.31 이전 출생자)",
+  "금액": "1인당 연간 15만 원 + 생애주기별 1만 원 추가 (청소년기 13세~18세: 2008년~2013년 출생자, 준고령기 60세~64세: 1962년~1966년 출생자)",
+  "마감": "신규발급·재충전 모두 2026.11.30.(월) 18시까지 신청 완료. 각 지역별 예산 소진 시 마감일 이전이라도 발급 불가",
+  "사용": "카드 사용기간 2026. 2. 2.(월) ~ 2026. 12. 31.(목)",
+  "신청": "주민센터 방문 또는 문화누리카드 누리집(www.mnuri.kr)·모바일 앱. 우편 신청은 영업일 기준 등기 배송일(3~5일) 고려",
+  "문의": "문화누리카드 고객지원센터 1544-3412"
+ },
+ "evidence": [
+  {
+   "url": "https://www.mnuri.kr/munhwa/introduceNuri.do",
+   "quote": "기초생활수급자 및 차상위 계층(6세 이상, 2020.12.31 이전 출생자)",
+   "snapshot": "radar/evidence/munhwa-nuri-deadline-1119/1.txt"
+  },
+  {
+   "url": "https://www.mnuri.kr/munhwa/introduceNuri.do",
+   "quote": "1인당 연간 15만 원 + 생애주기별 1만 원 추가 지원\n\n* 추가 지원 대상 : 청소년기(13세~18세) : 2008년~2013년 출생자\n\n준고령기(60세~64세) : 1962년~1966년 출생자",
+   "snapshot": "radar/evidence/munhwa-nuri-deadline-1119/1.txt"
+  },
+  {
+   "url": "https://www.mnuri.kr/munhwa/introduceNuri.do",
+   "quote": "* 카드 사용기간 : 2026. 2. 2.(월) ~ 2026. 12. 31.(목)",
+   "snapshot": "radar/evidence/munhwa-nuri-deadline-1119/1.txt"
+  },
+  {
+   "url": "https://www.mnuri.kr/munhwa/introduceNuri.do",
+   "quote": "문화누리카드 고객지원센터 1544-3412",
+   "snapshot": "radar/evidence/munhwa-nuri-deadline-1119/1.txt"
+  },
+  {
+   "url": "https://www.mnuri.kr/notice/userNotice/detail.do?nttId=46751",
+   "quote": "2026년 문화누리카드 신규발급 신청이\n\n11월 30일(월)에 마감됩니다.",
+   "snapshot": "radar/evidence/munhwa-nuri-deadline-1119/2.txt"
+  },
+  {
+   "url": "https://www.mnuri.kr/notice/userNotice/detail.do?nttId=46751",
+   "quote": "① 주민센터 방문\n\n2026.11.30.(월) 18시까지\n\n② 문화누리카드 누리집(www.mnuri.kr)·모바일 앱\n\n2026.11.30.(월) 18시까지 신규 발급 신청이 완료되어야 함",
+   "snapshot": "radar/evidence/munhwa-nuri-deadline-1119/2.txt"
+  },
+  {
+   "url": "https://www.mnuri.kr/notice/userNotice/detail.do?nttId=46751",
+   "quote": "2026.11.30(월) 18시까지 재충전 신청이 완료되어야 함",
+   "snapshot": "radar/evidence/munhwa-nuri-deadline-1119/2.txt"
+  },
+  {
+   "url": "https://www.mnuri.kr/notice/userNotice/detail.do?nttId=46751",
+   "quote": "※ 단, 각 지역별 예산 소진된 경우에는 마감일 이전이라도\n\n신규 발급이 불가합니다.",
+   "snapshot": "radar/evidence/munhwa-nuri-deadline-1119/2.txt"
+  },
+  {
+   "url": "https://www.mnuri.kr/notice/userNotice/detail.do?nttId=46751",
+   "quote": "※ 우편 신청 : 영업일 기준 등기 배송일(3~5일)을",
+   "snapshot": "radar/evidence/munhwa-nuri-deadline-1119/2.txt"
+  }
+ ],
+ "source": "문화누리카드 누리집 · 11/17 마감 안내 공지",
+ "source_urls": [
+  "https://www.mnuri.kr/munhwa/introduceNuri.do",
+  "https://www.mnuri.kr/notice/userNotice/detail.do?nttId=46751"
+ ],
+ "verified": {
+  "at": "2026-11-18",
+  "official_page_opened": true,
+  "notes": "mnuri.kr 공식 안내(문화누리카드란?/2026 발급 안내)와 11/17 공지 원문 확인: 대상(수급·차상위 6세 이상, 2020.12.31 이전 출생), 15만+생애주기 1만, 신규발급·재충전 11.30(월) 18시 마감, 지역 예산 소진 시 조기 마감, 우편 3~5일, 사용 12.31까지. 11/7 영상의 마감 임박 재알림 1회(topic_rules 허용)."
+ },
+ "tags": [
+  "문화누리카드",
+  "통합문화이용권",
+  "기초생활수급자",
+  "차상위계층",
+  "마감임박"
+ ],
+ "title": "기초수급·차상위 15만원, 문화누리카드 마감 11일 남았어요",
+ "title_pattern": "countdown",
+ "title_candidates": [
+  {
+   "pattern": "loss",
+   "title": "기초수급·차상위 15만원, 11/30 18시 지나면 못 받아요"
+  },
+  {
+   "pattern": "surprise",
+   "title": "작년에 못 받았어도 15만원, 문화누리카드 11/30까지 신청돼요"
+  },
+  {
+   "pattern": "question",
+   "title": "기초수급·차상위세요? 문화누리카드 15만원 받으셨어요?"
+  },
+  {
+   "pattern": "countdown",
+   "title": "기초수급·차상위 15만원, 문화누리카드 마감 11일 남았어요"
+  },
+  {
+   "pattern": "check",
+   "title": "기초수급·차상위 6세 이상이면 15만원, 아직 안 받으셨죠?"
+  }
+ ],
+ "hook_line": "마감 11일 남았어요",
+ "pill": "문화누리카드 · 마감 임박",
+ "intro_s": 1.2,
+ "thumb_sub": "신규발급·재충전 11/30 18시까지"
+}
