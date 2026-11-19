@@ -1,0 +1,30 @@
+{
+ "title": "지금 신청 가능한 지원금 총정리 13가지 (11월 19일 기준)",
+ "labels": [
+  "지원금",
+  "정부지원금",
+  "지원금총정리",
+  "신청방법",
+  "마감임박"
+ ],
+ "description": "11월 19일 기준 신청 가능한 지원금 13가지: 대상·금액·마감 정리",
+ "programs": [
+  "seoul-donghaeng-job-2027h1",
+  "sports-voucher-2027",
+  "munhwa-nuri-deadline-1119",
+  "eitc-late-2026",
+  "gg-youth-basic-income-2026q4",
+  "food-voucher-2026",
+  "seoul-birth-housing-2026h2",
+  "energy-voucher-2026",
+  "kua-job-allowance-2026",
+  "basic-pension-2026",
+  "first-meeting-voucher-2026",
+  "parent-pay-2026",
+  "jeonse-fraud-min-guarantee-2026"
+ ],
+ "qa": {
+  "pass": true,
+  "issues": []
+ }
+}

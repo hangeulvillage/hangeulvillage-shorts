@@ -26,6 +26,7 @@ def pick(today, max_age=30):
         if d and dt.date.fromisoformat(d) <= today:
             continue
         key = re.sub(r'\s*\([^)]*\)', '', c['program']).strip()
+        key = re.sub(r'\s*마감\s*임박', '', key).strip()  # a deadline-reminder card is the same program
         by_prog[key] = c  # later cards win
     far = dt.date(9999, 1, 1)
     return sorted(by_prog.values(), key=lambda c: (dt.date.fromisoformat(c['deadline']) if c.get('deadline') else far, c['program']))
