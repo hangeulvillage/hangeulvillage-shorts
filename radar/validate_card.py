@@ -40,6 +40,8 @@ def num_values(text):
         if 1 <= mo <= 12 and 1 <= d <= 31:
             out.append(('d', mo, d)); return ' '
         return m.group(0)
+    # short official style: '26. 11. 24.  ->  11/24 (apostrophe + 2-digit year)
+    t = re.sub(r"[\'\u2019\u2018](\d{2})\.\s*(\d{1,2})\.\s*(\d{1,2})\.?", lambda m: date(m, m.group(2), m.group(3)), t)
     t = re.sub(r'(?<![\d.])(\d{4})\s*[.\-/년]\s*(\d{1,2})\s*[.\-/월]\s*(\d{1,2})\s*일?', lambda m: date(m, m.group(2), m.group(3)), t)
     t = re.sub(r'(?<![\d.])(\d{1,2})\s*(?:월\s*|[./])(\d{1,2})\s*일?(?![\d.]|\s*만)', lambda m: date(m, m.group(1), m.group(2)), t)
     for m in re.finditer(r'(?<![\d.])(\d+(?:\.\d+)?)\s*(억|만|천)?(?:\s*(\d+)\s*천)?', t):
