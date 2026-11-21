@@ -19,6 +19,7 @@ Two channels share one PC (DESKTOP-JH1UFS7) and one Chrome:
 - Built-in browser (mcp__remote-devices__Claude_Browser__*): load with one ToolSearch (query "mcp__remote-devices__Claude_Browser__", max_results 64); always pass your tabId. It is used for HV TikTok only.
 - If Chrome cannot be reached or screenshots keep timing out, the PC is off or the Chrome window is minimized: stop browser work, say so in one line, and still do the cloud-only parts.
 - file_upload only accepts files inside your working directory.
+- TAB HYGIENE (2026-11-21, the owner's PC ran out of memory: Chrome 39 processes, 3.9 GB): before ending, call tabs_context_mcp and close EVERY tab in your group with tabs_close_mcp (use the leave-page fix below if one refuses). Never leave YouTube Studio, Facebook or Tistory tabs open. Do not open more than 2 tabs at a time.
 - A tab with a "Leave site?" (beforeunload) prompt cannot be closed (YouTube Studio upload tabs). Before tabs_close_mcp run `window.onbeforeunload=null; addEventListener('beforeunload',e=>e.stopImmediatePropagation(),true)` in that tab; finish or cancel the upload dialog first so nothing half-made stays. (2026-11-16)
 - If a site shows its login page (e.g. Tistory), never log in: skip that step, note it in the run record, and put "<site> 로그인 필요" in the message plus a PushNotification.
 
