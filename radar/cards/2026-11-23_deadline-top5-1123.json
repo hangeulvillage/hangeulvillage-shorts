@@ -1,0 +1,251 @@
+{
+ "id": "deadline-top5-1123",
+ "format": "ranking",
+ "program": "마감 임박 지원금 TOP 5 (11월 23일 기준)",
+ "short_name": "마감 임박 TOP 5",
+ "region": "전국",
+ "hook": "check",
+ "structure": "viral",
+ "style": "navy",
+ "headline": [
+  "수급·저소득 가구라면",
+  "마감 임박 {TOP 5}"
+ ],
+ "headline_type": "closing",
+ "rank_by": "마감 임박순 · 11월 23일 기준",
+ "publish_date": "2026-11-23",
+ "deadline": "2026-11-27",
+ "items": [
+  {
+   "rank": 1,
+   "name": "스포츠강좌이용권",
+   "who": "5~18세 · 수급·차상위·한부모 가정",
+   "amount": "월 10만 5천 원",
+   "deadline": "2026-11-27",
+   "apply": "누리집 · 시군구청·주민센터"
+  },
+  {
+   "rank": 2,
+   "name": "문화누리카드",
+   "who": "기초수급·차상위 6세 이상",
+   "amount": "1인 연 15만 원",
+   "deadline": "2026-11-30",
+   "apply": "주민센터 · 누리집·앱"
+  },
+  {
+   "rank": 3,
+   "name": "농식품바우처",
+   "who": "생계급여 가구 (임산부·아이·청년)",
+   "amount": "월 4만 ~ 18만 7천 원",
+   "deadline": "2026-12-11",
+   "apply": "주민센터 · 전화 · 온라인"
+  },
+  {
+   "rank": 4,
+   "name": "에너지바우처",
+   "who": "수급 가구 (어르신·영유아·장애인 등)",
+   "amount": "연 최대 701,300원",
+   "deadline": "2026-12-31",
+   "apply": "읍·면·동 행정복지센터"
+  },
+  {
+   "rank": 5,
+   "name": "국가장학금 1차",
+   "who": "대학생 (재학·신입·편입·복학 등)",
+   "amount": "소득 구간별 등록금 지원",
+   "deadline": "2027-01-07",
+   "apply": "한국장학재단 누리집·앱"
+  }
+ ],
+ "beats": {
+  "hook": [
+   {
+    "say": "마감이 다가오는 지원금 다섯 개, 마감 순서대로 정리했어요.",
+    "cap": "마감 임박 지원금 TOP 5"
+   },
+   {
+    "say": "일 위는 마지막에 공개할게요.",
+    "cap": "1위는 마지막에 공개"
+   }
+  ],
+  "items": [
+   {
+    "rank": 4,
+    "say": "사 위, 에너지바우처. 어르신이나 영유아가 있는 수급 가구, 연 최대 칠십만 천삼백 원이에요.",
+    "cap": "4위 에너지바우처 · 연 최대 701,300원 · 12/31 마감"
+   },
+   {
+    "rank": 2,
+    "say": "이 위, 문화누리카드. 기초수급이나 차상위 여섯 살 이상, 십오만 원인데 이번 달 마지막 날 끝나요.",
+    "cap": "2위 문화누리카드 · 15만 원 · 11/30 마감"
+   },
+   {
+    "rank": 5,
+    "say": "오 위, 국가장학금 일차. 대학생은 십일월 이십사 일부터 내년 일월 칠 일까지 신청해요.",
+    "cap": "5위 국가장학금 1차 · 11/24 ~ 1/7"
+   },
+   {
+    "rank": 3,
+    "say": "삼 위, 농식품바우처. 생계급여 가구에 아이나 청년이 있으면 매달 최대 십팔만 칠천 원이에요.",
+    "cap": "3위 농식품바우처 · 월 최대 18만 7천 원 · 12/11 마감"
+   },
+   {
+    "rank": 1,
+    "say": "대망의 일 위, 스포츠강좌이용권. 수급이나 차상위 가정 아이라면 월 십만 오천 원, 이번 주 금요일 마감이에요.",
+    "cap": "1위 스포츠강좌이용권 · 월 10만 5천 원 · 11/27 마감"
+   }
+  ],
+  "cta": [
+   {
+    "say": "내 나이랑 사는 지역을 댓글로 남겨 주세요.",
+    "cap": "내 나이랑 사는 지역을 댓글로"
+   },
+   {
+    "say": "받을 수 있는 지원금, 찾아 드릴게요.",
+    "cap": "받을 수 있는 지원금 찾아드려요"
+   }
+  ]
+ },
+ "facts": {
+  "1위 스포츠강좌이용권": "전국 동시 신청 11월 9일(월) ~ 11월 27일(금) 23:59 (선착순 아님). 5~18세(2009.01.01.~2022.12.31. 출생자) 중 생계·의료·주거·교육급여 수급가구, 차상위계층, 한부모가족. 매월 10만 5천원 내 스포츠강좌 수강료 지원(연간 12개월, 최대 126만원). 온라인(누리집 개인회원 → 개인 이용권 신청) 또는 시/군/구청·행정복지센터 방문. 신청 제외지역 인천 서해구. 선정은 12월 중 지자체",
+  "2위 문화누리카드": "기초생활수급자 및 차상위 계층(6세 이상, 2020.12.31 이전 출생자). 1인당 연간 15만 원 + 생애주기별 1만 원 추가. 신규발급 2026.11.30.(월) 18시까지 주민센터 방문 또는 누리집(www.mnuri.kr)·모바일 앱. 지역별 예산 소진 시 마감일 이전이라도 발급 불가",
+  "3위 농식품바우처": "생계급여(기준 중위소득 32%이하) 수급가구 중 임산부·영유아·아동·청년 포함가구. 가구원 수별 월 40,000원(1인) ~ 187,000원(10인 이상). 신청기간 2025년 12월 22일 ~ 2026년 12월 11일, 주소지 읍면동 행정복지센터 방문·고객지원센터 전화(1551-0857)·온라인. 일부 기초지자체 미추진",
+  "4위 에너지바우처": "생계·의료·주거·교육급여 수급자 중 노인·영유아·장애인·임산부·중증질환자·한부모·소년소녀가정·다자녀 세대. 2026년도 총액 1인 세대 295,200원 ~ 4인 이상 세대 701,300원(월별 금액 아님). 신청기간 2026년 6월 15일 ~ 2026년 12월 31일, 읍·면·동 행정복지센터",
+  "5위 국가장학금 1차": "2027년 1학기 1차 학생 신청 '26. 11. 24.(화) 9시 ~ '27. 1. 7.(목) 18시. 재학생·신입생·편입생·재입학생·복학생 등 모든 학적. 재학생은 1차 신청이 원칙. 지원 금액은 학자금 지원구간에 따라 결정. 한국장학재단 누리집·앱, 콜센터 1599-2000",
+  "신청": "스포츠강좌이용권 누리집·시군구청·행정복지센터(11.27까지) · 문화누리카드 주민센터·mnuri.kr·앱(11.30 18시까지) · 농식품바우처 행정복지센터·1551-0857·온라인(12.11까지) · 에너지바우처 행정복지센터(12.31까지) · 국가장학금 한국장학재단 누리집·앱(1.7 18시까지)"
+ },
+ "evidence": [
+  {
+   "url": "https://svoucher.kspo.or.kr/svoucher/bbs/B0000051/view.do?menuNo=20&topMenuNo=5&nttId=64394",
+   "quote": "✔️11월 9일(월)~ 11월 27일(금) 23:59 까지 (선착순 아님)",
+   "snapshot": "radar/evidence/deadline-top5-1123/1.txt"
+  },
+  {
+   "url": "https://svoucher.kspo.or.kr/svoucher/bbs/B0000051/view.do?menuNo=20&topMenuNo=5&nttId=64394",
+   "quote": "📍5~18세 (출생일 기준 2009.01.01.~2022.12.31. 출생자)",
+   "snapshot": "radar/evidence/deadline-top5-1123/1.txt"
+  },
+  {
+   "url": "https://svoucher.kspo.or.kr/svoucher/bbs/B0000051/view.do?menuNo=20&topMenuNo=5&nttId=64394",
+   "quote": "📍매월 10만 5천원 내 스포츠강좌 수강료 지원(연간 12개월, 최대 126만원 지원)",
+   "snapshot": "radar/evidence/deadline-top5-1123/1.txt"
+  },
+  {
+   "url": "https://www.mnuri.kr/munhwa/introduceNuri.do",
+   "quote": "기초생활수급자 및 차상위 계층(6세 이상, 2020.12.31 이전 출생자)",
+   "snapshot": "radar/evidence/deadline-top5-1123/2.txt"
+  },
+  {
+   "url": "https://www.mnuri.kr/munhwa/introduceNuri.do",
+   "quote": "1인당 연간 15만 원 + 생애주기별 1만 원 추가 지원",
+   "snapshot": "radar/evidence/deadline-top5-1123/2.txt"
+  },
+  {
+   "url": "https://www.mnuri.kr/notice/userNotice/detail.do?nttId=46751",
+   "quote": "2026.11.30.(월) 18시까지",
+   "snapshot": "radar/evidence/deadline-top5-1123/3.txt"
+  },
+  {
+   "url": "https://www.kosaf.go.kr/ko/notice.do?mode=view&searchStr=&searchType=&page=1&ctgrId1=&ctgrId2=&seqNo=21508",
+   "quote": "가. 학생 신청: '26. 11. 24.(화) 9시 ~ '27. 1. 7.(목) 18시까지",
+   "snapshot": "radar/evidence/deadline-top5-1123/4.txt"
+  },
+  {
+   "url": "https://www.kosaf.go.kr/ko/notice.do?mode=view&searchStr=&searchType=&page=1&ctgrId1=&ctgrId2=&seqNo=21508",
+   "quote": "콜센터 1599-2000",
+   "snapshot": "radar/evidence/deadline-top5-1123/4.txt"
+  },
+  {
+   "url": "https://www.energyv.or.kr/info/support_info.do",
+   "quote": "총액 295,200원\n(40,700원) 407,500원\n(58,800원) 532,700원\n(75,800원) 701,300원",
+   "snapshot": "radar/evidence/deadline-top5-1123/5.txt"
+  },
+  {
+   "url": "https://www.energyv.or.kr/info/support_info.do",
+   "quote": "- (신청기간) 2026년 6월 15일 ~ 2026년 12월 31일",
+   "snapshot": "radar/evidence/deadline-top5-1123/5.txt"
+  },
+  {
+   "url": "https://www.foodvoucher.go.kr/view/fm/vucintro/sprtCn",
+   "quote": "생계급여(기준 중위소득 32%이하) 수급가구 중 임산부·영유아·아동·청년 포함가구",
+   "snapshot": "radar/evidence/deadline-top5-1123/6.txt"
+  },
+  {
+   "url": "https://www.foodvoucher.go.kr/view/fm/vucintro/sprtCn",
+   "quote": "지원금액\t40,000원\t65,000원\t83,000원\t100,000원\t116,000원\t131,000원\t145,000원\t159,000원\t173,000원\t187,000원",
+   "snapshot": "radar/evidence/deadline-top5-1123/6.txt"
+  },
+  {
+   "url": "https://www.foodvoucher.go.kr/view/fm/vucintro/sprtCn",
+   "quote": "가구원 수\t1인\t2인\t3인\t4인\t5인\t6인\t7인\t8인\t9인\t10인 이상",
+   "snapshot": "radar/evidence/deadline-top5-1123/6.txt"
+  },
+  {
+   "url": "https://www.foodvoucher.go.kr/view/fm/vucaply/vucOfLnAply",
+   "quote": "2025년 12월 22일 부터 2026년 12월 11일 까지",
+   "snapshot": "radar/evidence/deadline-top5-1123/7.txt"
+  },
+  {
+   "url": "https://www.foodvoucher.go.kr/view/fm/vucaply/vucOfLnAply",
+   "quote": "전화신청 고객지원센터 (1551-0857)",
+   "snapshot": "radar/evidence/deadline-top5-1123/7.txt"
+  },
+  {
+   "url": "https://www.kosaf.go.kr/ko/notice.do?mode=view&searchStr=&searchType=&page=1&ctgrId1=&ctgrId2=&seqNo=21508",
+   "quote": "2027년 1학기 국가장학금 1차 신청 일정 및 신청매뉴얼 안내",
+   "snapshot": "radar/evidence/deadline-top5-1123/4.txt"
+  },
+  {
+   "url": "https://www.energyv.or.kr/info/support_info.do",
+   "quote": "2) 위 금액은 2026년도 총 지원금액으로 월별 지원금액이 아님",
+   "snapshot": "radar/evidence/deadline-top5-1123/5.txt"
+  }
+ ],
+ "source": "각 기관 공식 누리집 (11.22 확인)",
+ "source_urls": [
+  "https://svoucher.kspo.or.kr/svoucher/bbs/B0000051/view.do?menuNo=20&topMenuNo=5&nttId=64394",
+  "https://www.mnuri.kr/notice/userNotice/detail.do?nttId=46751",
+  "https://www.foodvoucher.go.kr/view/fm/vucaply/vucOfLnAply",
+  "https://www.energyv.or.kr/info/support_info.do",
+  "https://www.kosaf.go.kr/ko/notice.do?mode=view&searchStr=&searchType=&page=1&ctgrId1=&ctgrId2=&seqNo=21508"
+ ],
+ "verified": {
+  "at": "2026-11-22",
+  "official_page_opened": true,
+  "notes": "모두 이번 실행(11/22 18시대)에서 공식 페이지를 다시 열어 확인. 스포츠강좌이용권 svoucher 공지 64394(11/9~11/27 23:59, 5~18세 수급·차상위·한부모, 월 10만 5천원) — 본문이 11/20 스냅샷과 같아 그 텍스트를 1.txt로 사용. 문화누리 introduceNuri(15만, 6세 이상)·공지 46751(11/30 18시) — 키 문장 재확인, 11/19 스냅샷 사용. 국가장학금 kosaf 21508(11/24 9시~1/7 18시) — 재확인, 11/21 스냅샷 사용. 에너지바우처 energyv support_info(신청 6/15~12/31, 1인 295,200~4인 이상 701,300원) — 새 스냅샷. 농식품바우처 foodvoucher sprtCn(월 4만~18.7만)·vucOfLnAply(신청 2025.12.22~2026.12.11) — get_page_text가 이 사이트에서 빈 결과라 JS innerText로 새 스냅샷."
+ },
+ "tags": [
+  "지원금",
+  "마감임박",
+  "스포츠강좌이용권",
+  "문화누리카드",
+  "농식품바우처",
+  "에너지바우처"
+ ],
+ "title": "11/27 마감 1위부터, 놓치면 끝나는 지원금 TOP 5",
+ "title_pattern": "countdown",
+ "title_candidates": [
+  {
+   "pattern": "loss",
+   "title": "이번 달 놓치면 못 받는 지원금 TOP 5"
+  },
+  {
+   "pattern": "surprise",
+   "title": "수급·차상위면 아직 남았어요, 마감 임박 지원금 TOP 5"
+  },
+  {
+   "pattern": "question",
+   "title": "이 지원금 신청하셨어요? 마감 임박 TOP 5"
+  },
+  {
+   "pattern": "countdown",
+   "title": "11/27 마감 1위부터, 놓치면 끝나는 지원금 TOP 5"
+  },
+  {
+   "pattern": "check",
+   "title": "수급·저소득 가구면 확인, 마감 임박 지원금 TOP 5"
+  }
+ ],
+ "hook_line": "1위는 이번 주 금요일 마감",
+ "intro_s": 1.2
+}
