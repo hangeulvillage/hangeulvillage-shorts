@@ -27,10 +27,13 @@
 
 ## 숨고 (2026-11-24, owner approved)
 - Profile: 가게쇼츠공방, 영상 광고 (+ SNS/콘텐츠 마케팅, 썸네일), 활동 지역 인천 남동구, 범위 전국.
-- Prices on 숨고 (견적 costs ~5,000-6,500 캐시 each, no fee on the deal): 맛보기 49,000원 (1편 + 썸네일, 2일) /
-  추천 119,000원 (3편 + 게시글 문구 + 정사각형, 3일) / 월 정기 199,000원 (주 2편, 8편).
+- Delivery promise (2026-11-24, owner): work starts the moment materials (or payment after the free preview) are confirmed.
+  09:00-22:00 KST: delivered within 3 hours; night: by 11:00 next day. Watch task: 크몽·숨고 주문 감시 every 2 h, 09:37-21:37.
+- Prices on 숨고 (견적 costs ~5,000-6,500 캐시 each, no fee on the deal): 맛보기 49,000원 (1편 + 썸네일) /
+  추천 119,000원 (3편 + 게시글 문구 + 정사각형) / 월 정기 199,000원 (주 2편, 8편).
   The first quote (설영진, 노인 욕실의자, 2026-11-24) went out at 29,000원 and is honoured if accepted.
 - Quote rules: only store/product promo requests that fit photo-based vertical video; only while the request has < 5 quotes;
   at most 2 quotes a day; skip requests with a stated budget under 50,000원. Every quote offers a FREE first-scene preview
   (render the hook scene from the client's photos before payment). The owner approves each quote's cost in chat.
+- Kmong: 작업일 2/2/3 -> 1/1/1 and the same 3-hour wording after the first order (editing an approved gig can trigger re-review).
 - Kmong keeps 29,000 / 59,000 / 99,000 until 5 reviews, then 39,000 / 79,000 / 129,000.
