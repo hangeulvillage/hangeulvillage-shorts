@@ -1,0 +1,190 @@
+{
+ "id": "livelihood-benefit-2027",
+ "program": "국민기초생활보장 생계급여 (보건복지부) · 2027년 선정기준 인상",
+ "short_name": "생계급여",
+ "region": "전국",
+ "hook": "check",
+ "hook_note": "rotation said deadline (hook_next 19) but the program is 상시, so check was used",
+ "structure": "viral",
+ "style": "forest",
+ "headline": [
+  "혼자 살고 소득 적은 분",
+  "내년 생계급여 오릅니다"
+ ],
+ "headline_type": "news",
+ "audience": "소득 적은 1인 가구",
+ "audience_sub": "2027년 생계급여 · 상시 신청",
+ "audience_noun": "",
+ "amount": "월 최대 87만 5,533원",
+ "amount_short": "87만 5,533원",
+ "pay_note": "2027년 1인 가구 최대 급여액",
+ "deadline": null,
+ "deadline_text": "상시 신청 · 주민센터",
+ "publish_date": "2026-11-25",
+ "beats": {
+  "hook": [
+   {
+    "say": "혼자 사는데 소득이 적으세요?",
+    "cap": "혼자 사는데 소득이 적으세요?"
+   },
+   {
+    "say": "내년 생계급여, 일인 가구 월 최대 팔십칠만 원대예요.",
+    "cap": "2027년 생계급여 1인 가구 월 최대 87만 5,533원",
+    "expect": [
+     "87"
+    ]
+   }
+  ],
+  "check": [
+   {
+    "main": "소득인정액 87만 5,533원 이하",
+    "sub": "2027년 1인 가구 · 올해는 820,556원",
+    "say": "소득과 재산을 합친 금액이 기준 이하면 돼요.",
+    "cap": "소득인정액이 1인 87만 5,533원 이하 (2027년)"
+   },
+   {
+    "main": "4인 가구는 최대 221만 7,563원",
+    "sub": "2027년 최대 급여액 · 올해보다 인상",
+    "say": "사인 가구는 최대 이백이십일만 원대예요.",
+    "cap": "4인 가구 최대 221만 7,563원 (2027년)"
+   },
+   {
+    "main": "부양의무자 고소득이면 제외",
+    "sub": "따로 사는 1촌·배우자 연소득 1.3억·재산 12억 초과",
+    "bad": true,
+    "say": "단, 따로 사는 부모나 자녀가 고소득이면 안 돼요.",
+    "cap": "단, 부양의무자 연소득 1.3억원·재산 12억원 초과면 제외"
+   }
+  ],
+  "steps": [
+   {
+    "main": "주소지 주민센터에 신청",
+    "sub": "본인·친족 또는 담당 공무원 직권 신청",
+    "say": "사는 곳 주민센터에서 신청하면,",
+    "cap": "거주지 읍·면·동 주민센터에 신청"
+   },
+   {
+    "main": "소득·재산 조사",
+    "sub": "공적자료 확인 · 금융재산 조회",
+    "say": "소득과 재산 조사를 거쳐서,",
+    "cap": "소득·재산 조사 (금융재산 조회 포함)"
+   },
+   {
+    "main": "결과 통지 · 이의신청 90일",
+    "sub": "서면·전자우편·문자로 통지",
+    "say": "결과는 문자나 서면으로 알려 줘요.",
+    "cap": "결과 통지, 이의신청은 통지 후 90일 안에"
+   }
+  ],
+  "cta": [
+   {
+    "say": "내 나이랑 사는 지역을 댓글로 남겨 주세요.",
+    "cap": "내 나이랑 사는 지역을 댓글로"
+   },
+   {
+    "say": "받을 수 있는 지원금, 찾아 드릴게요.",
+    "cap": "받을 수 있는 지원금 찾아드려요"
+   }
+  ]
+ },
+ "facts": {
+  "대상": "소득인정액(소득평가액 + 재산의 소득환산액)이 생계급여 선정기준(기준 중위소득 32%) 이하인 가구. 상시 신청",
+  "금액": "2027년도 생계급여 선정기준 및 최대 급여액 1인 87만 5,533원, 4인 221만 7,563원 (2026년은 1인 820,556원, 4인 2,078,316원)",
+  "부양의무자": "수급권자와 생계·주거를 달리하는 1촌 및 그 배우자의 연소득 1.3억원 초과 또는 일반재산 12억원 초과면 수급자 선정 제외",
+  "신청": "거주지 읍·면·동 주민센터에 본인, 친족 및 기타 관계인이 신청하거나 사회복지담당공무원이 직권신청. 사회보장급여 제공(변경)신청서, 금융정보 등 제공동의서",
+  "결정": "소득·재산 조사(공적자료 확인, 금융재산 조회) 후 결정. 결정내용은 서면·전자우편·SMS로 통지, 통지 받은 날부터 90일 이내 이의신청 가능"
+ },
+ "evidence": [
+  {
+   "url": "https://eiec.kdi.re.kr/policy/materialView.do?num=284825",
+   "quote": "2027년도 생계급여 선정기준 및 최대 급여액은 1인 87만 5,533원, 4인 221만 7,563원으로 결정함.",
+   "snapshot": "radar/evidence/livelihood-benefit-2027/1.txt"
+  },
+  {
+   "url": "https://eiec.kdi.re.kr/policy/materialView.do?num=284825",
+   "quote": "급여별 선정기준은 기존과 동일(생계급여 32%, 의료급여 40%, 주거급여 48%, 교육급여 50%)하며",
+   "snapshot": "radar/evidence/livelihood-benefit-2027/1.txt"
+  },
+  {
+   "url": "https://www.mohw.go.kr/menu.es?mid=a10708010300",
+   "quote": "2026년 급여종류별 수급자 선정기준",
+   "snapshot": "radar/evidence/livelihood-benefit-2027/2.txt"
+  },
+  {
+   "url": "https://www.mohw.go.kr/menu.es?mid=a10708010300",
+   "quote": "생계급여(중위 32%)\t820,556\t1,343,773\t1,714,892\t2,078,316",
+   "snapshot": "radar/evidence/livelihood-benefit-2027/2.txt"
+  },
+  {
+   "url": "https://www.mohw.go.kr/menu.es?mid=a10708010300",
+   "quote": "소득인정액 = 소득평가액 + 재산의 소득환산액",
+   "snapshot": "radar/evidence/livelihood-benefit-2027/2.txt"
+  },
+  {
+   "url": "https://www.mohw.go.kr/menu.es?mid=a10708010300",
+   "quote": "수급(권)자와 생계·주거를 달리하는 1촌 및 그 배우자의 연소득 1.3억원 초과 또는 일반재산 12억원 초과할 경우 수급자 선정 제외",
+   "snapshot": "radar/evidence/livelihood-benefit-2027/2.txt"
+  },
+  {
+   "url": "https://www.mohw.go.kr/menu.es?mid=a10708010200",
+   "quote": "거주지 읍·면·동주민센터에 수급권자 본인, 친족 및 기타 관계인이 신청하거나 사회복지담당공무원이 직권신청",
+   "snapshot": "radar/evidence/livelihood-benefit-2027/3.txt"
+  },
+  {
+   "url": "https://www.mohw.go.kr/menu.es?mid=a10708010200",
+   "quote": "소득·재산 신고 자료 및 사회보장정보시스템(행복e음)을 통해 공적자료 확인, 금융재산 조회 실시",
+   "snapshot": "radar/evidence/livelihood-benefit-2027/3.txt"
+  },
+  {
+   "url": "https://www.mohw.go.kr/menu.es?mid=a10708010200",
+   "quote": "결정내용 통지(서면, 전자우편, SMS)\n결정내용에 이의가 있는 경우 통지를 받은 날부터 90일 이내 이의신청 가능",
+   "snapshot": "radar/evidence/livelihood-benefit-2027/3.txt"
+  }
+ ],
+ "source": "보건복지부 보도자료·누리집 (2026)",
+ "source_urls": [
+  "https://www.mohw.go.kr/menu.es?mid=a10708010300",
+  "https://www.mohw.go.kr/menu.es?mid=a10708010200",
+  "https://eiec.kdi.re.kr/policy/materialView.do?num=284825"
+ ],
+ "verified": {
+  "at": "2026-11-24",
+  "official_page_opened": true,
+  "notes": "보건복지부 누리집 원문 확인(2026-11-24 18:55 KST): 수급자선정기준 페이지(2026년 생계급여 1인 820,556원·4인 2,078,316원, 소득인정액 산식, 생계급여 부양의무자 기준 1촌 및 그 배우자 연소득 1.3억원·일반재산 12억원 초과 시 제외), 보장절차 페이지(최종수정 2026.09.23: 거주지 읍·면·동 주민센터 신청·직권신청, 소득·재산 조사, 서면·전자우편·SMS 통지, 90일 이내 이의신청). 2027년 금액은 복지부 기초생활보장과 보도자료(2026.07.28) KDI 경제정보센터 사본: 생계급여 선정기준 및 최대 급여액 1인 87만 5,533원, 4인 221만 7,563원. 11/23 제4차 기초생활보장 종합계획(2028년부터 35%로 단계 인상, 2027년 하반기 중증장애인 가구 부양의무자 기준 폐지)은 아직 계획이라 영상에서 뺌. 복지로 온라인 신청·상담전화는 이 원문에 없어 뺌."
+ },
+ "tags": [
+  "생계급여",
+  "기초생활수급",
+  "기준중위소득",
+  "보건복지부",
+  "지원금"
+ ],
+ "title": "혼자 살고 소득 적으세요? 월 87만 5,533원, 내년 생계급여",
+ "title_pattern": "question",
+ "title_candidates": [
+  {
+   "pattern": "loss",
+   "title": "소득 적은 1인 가구, 신청 안 하면 생계급여 0원이에요"
+  },
+  {
+   "pattern": "surprise",
+   "title": "내년 생계급여 1인 월 87만 5,533원, 올해보다 올라요"
+  },
+  {
+   "pattern": "question",
+   "title": "혼자 살고 소득 적으세요? 월 87만 5,533원, 내년 생계급여"
+  },
+  {
+   "pattern": "countdown",
+   "title": "2027년부터 달라지는 생계급여, 1인 월 최대 87만 5,533원"
+  },
+  {
+   "pattern": "check",
+   "title": "소득인정액 87만 5,533원 이하면 나와요, 2027년 생계급여"
+  }
+ ],
+ "hook_line": "혼자 사는데 소득 적으세요?",
+ "pill": "보건복지부 · 생계급여",
+ "intro_s": 1.2,
+ "thumb_sub": "국민기초생활보장 · 2027년 기준"
+}
