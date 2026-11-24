@@ -24,3 +24,13 @@
    - PREMIUM: 4편 + caption.txt + `--square`로 만든 video_square.mp4(1080x1080 피드용)
    여러 편은 강점 순서와 한 줄 소개를 바꾼 브리프로 만든다. 같은 문구를 반복하지 않는다.
 6. 수정 요청은 브리프만 고쳐서 다시 렌더한다.
+
+## 숨고 (2026-11-24, owner approved)
+- Profile: 가게쇼츠공방, 영상 광고 (+ SNS/콘텐츠 마케팅, 썸네일), 활동 지역 인천 남동구, 범위 전국.
+- Prices on 숨고 (견적 costs ~5,000-6,500 캐시 each, no fee on the deal): 맛보기 49,000원 (1편 + 썸네일, 2일) /
+  추천 119,000원 (3편 + 게시글 문구 + 정사각형, 3일) / 월 정기 199,000원 (주 2편, 8편).
+  The first quote (설영진, 노인 욕실의자, 2026-11-24) went out at 29,000원 and is honoured if accepted.
+- Quote rules: only store/product promo requests that fit photo-based vertical video; only while the request has < 5 quotes;
+  at most 2 quotes a day; skip requests with a stated budget under 50,000원. Every quote offers a FREE first-scene preview
+  (render the hook scene from the client's photos before payment). The owner approves each quote's cost in chat.
+- Kmong keeps 29,000 / 59,000 / 99,000 until 5 reviews, then 39,000 / 79,000 / 129,000.
