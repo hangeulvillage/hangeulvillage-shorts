@@ -31,6 +31,7 @@ Two channels share one PC (DESKTOP-JH1UFS7) and one Chrome:
 **Rule: every task that switches to 지원금 레이더 switches back to Hangeul Village before it ends, even after errors. If a switch back fails after one retry, put it in the FIRST line of your message and send a PushNotification.**
 
 ### 2a. YouTube Studio
+- The owner also has his own channel "melodynmemory" in the same Google account (confirmed 2026-11-24). Finding Studio on it is normal: switch to the channel your task needs, never edit or post anything on melodynmemory.
 youtube.com/channel_switcher does NOT change the channel Studio uses (Studio keeps its last channel), and a Studio URL with the other channel's id shows "죄송합니다". Switch inside Studio:
 1. Open https://studio.youtube.com/ , wait 5 s, read `#entity-name`.
 2. To switch: avatar (top right, ≈1543,24) → "계정 전환" (≈1390,196) → the channel ("지원금 레이더" @jiwongeumradar ≈1360,285, or "Hangeul Village" @hangeulvillage ≈1360,494) → wait 6 s.
