@@ -27,6 +27,7 @@
 
 ## 숨고 (2026-11-24, owner approved)
 - Profile: 가게쇼츠공방, 영상 광고 (+ SNS/콘텐츠 마케팅, 썸네일), 활동 지역 인천 남동구, 범위 전국.
+- Concept (2026-11-24): "3시간 가게쇼츠". One-liner on every platform: "사진만 주시면 3시간 안에, 광고 같은 가게 홍보 쇼츠를 만들어 드려요. 결제 전 첫 장면 무료 미리보기." Show quality with proof (free preview, samples), never with superlatives.
 - Delivery promise (2026-11-24, owner): work starts the moment materials (or payment after the free preview) are confirmed.
   09:00-22:00 KST: delivered within 3 hours; night: by 11:00 next day. Watch task: 크몽·숨고 주문 감시 every 2 h, 09:37-21:37.
 - Prices on 숨고 (견적 costs ~5,000-6,500 캐시 each, no fee on the deal): 맛보기 49,000원 (1편 + 썸네일) /
