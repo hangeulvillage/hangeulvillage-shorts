@@ -29,12 +29,22 @@
 - Profile: 가게쇼츠공방, 영상 광고 (+ SNS/콘텐츠 마케팅, 썸네일), 활동 지역 인천 남동구, 범위 전국.
 - Concept (2026-11-24): "3시간 가게쇼츠". One-liner on every platform: "사진만 주시면 3시간 안에, 광고 같은 가게 홍보 쇼츠를 만들어 드려요. 결제 전 첫 장면 무료 미리보기." Show quality with proof (free preview, samples), never with superlatives.
 - Delivery promise (2026-11-24, owner): work starts the moment materials (or payment after the free preview) are confirmed.
-  09:00-22:00 KST: delivered within 3 hours; night: by 11:00 next day. Watch task: 크몽·숨고 주문 감시 every 2 h, 09:37-21:37.
+  09:00-22:00 KST: delivered within 3 hours; night: by 11:00 next day. Watch task: 크몽·숨고 주문 감시 hourly, 09:37-22:37.
 - Prices on 숨고 (견적 costs ~5,000-6,500 캐시 each, no fee on the deal): 맛보기 49,000원 (1편 + 썸네일) /
   추천 119,000원 (3편 + 게시글 문구 + 정사각형) / 월 정기 199,000원 (주 2편, 8편).
   The first quote (설영진, 노인 욕실의자, 2026-11-24) went out at 29,000원 and is honoured if accepted.
-- Quote rules: only store/product promo requests that fit photo-based vertical video; only while the request has < 5 quotes;
-  at most 2 quotes a day; skip requests with a stated budget under 50,000원. Every quote offers a FREE first-scene preview
-  (render the hook scene from the client's photos before payment). The owner approves each quote's cost in chat.
+- Quote rules (updated 2026-11-24 16:31, owner: "판단기준을 만들고 니가 알아서 견적서 넣어줘, 하루 최대 5건"):
+  - Daily cap: 5 quotes total = 숨고 스마트견적 (auto, max 3/day, 24,000캐시/day, resets 09:00) + Claude manual (max 2/day).
+  - 스마트견적 (registered 2026-11-24): 영상 광고, 유튜브+SNS, 영상 제작 필요=네, 기간 1회성/1·3·6개월/상담 후 결정, 전국,
+    "49,000원부터" + generic text (3 packages, free preview, no on-site filming).
+  - SEND when ALL: (a) result can be made from photos/screenshots as a 15-60 s vertical video (가게·제품·서비스 홍보,
+    SNS/릴스/쇼츠, 광고 영상); (b) < 5 quotes so far (지정요청 to us: any count); (c) no stated budget under 50,000원;
+    (d) no on-site filming, interviews, long-form (> 60 s) editing, motion-graphics/3D/animation work, or event coverage;
+    (e) today's manual count < 2. Price: 49,000 if 1편 wanted, 119,000 if several/unclear, 199,000/월 if ongoing ≥ 1 month.
+    Tailor the first 2 lines to the request; always offer the free first-scene preview.
+  - SKIP: 촬영 필요 (현장/출장/360), 모션그래픽·애니메이션, 롱폼 편집, 5+ quotes, app UI demo series that need screen recording,
+    vague SNS-account management with no video.
+  - Live chat: when the owner says "숨고", Claude checks, applies the rules, sends or skips, then reports one line each.
+  - Scheduled watch tasks still only report and draft (no cash spending from a scheduled run).
 - Kmong: 작업일 2/2/3 -> 1/1/1 and the same 3-hour wording after the first order (editing an approved gig can trigger re-review).
 - Kmong keeps 29,000 / 59,000 / 99,000 until 5 reviews, then 39,000 / 79,000 / 129,000.
