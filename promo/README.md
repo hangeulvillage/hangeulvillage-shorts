@@ -46,5 +46,9 @@
     vague SNS-account management with no video.
   - Live chat: when the owner says "숨고", Claude checks, applies the rules, sends or skips, then reports one line each.
   - Scheduled watch tasks still only report and draft (no cash spending from a scheduled run).
+  - AUTO-REPLY (owner 2026-11-25 15:42): Claude answers 숨고 customer messages itself (live chat and the hourly watch task),
+    from listing facts only; custom price / refund / dispute / unclear -> hold and ask the owner. 크몽 replies stay drafts.
+  - Order confirmed -> Claude makes the video(s) at once and sends them to the OWNER first; deliver to the client only after
+    the owner confirms. Pre-payment free preview: make it and show the owner, who sends it.
 - Kmong: 작업일 2/2/3 -> 1/1/1 and the same 3-hour wording after the first order (editing an approved gig can trigger re-review).
 - Kmong keeps 29,000 / 59,000 / 99,000 until 5 reviews, then 39,000 / 79,000 / 129,000.
