@@ -1,0 +1,174 @@
+{
+ "id": "child-allowance-2026",
+ "program": "아동수당 (보건복지부) · 2026년 9세 미만 확대",
+ "short_name": "아동수당",
+ "region": "전국",
+ "hook": "check",
+ "hook_note": "hooks_rotation[hook_next 20 % 3] = check",
+ "structure": "viral",
+ "style": "navy",
+ "headline": [
+  "9세 미만 아이 부모님",
+  "신청 안 하면 0원"
+ ],
+ "headline_type": "loss",
+ "audience": "9세 미만 아이 부모",
+ "audience_sub": "아동수당 · 상시 신청",
+ "audience_noun": "",
+ "amount": "월 10만원",
+ "amount_short": "월 10만원",
+ "pay_note": "소득 상관없이 매달",
+ "deadline": null,
+ "deadline_text": "상시 신청 · 복지로",
+ "publish_date": "2026-11-26",
+ "beats": {
+  "hook": [
+   {
+    "say": "아홉 살 안 된 아이 키우세요?",
+    "cap": "만 9세 미만 아이 키우세요?"
+   },
+   {
+    "say": "소득 상관없이 매달 십만 원이에요.",
+    "cap": "소득 상관없이 월 10만원",
+    "expect": [
+     "10"
+    ]
+   }
+  ],
+  "check": [
+   {
+    "main": "0~만 9세 미만 아동",
+    "sub": "2026년 8세 미만 → 9세 미만 확대",
+    "say": "올해부터 아홉 살 미만까지 늘었어요.",
+    "cap": "2026년 지급 연령 9세 미만으로 확대"
+   },
+   {
+    "main": "비수도권·인구감소지역 추가",
+    "sub": "월 5000원~최대 2만 원 더",
+    "say": "지방에 살면 매달 조금 더 받아요.",
+    "cap": "비수도권·인구감소지역은 월 5000원~최대 2만 원 추가"
+   },
+   {
+    "main": "해외 90일 이상 체류 시 중단",
+    "sub": "아동이 90일 이상 해외에 있을 때",
+    "bad": true,
+    "say": "단, 아이가 해외에 오래 있으면 끊겨요.",
+    "cap": "단, 아동이 90일 이상 해외 체류 시 지급 중단"
+   }
+  ],
+  "steps": [
+   {
+    "main": "복지로 앱·웹 또는 주민센터",
+    "sub": "온라인은 보호자가 부모일 때만",
+    "say": "복지로나 주민센터에서 신청하고,",
+    "cap": "복지로(웹·앱) 또는 주소지 동주민센터 방문 신청"
+   },
+   {
+    "main": "출생일 포함 60일 안에 신청",
+    "sub": "출생월부터 소급 지급",
+    "say": "태어나고 육십 일 안에 하면 출생 달부터 나와요.",
+    "cap": "신생아는 출생일 포함 60일 이내 신청 시 출생월부터 소급"
+   }
+  ],
+  "cta": [
+   {
+    "say": "내 나이랑 사는 지역을 댓글로 남겨 주세요.",
+    "cap": "내 나이랑 사는 지역을 댓글로"
+   },
+   {
+    "say": "받을 수 있는 지원금, 찾아 드릴게요.",
+    "cap": "받을 수 있는 지원금 찾아드려요"
+   }
+  ]
+ },
+ "facts": {
+  "대상": "0~만 9세 미만 아동. 소득 상관없이 지원 (2026년 지급 연령 8세 미만에서 9세 미만으로 확대, 2030년까지 매년 1세씩 상향)",
+  "금액": "월 10만원",
+  "지역 추가": "비수도권 및 인구감소지역 거주 아동은 월 5000원에서 최대 2만 원까지 추가 지급",
+  "신청": "보호자 또는 대리인이 아동 주소지 동주민센터 방문, 또는 복지로 웹사이트·모바일 '복지로' 앱 (온라인은 보호자가 부모인 경우만). 미신청자는 반드시 신청해야 지급",
+  "신생아": "출생일 포함 60일 이내 신청하면 출생월부터 소급 지급",
+  "중단": "아동이 90일 이상 해외에 체류하면 지급 중단"
+ },
+ "evidence": [
+  {
+   "url": "https://www.bokjiro.go.kr/ssis-tbu/cms/pc/news/news/1309692_1114.html",
+   "quote": "개정에 따라 지급 연령은 2026년 9세 미만으로 확대되며, 이후 2030년까지 매년 1세씩 단계적으로 상향된다.",
+   "snapshot": "radar/evidence/child-allowance-2026/1.txt"
+  },
+  {
+   "url": "https://www.bokjiro.go.kr/ssis-tbu/cms/pc/news/news/1309692_1114.html",
+   "quote": "아동수당의 지급 연령이 기존 8세 미만에서 9세 미만으로 확대되고,",
+   "snapshot": "radar/evidence/child-allowance-2026/1.txt"
+  },
+  {
+   "url": "https://www.bokjiro.go.kr/ssis-tbu/cms/pc/news/news/1309692_1114.html",
+   "quote": "또한 비수도권 및 인구감소지역에 거주하는 아동에게는 월 5000원에서 최대 2만 원까지 추가 지급된다.",
+   "snapshot": "radar/evidence/child-allowance-2026/1.txt"
+  },
+  {
+   "url": "https://geumcheon.go.kr/portal/contents.do?key=748",
+   "quote": "0 ~ 만9세 미만 아동들의 보육을 위해 소득 상관없이 월10만원을 지원하는 제도입니다.",
+   "snapshot": "radar/evidence/child-allowance-2026/2.txt"
+  },
+  {
+   "url": "https://geumcheon.go.kr/portal/contents.do?key=748",
+   "quote": "아동수당 미신청자는 반드시 신청해야 지급하며, 신생아의 경우 출생일 포함 60일 이내 신청하는 경우 출생월부터 소급하여 지급됩니다.",
+   "snapshot": "radar/evidence/child-allowance-2026/2.txt"
+  },
+  {
+   "url": "https://geumcheon.go.kr/portal/contents.do?key=748",
+   "quote": "※ 아동이 90일 이상 해외에 체류하는 경우 지급 중단",
+   "snapshot": "radar/evidence/child-allowance-2026/2.txt"
+  },
+  {
+   "url": "https://geumcheon.go.kr/portal/contents.do?key=748",
+   "quote": "복지로 웹사이트 또는 모바일 ‘복지로’ 앱 접속 신청\n※보호자가 부모인 경우에만 신청 가능",
+   "snapshot": "radar/evidence/child-allowance-2026/2.txt"
+  }
+ ],
+ "source": "보건복지부·복지로 (2026.04.24)",
+ "source_urls": [
+  "https://www.bokjiro.go.kr/ssis-tbu/cms/pc/news/news/1309692_1114.html",
+  "https://geumcheon.go.kr/portal/contents.do?key=748"
+ ],
+ "verified": {
+  "at": "2026-11-25",
+  "official_page_opened": true,
+  "notes": "복지로 복지뉴스(정책브리핑, 2026-04-24, 보건복지부 발표) 원문 확인: 2026년 지급 연령 8세 미만 → 9세 미만 확대, 2030년까지 매년 1세씩 상향, 비수도권·인구감소지역 월 5000원~최대 2만 원 추가. 금천구청 아동수당 안내(최종수정 2026.06.24): 0~만9세 미만·소득 상관없이 월10만원, 동주민센터 방문 또는 복지로 웹·앱(보호자가 부모일 때만), 미신청자는 신청해야 지급, 신생아는 출생일 포함 60일 이내 신청 시 출생월부터 소급, 90일 이상 해외 체류 시 중단. 지역사랑상품권 1만원 추가는 지자체 조례 절차가 필요해 뺌. 2027년 10세 미만 확대는 예산 확정 전이라 뺌. 지급일은 이 원문에 없어 뺌."
+ },
+ "tags": [
+  "아동수당",
+  "육아지원금",
+  "복지로",
+  "보건복지부",
+  "지원금"
+ ],
+ "title": "9세 미만 아이 월 10만원, 소득 상관없이 나와요",
+ "title_pattern": "surprise",
+ "title_candidates": [
+  {
+   "pattern": "loss",
+   "title": "9세 미만 아이 월 10만원, 신청 안 하면 못 받아요"
+  },
+  {
+   "pattern": "surprise",
+   "title": "9세 미만 아이 월 10만원, 소득 상관없이 나와요"
+  },
+  {
+   "pattern": "question",
+   "title": "아기 낳으셨어요? 60일 안에 신청해야 월 10만원 소급돼요"
+  },
+  {
+   "pattern": "countdown",
+   "title": "출생 후 60일, 아동수당 월 10만원 출생월부터 받는 기한"
+  },
+  {
+   "pattern": "check",
+   "title": "만 9세 미만이면 나와요, 아동수당 월 10만원"
+  }
+ ],
+ "hook_line": "9세 미만 아이 키우세요?",
+ "pill": "보건복지부 · 아동수당",
+ "intro_s": 1.2,
+ "thumb_sub": "0~만 9세 미만 · 상시 신청"
+}
