@@ -34,13 +34,15 @@
   추천 119,000원 (3편 + 게시글 문구 + 정사각형) / 월 정기 199,000원 (주 2편, 8편).
   The first quote (설영진, 노인 욕실의자, 2026-11-24) went out at 29,000원 and is honoured if accepted.
 - Quote rules (updated 2026-11-24 16:31, owner: "판단기준을 만들고 니가 알아서 견적서 넣어줘, 하루 최대 5건"):
-  - Daily cap: 5 quotes total = 숨고 스마트견적 (auto, max 3/day, 24,000캐시/day, resets 09:00) + Claude manual (max 2/day).
+  - Daily cap (owner chose option 2, 2026-11-25 18:12): 3 quotes total = 스마트견적 1/day (9,000캐시 budget, resets 09:00)
+    + Claude manual max 2/day. Review conversion on 2026-12-09 (break-even: 1 order of 119,000 per ~17 quotes).
+  - Manual picks: fresh (< 30 min), ≤ 3 quotes so far, photo-based store/service promo; prefer 119,000 package.
   - 스마트견적 (registered 2026-11-24): 영상 광고, 유튜브+SNS, 영상 제작 필요=네, 기간 1회성/1·3·6개월/상담 후 결정, 전국,
     "49,000원부터" + generic text (3 packages, free preview, no on-site filming).
   - SEND when ALL: (a) result can be made from photos/screenshots as a 15-60 s vertical video (가게·제품·서비스 홍보,
     SNS/릴스/쇼츠, 광고 영상); (b) < 5 quotes so far (지정요청 to us: any count); (c) no stated budget under 50,000원;
     (d) no on-site filming, interviews, long-form (> 60 s) editing, motion-graphics/3D/animation work, or event coverage;
-    (e) today's manual count < 2. Price: 49,000 if 1편 wanted, 119,000 if several/unclear, 199,000/월 if ongoing ≥ 1 month.
+    (e) today's manual count < 2 and today's total < 3. Price: 49,000 if 1편 wanted, 119,000 if several/unclear, 199,000/월 if ongoing ≥ 1 month.
     Tailor the first 2 lines to the request; always offer the free first-scene preview.
   - SKIP: 촬영 필요 (현장/출장/360), 모션그래픽·애니메이션, 롱폼 편집, 5+ quotes, app UI demo series that need screen recording,
     vague SNS-account management with no video.
