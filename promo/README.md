@@ -46,8 +46,9 @@
   추천 119,000원 (3편 + 게시글 문구 + 정사각형) / 월 정기 199,000원 (주 2편, 8편).
   The first quote (설영진, 노인 욕실의자, 2026-11-24) went out at 29,000원 and is honoured if accepted.
 - Quote rules (updated 2026-11-24 16:31, owner: "판단기준을 만들고 니가 알아서 견적서 넣어줘, 하루 최대 5건"):
-  - Daily cap (owner chose option 2, 2026-11-25 18:12): 3 quotes total = 스마트견적 1/day (9,000캐시 budget, resets 09:00)
-    + Claude manual max 2/day. Review conversion on 2026-12-09 (break-even: 1 order of 119,000 per ~17 quotes).
+  - Daily cap (owner 2026-11-26 20:22, "3건으로 유지"): 스마트견적 3/day (24,000캐시 budget, resets 09:00) runs on its own.
+    The owner no longer needs to say "숨고". If he does, Claude may add up to 2 hand-picked quotes; over that only with his "보내줘".
+    Review conversion on 2026-12-09. Unread-48h quotes are refunded by 숨고 as bonus cash.
   - Manual picks: fresh (< 30 min), ≤ 3 quotes so far, photo-based store/service promo; prefer 119,000 package.
   - 스마트견적 (registered 2026-11-24): 영상 광고, 유튜브+SNS, 영상 제작 필요=네, 기간 1회성/1·3·6개월/상담 후 결정, 전국,
     "49,000원부터" + generic text (3 packages, free preview, no on-site filming).
