@@ -58,9 +58,18 @@
     Tailor the first 2 lines to the request; always offer the free first-scene preview.
   - SKIP: 촬영 필요 (현장/출장/360), 행사(돌잔치·사내 행사) 영상, 모션그래픽·애니메이션, 롱폼 편집, 5+ quotes, blog/체험단/keyword ads/follower or cafe-comment work, ad-setup lessons, app UI demo series that need screen recording,
     vague SNS-account management with no video.
+  - FIRST-3 OFFER (owner 2026-11-26 16:23): "첫 고객 3명 한정 영상 1편 + 썸네일 29,000원" until 3 real orders exist.
+    Used so far: 0/3 (update this line when an order uses it). Quote amount field = 29,000 while the offer runs; list the
+    regular packages below it. When 3 are used: remove this line, amounts back to 49,000/119,000/199,000.
+  - ATTACH to every quote (파일 첨부): samples_3.jpg + cafe_03.jpg + cathotel_06.jpg + bike_03.jpg from
+    https://raw.githubusercontent.com/hangeulvillage/hangeulvillage-shorts/main/promo/listing/stills/ (fetch -> DataTransfer -> input[type=file]).
+  - Priority: "영상 광고" requests first. "SNS/바이럴 마케팅" only when the request clearly mentions video/릴스/쇼츠/콘텐츠 제작
+    or is a store/service that obviously needs promo videos; skip pure account-management/blog/ads requests.
+  - FIRST LINE must carry the hook (the card preview shows only the start):
+    "사진 1장만 보내 주시면 첫 장면을 무료로 만들어 보여 드려요. 첫 고객 3명은 영상 1편 29,000원!"
   - Quote text template (fill the brackets per 업종; add "아이 얼굴 사진은 보호자 동의가 있는 것만" for kids' businesses,
     "직접 찍었거나 사용 권한이 있는 사진만" when photos may belong to others, "상담은 숨고 채팅으로 바로 답변" if they chose 전화 상담):
-    안녕하세요, 가게쇼츠공방입니다. (업종) SNS 홍보를 준비 중이시군요! / (사진 종류) 사진 3~8장과 강점 3가지(예시 3개)만 보내 주시면,
+    (FIRST LINE above) / 안녕하세요, 가게쇼츠공방입니다. (업종) 홍보를 준비 중이시군요! / (사진 종류) 사진 3~8장과 강점 3가지(예시 3개)만 보내 주시면,
     3시간 안에 인스타 릴스·유튜브 쇼츠·당근 광고에 바로 올릴 광고 같은 세로 영상(15~25초)을 만들어 드려요. 촬영 없이 사진으로 만들고,
     큰 자막·AI 성우·배경음악이 들어가요. / [추천] 119,000원 - 구성이 다른 영상 3편(주제 3개) + 게시글 문구·해시태그 + 정사각형 버전 /
     [먼저 보시려면] 49,000원 - 영상 1편 + 썸네일 / [꾸준히 올리시려면] 월 199,000원 - 매주 2편, 한 달 8편 /
