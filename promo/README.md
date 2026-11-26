@@ -24,6 +24,13 @@
    - PREMIUM: 4편 + caption.txt + `--square`로 만든 video_square.mp4(1080x1080 피드용)
    여러 편은 강점 순서와 한 줄 소개를 바꾼 브리프로 만든다. 같은 문구를 반복하지 않는다.
 6. 수정 요청은 브리프만 고쳐서 다시 렌더한다.
+7. 납품 전 스스로 점검 (2026-11-26, 사장님 확인 전에 세 번 본다):
+   - qa.png·thumb.jpg·영상 중간 프레임을 직접 열어 글자가 얼굴·상품·간판을 가리지 않는지
+   - 화면과 음성에 고객이 준 사실만 있는지(가격·혜택·주소를 고객 답변과 한 줄씩 대조, 지어낸 것 0)
+   - 패키지 납품물이 빠짐없는지(편 수, caption.txt, 정사각형, 썸네일)
+   하나라도 걸리면 고쳐서 다시 렌더한 뒤 사장님께 보낸다. 사장님 확인 전에는 고객에게 보내지 않는다.
+8. 무료 첫 장면 미리보기(결제 전): 렌더 후 `ffmpeg -y -i OUT/video.mp4 -t 5 -c:v libx264 -preset veryfast -crf 23 -c:a aac OUT/preview.mp4`,
+   preview.mp4 + thumb.jpg를 사장님께 먼저 보여 드리고, 사장님이 고객에게 보낸다.
 
 ## 숨고 (2026-11-24, owner approved)
 - Profile: 가게쇼츠공방, 영상 광고 (+ SNS/콘텐츠 마케팅, 썸네일), 활동 지역 인천 남동구, 범위 전국.
@@ -44,8 +51,18 @@
     (d) no on-site filming, interviews, long-form (> 60 s) editing, motion-graphics/3D/animation work, or event coverage;
     (e) today's manual count < 2 and today's total < 3. Price: 49,000 if 1편 wanted, 119,000 if several/unclear, 199,000/월 if ongoing ≥ 1 month.
     Tailor the first 2 lines to the request; always offer the free first-scene preview.
-  - SKIP: 촬영 필요 (현장/출장/360), 모션그래픽·애니메이션, 롱폼 편집, 5+ quotes, app UI demo series that need screen recording,
+  - SKIP: 촬영 필요 (현장/출장/360), 행사(돌잔치·사내 행사) 영상, 모션그래픽·애니메이션, 롱폼 편집, 5+ quotes, blog/체험단/keyword ads/follower or cafe-comment work, ad-setup lessons, app UI demo series that need screen recording,
     vague SNS-account management with no video.
+  - Quote text template (fill the brackets per 업종; add "아이 얼굴 사진은 보호자 동의가 있는 것만" for kids' businesses,
+    "직접 찍었거나 사용 권한이 있는 사진만" when photos may belong to others, "상담은 숨고 채팅으로 바로 답변" if they chose 전화 상담):
+    안녕하세요, 가게쇼츠공방입니다. (업종) SNS 홍보를 준비 중이시군요! / (사진 종류) 사진 3~8장과 강점 3가지(예시 3개)만 보내 주시면,
+    3시간 안에 인스타 릴스·유튜브 쇼츠·당근 광고에 바로 올릴 광고 같은 세로 영상(15~25초)을 만들어 드려요. 촬영 없이 사진으로 만들고,
+    큰 자막·AI 성우·배경음악이 들어가요. / [추천] 119,000원 - 구성이 다른 영상 3편(주제 3개) + 게시글 문구·해시태그 + 정사각형 버전 /
+    [먼저 보시려면] 49,000원 - 영상 1편 + 썸네일 / [꾸준히 올리시려면] 월 199,000원 - 매주 2편, 한 달 8편 /
+    결제 전에 사진만 보내 주시면 첫 장면 미리보기를 무료로 보내 드려요. 마음에 드실 때 시작하시면 돼요. 프로필에서 샘플 영상도 보실 수 있어요!
+  - Form mechanics: amount input[placeholder="금액을 입력해 주세요."], text = textarea; focus → select → document.execCommand('insertText')
+    (setting .value is ignored by React). Click "N캐시로 견적 보내기"; URL changing to /pro/chats/ = sent.
+  - Over the daily cap: only for an excellent fresh request (0-2 quotes, just posted, clear fit) prefill and ask the owner "보내줘 / 패스".
   - Live chat: when the owner says "숨고", Claude checks, applies the rules, sends or skips, then reports one line each.
   - Scheduled watch tasks still only report and draft (no cash spending from a scheduled run).
   - AUTO-REPLY (owner 2026-11-25 15:42): Claude answers 숨고 customer messages itself (live chat and the hourly watch task),
