@@ -257,6 +257,7 @@ def caption(brief):
     tags.append('동네가게')
     tags = [re.sub(r'[^0-9A-Za-z가-힣]', '', t) for t in tags]
     tags = list(dict.fromkeys(t for t in tags if t))[:5]
+    if brief.get('voice', 'F1') != 'none': lines += ['', '※ 영상 속 목소리는 AI 음성입니다.']  # Supertonic OpenRAIL-M Att.A(e): disclose machine-generated content
     return '\n'.join(lines) + '\n\n' + ' '.join('#' + t for t in tags) + '\n'
 
 
