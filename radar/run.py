@@ -91,7 +91,7 @@ def cmd_blog(a, extra):
     results = {}
     for name, flags in (('tistory', []), ('naver', ['--naver'])):
         d = os.path.join(a.out, name)
-        r = subprocess.run([sys.executable, os.path.join(HERE, 'blog.py'), a.card, d, '--yt', a.yt] + flags,
+        r = subprocess.run([sys.executable, os.path.join(HERE, 'blog.py'), a.card, d, '--yt=' + a.yt] + flags,
                            capture_output=True, text=True)
         if r.returncode != 0:
             out({'ok': False, 'step': f'blog:{name}', 'stderr': r.stderr[-1500:]}, 1)
