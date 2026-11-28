@@ -1,0 +1,185 @@
+{
+ "id": "k-pass-youth-2026",
+ "program": "모두의카드(K-패스) 청소년 대중교통비 환급 (국토교통부)",
+ "short_name": "청소년 모두의카드",
+ "region": "전국",
+ "hook": "check",
+ "hook_note": "hooks_rotation[hook_next 23 % 3] = check",
+ "structure": "viral",
+ "style": "navy",
+ "headline": [
+  "만 13~18세 자녀 둔 집",
+  "12월부터 청소년도 환급"
+ ],
+ "headline_type": "news",
+ "audience": "13~18세 청소년",
+ "audience_sub": "모두의카드 · 12월 1일부터",
+ "audience_noun": "",
+ "amount": "교통비 20% 환급",
+ "amount_short": "20% 환급",
+ "pay_note": "버스·지하철 이용금액",
+ "deadline": null,
+ "deadline_text": "12월 1일부터 · 앱 등록",
+ "publish_date": "2026-11-29",
+ "beats": {
+  "hook": [
+   {
+    "say": "열세 살에서 열여덟 살 자녀 있으세요?",
+    "cap": "만 13~18세 자녀 있으세요?"
+   },
+   {
+    "say": "십이월부터 버스 지하철 요금 이십 퍼센트를 돌려받아요.",
+    "cap": "12월부터 교통비 20% 환급",
+    "expect": [
+     "20"
+    ]
+   }
+  ],
+  "check": [
+   {
+    "main": "만 13~18세 청소년",
+    "sub": "12월 1일부터 이용 가능",
+    "say": "만 열세 살부터 열여덟 살까지 돼요.",
+    "cap": "만 13~18세 청소년 (12월 1일부터)"
+   },
+   {
+    "main": "한 달 15번 이상 이용",
+    "sub": "대중교통 월 15회 이상",
+    "say": "한 달에 열다섯 번 이상 타야 해요.",
+    "cap": "월 15회 이상 대중교통 이용"
+   },
+   {
+    "main": "카뱅·케뱅은 18세만",
+    "sub": "선불·체크카드만 발급",
+    "bad": true,
+    "say": "카카오뱅크와 케이뱅크 카드는 열여덟 살만 돼요.",
+    "cap": "카카오뱅크·케이뱅크는 만 18세만 발급"
+   }
+  ],
+  "steps": [
+   {
+    "main": "카드사에서 카드 발급",
+    "sub": "12개 카드사 선불·체크카드",
+    "say": "카드사에서 모두의카드를 만들고,",
+    "cap": "카드사에서 모두의카드 발급 (선불·체크)"
+   },
+   {
+    "main": "앱에서 가입·카드 등록",
+    "sub": "모두의카드 앱 또는 누리집",
+    "say": "모두의카드 앱에서 가입하고 카드를 등록해요.",
+    "cap": "모두의카드 앱·누리집 가입 후 카드 등록"
+   },
+   {
+    "main": "더 큰 환급 자동 적용",
+    "sub": "정률 20%·정액형 중 큰 쪽",
+    "say": "그러면 더 큰 환급이 자동으로 적용돼요.",
+    "cap": "정률 20%·정액형 중 큰 환급 자동 적용"
+   }
+  ],
+  "cta": [
+   {
+    "say": "내 나이랑 사는 지역을 댓글로 남겨 주세요.",
+    "cap": "내 나이랑 사는 지역을 댓글로"
+   },
+   {
+    "say": "받을 수 있는 지원금, 찾아 드릴게요.",
+    "cap": "받을 수 있는 지원금 찾아드려요"
+   }
+  ]
+ },
+ "facts": {
+  "대상": "만 13세~18세 청소년 (12월 1일부터 모두의카드 이용 가능)",
+  "조건": "월 15회 이상 대중교통을 이용하면 교통비의 일부를 돌려받는 교통비 지원 제도",
+  "금액": "정률형 대중교통 이용금액의 20% 환급 또는 정액형(수도권 일반형 기준 월 6만 2000원 초과분) 환급 중 더 큰 환급 자동 적용",
+  "카드": "선불·체크카드, 12월에는 12개 카드사에서 발급 (농협·신한·우리·이즐·코레일·토스·티머니·하나·IBK기업·KB국민·카카오뱅크·케이뱅크). 카카오뱅크와 케이뱅크는 만 18세만 발급",
+  "신청": "카드사에서 모두의카드 발급 → 모두의카드 앱 또는 누리집에서 회원가입 → 발급받은 카드 등록 → 등록한 카드로 대중교통 이용",
+  "문의": "국토교통부 광역교통경제과(044-201-5022), 한국교통안전공단 데이터융복합처(054-459-7446)"
+ },
+ "evidence": [
+  {
+   "url": "https://www.korea.kr/news/policyNewsView.do?newsId=148976499",
+   "quote": "오는 12월 1일부터 만 13세~18세 청소년도 '모두의카드'를 이용해 대중교통비 환급 혜택을 받을 수 있다.",
+   "snapshot": "radar/evidence/k-pass-youth-2026/1.txt"
+  },
+  {
+   "url": "https://www.korea.kr/news/policyNewsView.do?newsId=148976499",
+   "quote": "환급 기준은 정률형 20%, 정액형 6만 2000원(수도권, 일반형 기준)이 적용될 예정이다.",
+   "snapshot": "radar/evidence/k-pass-youth-2026/1.txt"
+  },
+  {
+   "url": "https://www.korea.kr/news/policyNewsView.do?newsId=148976499",
+   "quote": "청소년이 이용할 수 있는 카드는 선불·체크 카드로 12월에는 12개 카드사에서 발급 가능하며, 카드를 발급받은 뒤 모두의카드 앱이나 누리집에서 회원가입 및 등록을 한 뒤 이용할 수 있다.",
+   "snapshot": "radar/evidence/k-pass-youth-2026/1.txt"
+  },
+  {
+   "url": "https://www.korea.kr/news/policyNewsView.do?newsId=148976499",
+   "quote": "다만 카카오뱅크와 케이뱅크는 만 18세만 발급받을 수 있다.",
+   "snapshot": "radar/evidence/k-pass-youth-2026/1.txt"
+  },
+  {
+   "url": "https://www.korea.kr/news/policyNewsView.do?newsId=148976499",
+   "quote": "문의: 국토교통부 광역교통경제과(044-201-5022), 한국교통안전공단 데이터융복합처(054-459-7446)",
+   "snapshot": "radar/evidence/k-pass-youth-2026/1.txt"
+  },
+  {
+   "url": "https://www.korea.kr/multi/visualNewsView.do?newsId=148976628",
+   "quote": "월 15회 이상 대중교통을 이용하면 교통비의 일부를 돌려받을 수 있는 교통비 지원 제도입니다.",
+   "snapshot": "radar/evidence/k-pass-youth-2026/2.txt"
+  },
+  {
+   "url": "https://www.korea.kr/multi/visualNewsView.do?newsId=148976628",
+   "quote": "※ 수도권 일반형 기준 월 6만 2000원 초과분",
+   "snapshot": "radar/evidence/k-pass-youth-2026/2.txt"
+  },
+  {
+   "url": "https://www.korea.kr/multi/visualNewsView.do?newsId=148976628",
+   "quote": "두 방식 중 더 큰 환급 혜택을 자동으로 적용해 드려요!",
+   "snapshot": "radar/evidence/k-pass-youth-2026/2.txt"
+  }
+ ],
+ "source": "정책브리핑 국토교통부 (2026.11.25)",
+ "source_urls": [
+  "https://www.korea.kr/news/policyNewsView.do?newsId=148976499",
+  "https://www.korea.kr/multi/visualNewsView.do?newsId=148976628"
+ ],
+ "verified": {
+  "at": "2026-11-28",
+  "official_page_opened": true,
+  "notes": "정책브리핑 정책뉴스(국토교통부 2026.11.25 '모두의카드 12월부터 13세~18세 청소년도 이용 가능')와 카드뉴스(2026.11.27 '이제 청소년도 교통비 환급 20%, 12월 1일부터!') 원문 확인: 12월 1일부터 만 13~18세 이용, 월 15회 이상 대중교통 이용 시 환급, 정률형 20%·정액형(수도권 일반형 월 6만 2000원 초과분) 중 큰 쪽 자동 적용, 선불·체크카드 12개 카드사(카카오뱅크·케이뱅크는 만 18세만), 앱/누리집 가입·카드 등록. 신청 마감 없음(이용 제도). 정액형 지방 기준금액·월 이용 상한은 원문에 없어 뺌. 내년 2월 신규 상품 3종은 아직 아니라 뺌."
+ },
+ "tags": [
+  "모두의카드",
+  "K패스",
+  "청소년교통비",
+  "교통비환급",
+  "지원금"
+ ],
+ "title": "13~18세 청소년 교통비 20% 환급, 12/1부터인 거 아세요?",
+ "title_pattern": "question",
+ "title_candidates": [
+  {
+   "pattern": "loss",
+   "title": "13~18세 교통비 20% 환급, 카드 등록 안 하면 못 받아요"
+  },
+  {
+   "pattern": "surprise",
+   "title": "이제 청소년도 교통비 20% 돌려받아요, 12/1부터"
+  },
+  {
+   "pattern": "question",
+   "title": "13~18세 청소년 교통비 20% 환급, 12/1부터인 거 아세요?"
+  },
+  {
+   "pattern": "countdown",
+   "title": "12/1부터 시작, 13~18세 교통비 20% 환급 모두의카드"
+  },
+  {
+   "pattern": "check",
+   "title": "한 달 15번 이상 타는 13~18세면 교통비 20% 환급"
+  }
+ ],
+ "hook_line": "13~18세 자녀 있으세요?",
+ "pill": "국토교통부 · 모두의카드",
+ "intro_s": 1.2,
+ "thumb_sub": "모두의카드 · 12월 1일부터"
+}
